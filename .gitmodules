@@ -9,6 +9,3 @@
 [submodule "cactus-blockchain"]
 	path = cactus-blockchain
 	url = https://github.com/Cactus-Network/cactus-blockchain
-[submodule "cactus-blockchain/mozilla-ca"]
-	path = cactus-blockchain/mozilla-ca
-	url = https://github.com/Chia-Network/mozilla-ca
