@@ -1,0 +1,11 @@
+[submodule "cactus-blockchain-gui"]
+	path = cactus-blockchain-gui
+	url = https://github.com/Cactus-Network/cactus-blockchain-gui.git
+	branch = pools
+[submodule "mozilla-ca"]
+	path = mozilla-ca
+	url = https://github.com/Chia-Network/mozilla-ca
+        branch = main
+[submodule "cactus-blockchain"]
+	path = cactus-blockchain
+	url = https://github.com/Cactus-Network/cactus-blockchain

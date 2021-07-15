@@ -1,0 +1,8 @@
+    - name: Checkout test blocks and plots
+      uses: actions/checkout@v2
+      with:
+        repository: 'Cactus-Network/test-cache'
+        path: '.cactus'
+        ref: '0.27.0'
+        fetch-depth: 1
+
