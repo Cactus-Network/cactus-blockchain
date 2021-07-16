@@ -184,7 +184,7 @@ class FullNode:
             self.log.info("Default port field not found in config.")
             default_port = None
         if "dns_servers" in self.config:
-            dns_servers = self.config["dns_servers"]
+            dns_servers = self.config["dns-introducer.cactus-network.net"]
         elif self.config["port"] == 8444:
             # If `dns_servers` misses from the `config`, hardcode it if we're running mainnet.
             dns_servers.append("dns-introducer.cactus.net")
