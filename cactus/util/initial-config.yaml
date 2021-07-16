@@ -112,7 +112,7 @@ farmer:
   pool_public_keys: []
 
   # Replace this with a real puzzle hash
-  cac_target_address: 0xc09858f3aa29e6c4d5502809a4e5692d7c816deca727a5a2d37a360ee44f746d
+  # cac_target_address: 0xc09858f3aa29e6c4d5502809a4e5692d7c816deca727a5a2d37a360ee44f746d
 
   # If True, starts an RPC server at the following port
   start_rpc_server: True
