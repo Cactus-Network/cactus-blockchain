@@ -7,7 +7,7 @@ from cactus.util.ints import uint32
 # EIP 2334 bls key derivation
 # https://eips.ethereum.org/EIPS/eip-2334
 # 12381 = bls spec number
-# 8444 = Cactus blockchain number and port number
+# 11444 = Cactus blockchain number and port number
 # 0, 1, 2, 3, 4, 5, 6 farmer, pool, wallet, local, backup key, singleton, pooling authentication key numbers
 
 
@@ -18,30 +18,30 @@ def _derive_path(sk: PrivateKey, path: List[int]) -> PrivateKey:
 
 
 def master_sk_to_farmer_sk(master: PrivateKey) -> PrivateKey:
-    return _derive_path(master, [12381, 8444, 0, 0])
+    return _derive_path(master, [12381, 11444, 0, 0])
 
 
 def master_sk_to_pool_sk(master: PrivateKey) -> PrivateKey:
-    return _derive_path(master, [12381, 8444, 1, 0])
+    return _derive_path(master, [12381, 11444, 1, 0])
 
 
 def master_sk_to_wallet_sk(master: PrivateKey, index: uint32) -> PrivateKey:
-    return _derive_path(master, [12381, 8444, 2, index])
+    return _derive_path(master, [12381, 11444, 2, index])
 
 
 def master_sk_to_local_sk(master: PrivateKey) -> PrivateKey:
-    return _derive_path(master, [12381, 8444, 3, 0])
+    return _derive_path(master, [12381, 11444, 3, 0])
 
 
 def master_sk_to_backup_sk(master: PrivateKey) -> PrivateKey:
-    return _derive_path(master, [12381, 8444, 4, 0])
+    return _derive_path(master, [12381, 11444, 4, 0])
 
 
 def master_sk_to_singleton_owner_sk(master: PrivateKey, wallet_id: uint32) -> PrivateKey:
     """
     This key controls a singleton on the blockchain, allowing for dynamic pooling (changing pools)
     """
-    return _derive_path(master, [12381, 8444, 5, wallet_id])
+    return _derive_path(master, [12381, 11444, 5, wallet_id])
 
 
 def master_sk_to_pooling_authentication_sk(master: PrivateKey, wallet_id: uint32, index: uint32) -> PrivateKey:
@@ -50,7 +50,7 @@ def master_sk_to_pooling_authentication_sk(master: PrivateKey, wallet_id: uint32
     """
     assert index < 10000
     assert wallet_id < 10000
-    return _derive_path(master, [12381, 8444, 6, wallet_id * 10000 + index])
+    return _derive_path(master, [12381, 11444, 6, wallet_id * 10000 + index])
 
 
 async def find_owner_sk(all_sks: List[PrivateKey], owner_pk: G1Element) -> Optional[G1Element]:

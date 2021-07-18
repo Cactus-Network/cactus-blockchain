@@ -377,7 +377,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 ### Changed
 
 - Weight proof request timeout was increased to 180 seconds.
-- Mainnet uses port 8444 and other constants and service names were changed for mainnet.
+- Mainnet uses port 11444 and other constants and service names were changed for mainnet.
 - GUI locales are now extracted and compiled in `npm run build`.
 - Daemon now logs to STDERR also.
 
@@ -692,7 +692,7 @@ all fields that referred to sub blocks are changed to blocks.
 ### Changed
 
 - Significant improvements have been made to how the full node handles the mempool. This generally cuts CPU usage of node by 2x or more. Part of this increase is that we have temporarily limited the size of transactions. If you want to test sending a transaction you should keep the value of your transaction below 20 TXCH as new consensus will cause you to use a lot of inputs. This will be returned to the expected level as soon as the integration of [clvm rust](https://github.com/Cactus-Network/clvm_rs) is complete.
-- We have changed the way TLS between nodes and between cactus services work. Each node now has two certificate authorities. One is a public, shared CA that signs the TLS certificates that every node uses to connect to other nodes on 8444 or 58444. You now also have a self generated private CA that must sign e.g. farmer and harvester's certificates. To run a remote harvester you need a new harvester key that is then signed by your private CA. We know this is not easy for remote harvester in this release but will address it quickly.
+- We have changed the way TLS between nodes and between cactus services work. Each node now has two certificate authorities. One is a public, shared CA that signs the TLS certificates that every node uses to connect to other nodes on 11444 or 511444. You now also have a self generated private CA that must sign e.g. farmer and harvester's certificates. To run a remote harvester you need a new harvester key that is then signed by your private CA. We know this is not easy for remote harvester in this release but will address it quickly.
 - We have changed the way we compile the proof of space plotter and added one additional optimization. On many modern processors this will mean that using the plotter with the `-e` flag will be 2-3% faster than the Beta 17 plotter on the same CPU. We have found this to be very sensitive to different CPUs but are now confident that, at worst, the Beta 24 plotter with `-e` will be the same speed as Beta 17 if not slightly faster on the same hardware. Huge thanks to @xorinox for meticulously tracking down and testing this.
 - If a peer is not responsive during sync, node will disconnect it.
 - Peers that have not sent data in the last hour are now disconnected.
@@ -852,7 +852,7 @@ all fields that referred to sub blocks are changed to blocks.
 - The plotter supports the new bitfield back propagation method and the old method from Beta 17. To choose the old method add a `-e` to the command line or choose "Disable bitfield plotting" in "Show Advanced Options" of the Plots tab. Bitfield back propagation writes about 13% less total writes and can be faster on some slower hard drive temp spaces. For now, SSD temp space will likely plot faster with bitfield back propagation disabled. We will be returning to speed enhancements to the plotter as we approach and pass our mainnet launch.
 - The Farm tab in the GUI is significantly enhanced. Here you have a dashboard overview of your farm and your activity in response to challenges blockchain challnegs, how long it will take you - on average - to win a block, and how much TXCH you've won so far. Harvester and Full Node connections have moved to Advanced Options.
 - Harvester and farmer will start when the GUI starts instead of waiting for key selection if there are already keys available. This means you will start farming on reboot if you have the Cactus application set to launch on start.
-- Testnet is now running at the primary port of 58444. Update your routers appropriately. This opens 8444 for mainnet.
+- Testnet is now running at the primary port of 511444. Update your routers appropriately. This opens 11444 for mainnet.
 - All networking code has been refactored and mostly moved to websockets.
 - RPCs and daemon now communicate over TLS with certificates that are generated into `~/.cactus/VERSION/config/`
 - We have moved to taproot across all of our transactions and smart transactions.
@@ -1200,7 +1200,7 @@ farmer and full node protocols.
 - Use real plot sizes in UI instead of a formula/
 - HD keys now use EIP 2333 format instead of BIP32, for compatibility with
 other chains.
-- Keys are now derived with the EIP 2334 (m/12381/8444/a/b).
+- Keys are now derived with the EIP 2334 (m/12381/11444/a/b).
 - Removed the ability to pass in sk_seed to plotting, to increase security.
 - Linux builds of chiavdf and blspy now use a fresh build of gmp 6.2.1.
 
@@ -1583,7 +1583,7 @@ relic. We will make a patch available for these systems shortly.
 
 ### Added
 
-- Introducer now makes sure it only sends peer addresses to peers of peers that it can reach on port 8444 or their UPnP port.
+- Introducer now makes sure it only sends peer addresses to peers of peers that it can reach on port 11444 or their UPnP port.
 - We are now using setuptools_scm for versioning.
 
 ### Changed
