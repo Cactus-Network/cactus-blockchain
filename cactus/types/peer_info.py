@@ -14,7 +14,7 @@ class PeerInfo(Streamable):
 
     def is_valid(self, allow_private_subnets=False) -> bool:
         ip: Optional[Union[ipaddress.IPv6Address, ipaddress.IPv4Address]] = None
-        if self.port != 11444:
+        if self.port not in [11444,11446,11447,11448]:
             return False
         try:
             ip = ipaddress.IPv6Address(self.host)
