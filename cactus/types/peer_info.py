@@ -14,6 +14,9 @@ class PeerInfo(Streamable):
 
     def is_valid(self, allow_private_subnets=False) -> bool:
         ip: Optional[Union[ipaddress.IPv6Address, ipaddress.IPv4Address]] = None
+        #Workaround until new SSL certificates are generated. Remove once new certs are generated
+        if self.port not in range(11444,1449):
+            return False
         try:
             ip = ipaddress.IPv6Address(self.host)
         except ValueError:
