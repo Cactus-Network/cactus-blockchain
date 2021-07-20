@@ -400,7 +400,7 @@ if (!handleSquirrelEvent()) {
           {
             label: i18n._(/* i18n */ { id: 'Chat on KeyBase' }),
             click: () => {
-              openExternal('https://keybase.io/team/cactus_network.public');
+              openExternal('https://keybase.io/team/cactus-network.network.public');
             },
           },
           {

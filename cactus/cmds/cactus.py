@@ -35,7 +35,7 @@ def monkey_patch_click() -> None:
 
 @click.group(
     help=f"\n  Manage cactus blockchain infrastructure ({__version__})\n",
-    epilog="Try 'cactus start node', 'cactus netspace -d 192', or 'cactus show -s'",
+    epilog="Try 'cactus start node', 'cactus-network.netspace -d 192', or 'cactus show -s'",
     context_settings=CONTEXT_SETTINGS,
 )
 @click.option("--root-path", default=DEFAULT_ROOT_PATH, help="Config file root", type=click.Path(), show_default=True)

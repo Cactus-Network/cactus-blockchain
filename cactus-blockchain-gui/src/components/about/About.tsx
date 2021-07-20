@@ -70,7 +70,7 @@ const Spacer = styled.div`
   margin-bottom: 1rem;
 `;
 
-const url = 'https://cactus.net';
+const url = 'https://cactus-network.net';
 
 type Props = {
   version: string;

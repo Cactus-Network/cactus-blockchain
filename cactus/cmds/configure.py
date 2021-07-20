@@ -86,7 +86,7 @@ def configure(
         if testnet == "true" or testnet == "t":
             print("Setting Testnet")
             testnet_port = "58444"
-            testnet_introducer = "beta1_introducer.cactus.net"
+            testnet_introducer = "beta1_introducer.cactus-network.net"
             testnet = "testnet7"
             config["full_node"]["port"] = int(testnet_port)
             config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
@@ -110,8 +110,8 @@ def configure(
 
         elif testnet == "false" or testnet == "f":
             print("Setting Mainnet")
-            mainnet_port = "8444"
-            mainnet_introducer = "introducer.cactus.net"
+            mainnet_port = "11444"
+            mainnet_introducer = "introducer.cactus-network.net"
             net = "mainnet"
             config["full_node"]["port"] = int(mainnet_port)
             config["full_node"]["introducer_peer"]["port"] = int(mainnet_port)

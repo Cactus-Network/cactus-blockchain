@@ -1,5 +1,5 @@
 # cactus-blockchain
-![Alt text](https://www.cactus.net/img/cactus_logo.svg)
+![Alt text](https://www.cactus-network.network.net/img/cactus_logo.svg)
 
 ![GitHub contributors](https://img.shields.io/github/contributors/Cactus-Network/cactus-blockchain?logo=GitHub)
 
