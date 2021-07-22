@@ -22,3 +22,4 @@ Once installed, a
 [Quick Start Guide](https://github.com/Cactus-Network/cactus-blockchain/wiki/Quick-Start-Guide)
 is available from the repository
 [wiki](https://github.com/Cactus-Network/cactus-blockchain/wiki).
+# cactus-blockchain-gui
