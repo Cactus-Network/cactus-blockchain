@@ -18,7 +18,7 @@ function getInstallerConfig () {
     authors: 'Cactus Network',
     version: process.env.CACTUS_INSTALLER_VERSION,
     noMsi: true,
-    iconUrl: 'https://raw.githubusercontent.com/Cactus-Network/cactus-blockchain/master/electron-react/src/assets/img/cactus.ico',
+    iconUrl: 'https://raw.githubusercontent.com/Cactus-Network/cactus-blockchain/main/cactus-blockchain-gui/src/assets/img/cactus.ico',
     outputDirectory: path.join(outPath, 'windows-installer'),
     certificateFile: 'win_code_sign_cert.p12',
     certificatePassword: process.env.WIN_CODE_SIGN_PASS,
