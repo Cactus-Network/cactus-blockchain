@@ -3,6 +3,7 @@
 **Cactus** is a modern community-centric green cryptocurrency based on a proof-of-space-and-time consensus algorithm. It is a community-supported fork of the [Chia Network](https://github.com/Chia-Network/chia-blockchain) codebase.
 
 For more information, see our website and downloads at www.Cactus-Network.net. 
+<p>You can learn more in the Cactus Wiki: <a href="https://github.com/Cactus-Network/cactus-blockchain/wiki/Cactus-Blockchain-Wiki">Quick Start Guide</a></p>
 <p>Please check out the Cactus Discord Channel: (https://discord.gg/qfHBqZnXTj).</p>
 
 <p>Full Node List Here:<a href="https://www.cactus-network.net/cactus-full-nodes/" rel="nofollow"> Full Node IP's</a></p>
