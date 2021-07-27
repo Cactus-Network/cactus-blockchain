@@ -48,8 +48,8 @@ keyring_imports = collect_submodules("keyring.backends")
 # keyring uses entrypoints to read keyring.backends from metadata file entry_points.txt.
 keyring_datas = copy_metadata("keyring")[0]
 
-#version_data = copy_metadata(get_distribution("cactus-blockchain"))[0]
-version_data = 1.2.0
+version_data = copy_metadata(get_distribution("cactus-blockchain"))[0]
+#version_data = 1.2.0
 
 block_cipher = None
 

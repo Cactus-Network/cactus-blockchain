@@ -1,4 +1,5 @@
 # $env:path should contain a path to editbin.exe and signtool.exe
+# Set-ExecutionPolicy RemoteSigned
 
 $ErrorActionPreference = "Stop"
 
@@ -36,7 +37,7 @@ pip install setuptools_scm
 Write-Output "   ---"
 Write-Output "Get CACTUS_INSTALLER_VERSION"
 # The environment variable CACTUS_INSTALLER_VERSION needs to be defined
-$env:CACTUS_INSTALLER_VERSION = "1.2.0" #python "C:\Users\Wesley\cactus-blockchain\build_scripts\installer-version.py" -win
+$env:CACTUS_INSTALLER_VERSION = "1.2.1" #python "C:\Users\Wesley\cactus-blockchain\build_scripts\installer-version.py" -win
 
 if (-not (Test-Path env:CACTUS_INSTALLER_VERSION)) {
   $env:CACTUS_INSTALLER_VERSION = '0.0.0'
@@ -49,8 +50,8 @@ Write-Output "   ---"
 Write-Output "Build cactus-blockchain wheels"
 Write-Output "   ---"
 
-Set-Location -Path "..\..\cactus-blockchain" -PassThru
-
+#Script needs to be here ..\..\cactus-blockchain for pip wheel call because setup.py is at root
+Set-Location -Path "C:\Users\Wesley\cactus-blockchain" -PassThru
 pip wheel --use-pep517 --extra-index-url https://pypi.chia.net/simple/ -f . --wheel-dir=.\build_scripts\win_build .
 
 Write-Output "   ---"
