@@ -811,7 +811,7 @@ msgid "Fee"
 msgstr "Gebyr"
 
 #: src/components/wallet/coloured/WalletColoured.tsx:420
-#~ msgid "Fee (TXCH)"
+#~ msgid "Fee (TCAC)"
 #~ msgstr ""
 
 #: src/components/wallet/coloured/WalletColoured.tsx:420
@@ -1015,16 +1015,16 @@ msgid "Join a Pool"
 msgstr "Tilslut til en Pulje"
 
 #: src/components/plot/add/PlotAddNFT.tsx:44
-msgid "Join a pool and get consistent XCH farming rewards. The average returns are the same, but it is much less volatile."
-msgstr "Tilslut en pulje og få stabil XCH farm belønninger. Gennemsnitsudbyttet er det samme, med en del mindrer udsving."
+msgid "Join a pool and get consistent CAC farming rewards. The average returns are the same, but it is much less volatile."
+msgstr "Tilslut en pulje og få stabil CAC farm belønninger. Gennemsnitsudbyttet er det samme, med en del mindrer udsving."
 
 #: src/components/plotNFT/PlotNFTAdd.tsx:59
-msgid "Join a pool and get consistent XCH farming rewards. The average returns are the same, but it is much less volatile. Assign plots to a plot NFT. You can easily switch pools without having to re-plot."
-msgstr "Tilslut en pulje og få stabil XCH farm belønninger. Gennemsnitsudbyttet er det samme, med en del mindrer udsving. Tildel dine plots til en plot NFT. Du kan nemt skifte imellem puljer uden at skulle re-plotte."
+msgid "Join a pool and get consistent CAC farming rewards. The average returns are the same, but it is much less volatile. Assign plots to a plot NFT. You can easily switch pools without having to re-plot."
+msgstr "Tilslut en pulje og få stabil CAC farm belønninger. Gennemsnitsudbyttet er det samme, med en del mindrer udsving. Tildel dine plots til en plot NFT. Du kan nemt skifte imellem puljer uden at skulle re-plotte."
 
 #: src/components/plot/add/PlotAddNFT.tsx:133
-msgid "Join a pool and get more consistent XCH farming rewards. Create a plot NFT and assign your new plots to a group."
-msgstr "Tilslut en pulje og få stabil XCH farm belønninger. Opret en plot NFT og tildel dine nye plot filer til en gruppe."
+msgid "Join a pool and get more consistent CAC farming rewards. Create a plot NFT and assign your new plots to a group."
+msgstr "Tilslut en pulje og få stabil CAC farm belønninger. Opret en plot NFT og tildel dine nye plot filer til en gruppe."
 
 #: src/components/plot/overview/PlotOverviewPlots.tsx:63
 msgid "K-Size"
@@ -1257,8 +1257,8 @@ msgid "Not found Plots"
 msgstr "Ikke fundet Plotfiler"
 
 #: src/components/farm/FarmManageFarmingRewards.tsx:184
-msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25XCH reward for pooling plots."
-msgstr "Bemærk, at dette ikke ændrer din pulje udbetalingsadresser. Dette påvirker kun gamle plot filer af gammelt format, og 0,25XCH belønning for pulje plots."
+msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25CAC reward for pooling plots."
+msgstr "Bemærk, at dette ikke ændrer din pulje udbetalingsadresser. Dette påvirker kun gamle plot filer af gammelt format, og 0,25CAC belønning for pulje plots."
 
 #: src/components/plotNFT/PlotExternalNFTCard.tsx:120
 #: src/components/plotNFT/PlotNFTCard.tsx:159
@@ -1825,8 +1825,8 @@ msgid "Self Pooling"
 msgstr "Selv Pulje"
 
 #: src/components/plotNFT/select/PlotNFTSelectBase.tsx:105
-msgid "Self pool. When you win a block you will earn XCH rewards."
-msgstr "Selvpulje. Når du vinder en blok, vil du tjene XCH belønning."
+msgid "Self pool. When you win a block you will earn CAC rewards."
+msgstr "Selvpulje. Når du vinder en blok, vil du tjene CAC belønning."
 
 #: src/components/trading/CreateOffer.jsx:164
 #: src/components/trading/TradesTable.tsx:47
@@ -1878,8 +1878,8 @@ msgid "Skips adding a final directory to harvester for farming"
 msgstr "Skipper tilføjelse af endelig mappe til harvesteren for farmning"
 
 #: src/components/pool/PoolHero.tsx:26
-msgid "Smooth out your XCH farming rewards by joining a pool."
-msgstr "Glat dine XCH belønninger ud ved at deltage i en pulje."
+msgid "Smooth out your CAC farming rewards by joining a pool."
+msgstr "Glat dine CAC belønninger ud ved at deltage i en pulje."
 
 #: src/components/plotNFT/PlotNFTGetPoolLoginLinkDialog.tsx:60
 msgid "Something went wrong"
@@ -1991,23 +1991,23 @@ msgstr "Synkroniserer <0/>/<1/>"
 #~ msgstr "Syncing {progress}/{tip}"
 
 #: src/components/farm/card/FarmCardBlockRewards.tsx:15
-#~ msgid "TXCH Block Rewards"
+#~ msgid "TCAC Block Rewards"
 #~ msgstr ""
 
 #: src/components/farm/card/FarmCardCoinbaseRewards.tsx:12
-#~ msgid "TXCH Farming Rewards"
+#~ msgid "TCAC Farming Rewards"
 #~ msgstr ""
 
 #: src/components/farm/card/FarmCardFeesReward.tsx:12
-#~ msgid "TXCH Fees Collected"
+#~ msgid "TCAC Fees Collected"
 #~ msgstr ""
 
 #: src/components/farm/card/FarmCardUserFees.tsx:12
-#~ msgid "TXCH User Fees"
-#~ msgstr "TXCH User Fees"
+#~ msgid "TCAC User Fees"
+#~ msgstr "TCAC User Fees"
 
 #: src/components/farm/card/FarmCardUserFees.tsx:15
-#~ msgid "TXCH User Transaction Fees"
+#~ msgid "TCAC User Transaction Fees"
 #~ msgstr ""
 
 #: src/components/pool/PoolInfo.tsx:37
@@ -2084,8 +2084,8 @@ msgid "The total transactions fees in this block. Rewarded to the farmer."
 msgstr "Det samlede transaktionsgebyr i denne blok. Belønnet til farmeren."
 
 #: src/components/plotNFT/PlotNFTPayoutInstructionsDialog.tsx:87
-msgid "These are the instructions for how the farmer wants to get paid. By default this will be an XCH address, but it can be set to any string with a size of less than 1024 characters, so it can represent another blockchain or payment system identifier."
-msgstr "Dette er instruktionerne for hvordan farmeren ønsker at blive betalt. Som standard vil dette være en XCH-adresse, men det kan indstilles til en vilkårlig streng med en størrelse på mindre end 1024 tegn, så det kan repræsentere en anden blockchain eller betalingssystem-id."
+msgid "These are the instructions for how the farmer wants to get paid. By default this will be an CAC address, but it can be set to any string with a size of less than 1024 characters, so it can represent another blockchain or payment system identifier."
+msgstr "Dette er instruktionerne for hvordan farmeren ønsker at blive betalt. Som standard vil dette være en CAC-adresse, men det kan indstilles til en vilkårlig streng med en størrelse på mindre end 1024 tegn, så det kan repræsentere en anden blockchain eller betalingssystem-id."
 
 #: src/components/plot/PlotsFailed.tsx:40
 msgid "These plots are invalid, you might want to delete them."
