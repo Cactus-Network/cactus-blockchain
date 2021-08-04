@@ -1257,8 +1257,12 @@ msgid "Not found Plots"
 msgstr "Ikke fundet Plotfiler"
 
 #: src/components/farm/FarmManageFarmingRewards.tsx:184
-msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25CAC reward for pooling plots."
-msgstr "Bemærk, at dette ikke ændrer din pulje udbetalingsadresser. Dette påvirker kun gamle plot filer af gammelt format, og 0,25CAC belønning for pulje plots."
+#~ msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25CAC reward for pooling plots."
+#~ msgstr "Bemærk, at dette ikke ændrer din pulje udbetalingsadresser. Dette påvirker kun gamle plot filer af gammelt format, og 0,25CAC belønning for pulje plots."
+
+#: src/components/farm/FarmManageFarmingRewards.tsx:184
+msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25XCH reward for pooling plots."
+msgstr ""
 
 #: src/components/plotNFT/PlotExternalNFTCard.tsx:120
 #: src/components/plotNFT/PlotNFTCard.tsx:159
@@ -2510,6 +2514,10 @@ msgstr "Du vil modtage <0/> til {0}"
 msgid "You will recieve <0/> to {address}"
 msgstr "Du vil modtage <0/> til {address}"
 
+#: src/components/farm/FarmYourHarvesterNetwork.tsx:96
+msgid "Your Cactus Harvester Network"
+msgstr "Dit Harvester netværk"
+
 #: src/components/farm/overview/FarmOverview.tsx:37
 msgid "Your Farm Overview"
 msgstr "Din Farmer Overblik"
@@ -2517,10 +2525,6 @@ msgstr "Din Farmer Overblik"
 #: src/components/farm/FarmFullNodeConnections.tsx:95
 msgid "Your Full Node Connection"
 msgstr "Din Fulde Node Forbindelse"
-
-#: src/components/farm/FarmYourHarvesterNetwork.tsx:96
-msgid "Your Harvester Network"
-msgstr "Dit Harvester netværk"
 
 #: src/components/pool/PoolOverview.tsx:160
 msgid "Your Pool Overview"

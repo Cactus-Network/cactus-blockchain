@@ -2507,7 +2507,7 @@ msgid "Your Full Node Connection"
 msgstr "Kết nối nút đầy đủ của bạn"
 
 #: src/components/farm/FarmYourHarvesterNetwork.tsx:96
-msgid "Your Harvester Network"
+msgid "Your Cactus Harvester Network"
 msgstr "Mạng lưới Harvester của bạn"
 
 #: src/components/pool/PoolOverview.tsx:160

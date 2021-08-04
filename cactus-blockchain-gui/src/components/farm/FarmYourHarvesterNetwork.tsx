@@ -93,7 +93,7 @@ export default function FarmYourHarvesterNetwork() {
   return (
     <Card
       gap={1}
-      title={<Trans>Your Harvester Network</Trans>}
+      title={<Trans>Your Cactus Harvester Network</Trans>}
       tooltip={
         <Trans>
           A harvester is a service running on a machine where plot(s) are

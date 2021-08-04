@@ -1257,7 +1257,11 @@ msgid "Not found Plots"
 msgstr "Nem talált Parcellát"
 
 #: src/components/farm/FarmManageFarmingRewards.tsx:184
-msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25CAC reward for pooling plots."
+#~ msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25CAC reward for pooling plots."
+#~ msgstr ""
+
+#: src/components/farm/FarmManageFarmingRewards.tsx:184
+msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25XCH reward for pooling plots."
 msgstr ""
 
 #: src/components/plotNFT/PlotExternalNFTCard.tsx:120
@@ -2512,6 +2516,10 @@ msgstr ""
 msgid "You will recieve <0/> to {address}"
 msgstr ""
 
+#: src/components/farm/FarmYourHarvesterNetwork.tsx:96
+msgid "Your Cactus Harvester Network"
+msgstr "Az arató hálózatod"
+
 #: src/components/farm/overview/FarmOverview.tsx:37
 msgid "Your Farm Overview"
 msgstr "A farmod áttekintése"
@@ -2519,10 +2527,6 @@ msgstr "A farmod áttekintése"
 #: src/components/farm/FarmFullNodeConnections.tsx:95
 msgid "Your Full Node Connection"
 msgstr "A teljes értékű node-od kapcsolata"
-
-#: src/components/farm/FarmYourHarvesterNetwork.tsx:96
-msgid "Your Harvester Network"
-msgstr "Az arató hálózatod"
 
 #: src/components/pool/PoolOverview.tsx:160
 msgid "Your Pool Overview"

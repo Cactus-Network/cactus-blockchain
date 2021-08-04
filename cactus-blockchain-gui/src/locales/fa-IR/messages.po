@@ -1263,8 +1263,12 @@ msgid "Not found Plots"
 msgstr "پلاتی یافت نشد"
 
 #: src/components/farm/FarmManageFarmingRewards.tsx:184
-msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25CAC reward for pooling plots."
-msgstr "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25CAC reward for pooling plots."
+#~ msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25CAC reward for pooling plots."
+#~ msgstr "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25CAC reward for pooling plots."
+
+#: src/components/farm/FarmManageFarmingRewards.tsx:184
+msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25XCH reward for pooling plots."
+msgstr ""
 
 #: src/components/plotNFT/PlotExternalNFTCard.tsx:120
 #: src/components/plotNFT/PlotNFTCard.tsx:159
@@ -2522,6 +2526,10 @@ msgstr "You will recieve <0/> to {0}"
 msgid "You will recieve <0/> to {address}"
 msgstr "You will recieve <0/> to {address}"
 
+#: src/components/farm/FarmYourHarvesterNetwork.tsx:96
+msgid "Your Cactus Harvester Network"
+msgstr "شبکه برداشت کننده های شما"
+
 #: src/components/farm/overview/FarmOverview.tsx:37
 msgid "Your Farm Overview"
 msgstr "نمای کلی مزرعه شما"
@@ -2529,10 +2537,6 @@ msgstr "نمای کلی مزرعه شما"
 #: src/components/farm/FarmFullNodeConnections.tsx:95
 msgid "Your Full Node Connection"
 msgstr "اتصالات گره کامل شما"
-
-#: src/components/farm/FarmYourHarvesterNetwork.tsx:96
-msgid "Your Harvester Network"
-msgstr "شبکه برداشت کننده های شما"
 
 #: src/components/pool/PoolOverview.tsx:160
 msgid "Your Pool Overview"

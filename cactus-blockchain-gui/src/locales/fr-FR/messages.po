@@ -1257,7 +1257,11 @@ msgid "Not found Plots"
 msgstr "Aucune parcelle trouvée"
 
 #: src/components/farm/FarmManageFarmingRewards.tsx:184
-msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25CAC reward for pooling plots."
+#~ msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25CAC reward for pooling plots."
+#~ msgstr ""
+
+#: src/components/farm/FarmManageFarmingRewards.tsx:184
+msgid "Note that this does not change your pooling payout addresses. This only affects old format plots, and the 0.25XCH reward for pooling plots."
 msgstr ""
 
 #: src/components/plotNFT/PlotExternalNFTCard.tsx:120
@@ -2510,6 +2514,10 @@ msgstr "Vous recevrez <0/> à {0}"
 msgid "You will recieve <0/> to {address}"
 msgstr "Vous recevrez <0/> à {address}"
 
+#: src/components/farm/FarmYourHarvesterNetwork.tsx:96
+msgid "Your Cactus Harvester Network"
+msgstr "Votre réseau de moissonneurs"
+
 #: src/components/farm/overview/FarmOverview.tsx:37
 msgid "Your Farm Overview"
 msgstr "Aperçu de votre Ferme"
@@ -2517,10 +2525,6 @@ msgstr "Aperçu de votre Ferme"
 #: src/components/farm/FarmFullNodeConnections.tsx:95
 msgid "Your Full Node Connection"
 msgstr "Votre connexion au full node"
-
-#: src/components/farm/FarmYourHarvesterNetwork.tsx:96
-msgid "Your Harvester Network"
-msgstr "Votre réseau de moissonneurs"
 
 #: src/components/pool/PoolOverview.tsx:160
 msgid "Your Pool Overview"

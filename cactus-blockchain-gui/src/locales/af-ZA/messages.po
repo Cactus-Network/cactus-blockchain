@@ -2000,7 +2000,7 @@ msgid "Your Full Node Connection"
 msgstr ""
 
 #: src/components/farm/FarmYourHarvesterNetwork.tsx:56
-msgid "Your Harvester Network"
+msgid "Your Cactus Harvester Network"
 msgstr ""
 
 #: src/components/wallet/WalletStatusCard.tsx:30
