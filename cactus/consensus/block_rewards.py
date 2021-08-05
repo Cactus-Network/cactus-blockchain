@@ -16,7 +16,7 @@ def calculate_pool_reward(height: uint32) -> uint64:
 
     return uint64(int(0))
 
-   """
+    """
     if height == 0:
         return uint64(int((7 / 8) * 210000 * _mojo_per_cactus))
     elif height < 3 * _blocks_per_year:
@@ -29,7 +29,7 @@ def calculate_pool_reward(height: uint32) -> uint64:
         return uint64(int((7 / 8) * 0.25 * _mojo_per_cactus))
     else:
         return uint64(int((7 / 8) * 0.125 * _mojo_per_cactus))
-   """
+    """
 
 def calculate_base_farmer_reward(height: uint32) -> uint64:
     """
