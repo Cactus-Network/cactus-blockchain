@@ -297,6 +297,18 @@ msgstr "Vásárlás"
 #~ msgid "CCListItems.title"
 #~ msgstr ""
 
+#: src/electron/main.tsx:428
+msgid "Cactus"
+msgstr "Cactus"
+
+#: src/electron/main.tsx:367
+msgid "Cactus Blockchain Wiki"
+msgstr "Cactus Blokklánc Wiki"
+
+#: src/components/wallet/standard/WalletStandard.tsx:642
+msgid "Cactus Wallet"
+msgstr "Cactus Pénztárca"
+
 #: src/components/selectKey/SelectKey.tsx:212
 msgid "Can be backed up to mnemonic seed"
 msgstr "Biztonsági mentés elérhető a mnemonic maggal"
@@ -353,18 +365,6 @@ msgstr "Pool Váltás"
 #: src/electron/main.tsx:410
 msgid "Chat on KeyBase"
 msgstr "Csevegés a KeyBase-n"
-
-#: src/electron/main.tsx:428
-msgid "Cactus"
-msgstr "Cactus"
-
-#: src/electron/main.tsx:367
-msgid "Cactus Blockchain Wiki"
-msgstr "Cactus Blokklánc Wiki"
-
-#: src/components/wallet/standard/WalletStandard.tsx:642
-msgid "Cactus Wallet"
-msgstr "Cactus Pénztárca"
 
 #: src/components/plot/add/PlotAddNumberOfPlots.tsx:34
 msgid "Choose Number of Plots"
@@ -2796,12 +2796,12 @@ msgstr ""
 msgid "Wallet does not exists"
 msgstr "A tárca nem létezik"
 
-#: src/components/wallet/Wallets.tsx:34
-#~ msgid "WalletItem.ccWallet"
-#~ msgstr ""
-
 #: src/components/wallet/Wallets.tsx:30
 #~ msgid "WalletItem.cactusWallet"
+#~ msgstr ""
+
+#: src/components/wallet/Wallets.tsx:34
+#~ msgid "WalletItem.ccWallet"
 #~ msgstr ""
 
 #: src/components/wallet/Wallets.tsx:48
@@ -3085,7 +3085,7 @@ msgstr ""
 msgid "{currencyCode} Block Rewards"
 msgstr "Blokk jutalmak {currencyCode}"
 
-#: src/components/farm/card/FarmCardTotalCactusFarmed.tsx:29
+#: src/components/farm/card/FarmCardTotalChiaFarmed.tsx:29
 msgid "{currencyCode} Total Cactus Farmed"
 msgstr "Teljes farmolt Cactus mennyiség {currencyCode}"
 

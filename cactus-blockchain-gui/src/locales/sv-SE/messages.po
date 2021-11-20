@@ -297,6 +297,18 @@ msgstr "Köp"
 #~ msgid "CCListItems.title"
 #~ msgstr ""
 
+#: src/electron/main.tsx:428
+msgid "Cactus"
+msgstr "Cactus"
+
+#: src/electron/main.tsx:367
+msgid "Cactus Blockchain Wiki"
+msgstr "Cactus Blockchains wiki"
+
+#: src/components/wallet/standard/WalletStandard.tsx:642
+msgid "Cactus Wallet"
+msgstr "Cactus-plånbok"
+
 #: src/components/selectKey/SelectKey.tsx:212
 msgid "Can be backed up to mnemonic seed"
 msgstr "Kan säkerhetskopieras till minnesfras"
@@ -353,18 +365,6 @@ msgstr "Byt pool"
 #: src/electron/main.tsx:410
 msgid "Chat on KeyBase"
 msgstr "Chatta på KeyBase"
-
-#: src/electron/main.tsx:428
-msgid "Cactus"
-msgstr "Cactus"
-
-#: src/electron/main.tsx:367
-msgid "Cactus Blockchain Wiki"
-msgstr "Cactus Blockchains wiki"
-
-#: src/components/wallet/standard/WalletStandard.tsx:642
-msgid "Cactus Wallet"
-msgstr "Cactus-plånbok"
 
 #: src/components/plot/add/PlotAddNumberOfPlots.tsx:34
 msgid "Choose Number of Plots"
@@ -2794,12 +2794,12 @@ msgstr "Plånboksstatus:"
 msgid "Wallet does not exists"
 msgstr "Plånboken finns inte"
 
-#: src/components/wallet/Wallets.tsx:34
-#~ msgid "WalletItem.ccWallet"
-#~ msgstr ""
-
 #: src/components/wallet/Wallets.tsx:30
 #~ msgid "WalletItem.cactusWallet"
+#~ msgstr ""
+
+#: src/components/wallet/Wallets.tsx:34
+#~ msgid "WalletItem.ccWallet"
 #~ msgstr ""
 
 #: src/components/wallet/Wallets.tsx:48
@@ -3085,7 +3085,7 @@ msgstr "{0} poäng {1} - {2} timmar sedan"
 msgid "{currencyCode} Block Rewards"
 msgstr "{currencyCode} blockbelöningar"
 
-#: src/components/farm/card/FarmCardTotalCactusFarmed.tsx:29
+#: src/components/farm/card/FarmCardTotalChiaFarmed.tsx:29
 msgid "{currencyCode} Total Cactus Farmed"
 msgstr "{currencyCode} Totalt antal Cactus som odlats"
 

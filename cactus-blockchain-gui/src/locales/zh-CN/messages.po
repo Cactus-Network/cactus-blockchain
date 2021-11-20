@@ -297,6 +297,18 @@ msgstr "购买"
 #~ msgid "CCListItems.title"
 #~ msgstr ""
 
+#: src/electron/main.tsx:428
+msgid "Cactus"
+msgstr "奇亚"
+
+#: src/electron/main.tsx:367
+msgid "Cactus Blockchain Wiki"
+msgstr "奇亚区块链项目维基"
+
+#: src/components/wallet/standard/WalletStandard.tsx:642
+msgid "Cactus Wallet"
+msgstr "奇亚钱包"
+
 #: src/components/selectKey/SelectKey.tsx:212
 msgid "Can be backed up to mnemonic seed"
 msgstr "可备份为助记词"
@@ -353,18 +365,6 @@ msgstr "更换农业合作社"
 #: src/electron/main.tsx:410
 msgid "Chat on KeyBase"
 msgstr "在Keybase上参与讨论"
-
-#: src/electron/main.tsx:428
-msgid "Cactus"
-msgstr "奇亚"
-
-#: src/electron/main.tsx:367
-msgid "Cactus Blockchain Wiki"
-msgstr "奇亚区块链项目维基"
-
-#: src/components/wallet/standard/WalletStandard.tsx:642
-msgid "Cactus Wallet"
-msgstr "奇亚钱包"
 
 #: src/components/plot/add/PlotAddNumberOfPlots.tsx:34
 msgid "Choose Number of Plots"
@@ -2794,12 +2794,12 @@ msgstr "钱包状态："
 msgid "Wallet does not exists"
 msgstr "钱包不存在"
 
-#: src/components/wallet/Wallets.tsx:34
-#~ msgid "WalletItem.ccWallet"
-#~ msgstr ""
-
 #: src/components/wallet/Wallets.tsx:30
 #~ msgid "WalletItem.cactusWallet"
+#~ msgstr ""
+
+#: src/components/wallet/Wallets.tsx:34
+#~ msgid "WalletItem.ccWallet"
 #~ msgstr ""
 
 #: src/components/wallet/Wallets.tsx:48
@@ -3083,7 +3083,7 @@ msgstr "{0} 积点 {1} - {2} 小时前"
 msgid "{currencyCode} Block Rewards"
 msgstr "{currencyCode} 区块奖励"
 
-#: src/components/farm/card/FarmCardTotalCactusFarmed.tsx:29
+#: src/components/farm/card/FarmCardTotalChiaFarmed.tsx:29
 msgid "{currencyCode} Total Cactus Farmed"
 msgstr "{currencyCode} 收获的奇亚币总计"
 

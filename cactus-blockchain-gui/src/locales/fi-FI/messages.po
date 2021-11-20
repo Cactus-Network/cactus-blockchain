@@ -297,6 +297,18 @@ msgstr "Osta"
 #~ msgid "CCListItems.title"
 #~ msgstr ""
 
+#: src/electron/main.tsx:428
+msgid "Cactus"
+msgstr "Cactus"
+
+#: src/electron/main.tsx:367
+msgid "Cactus Blockchain Wiki"
+msgstr "Cactus Wiki"
+
+#: src/components/wallet/standard/WalletStandard.tsx:642
+msgid "Cactus Wallet"
+msgstr "Cactus-lompakko"
+
 #: src/components/selectKey/SelectKey.tsx:212
 msgid "Can be backed up to mnemonic seed"
 msgstr "Varmuuskopioitavissa muistisanoiksi"
@@ -353,18 +365,6 @@ msgstr "Vaihda Poolia"
 #: src/electron/main.tsx:410
 msgid "Chat on KeyBase"
 msgstr "Keskustele KeyBasessa"
-
-#: src/electron/main.tsx:428
-msgid "Cactus"
-msgstr "Cactus"
-
-#: src/electron/main.tsx:367
-msgid "Cactus Blockchain Wiki"
-msgstr "Cactus Wiki"
-
-#: src/components/wallet/standard/WalletStandard.tsx:642
-msgid "Cactus Wallet"
-msgstr "Cactus-lompakko"
 
 #: src/components/plot/add/PlotAddNumberOfPlots.tsx:34
 msgid "Choose Number of Plots"
@@ -2794,12 +2794,12 @@ msgstr "Lompakon Tila:"
 msgid "Wallet does not exists"
 msgstr "Lompakkoa ei löydy"
 
-#: src/components/wallet/Wallets.tsx:34
-#~ msgid "WalletItem.ccWallet"
-#~ msgstr ""
-
 #: src/components/wallet/Wallets.tsx:30
 #~ msgid "WalletItem.cactusWallet"
+#~ msgstr ""
+
+#: src/components/wallet/Wallets.tsx:34
+#~ msgid "WalletItem.ccWallet"
 #~ msgstr ""
 
 #: src/components/wallet/Wallets.tsx:48
@@ -3083,7 +3083,7 @@ msgstr "{0} pistettä {1} - {2} tuntia sitten"
 msgid "{currencyCode} Block Rewards"
 msgstr "{currencyCode} Lohkopalkkiot"
 
-#: src/components/farm/card/FarmCardTotalCactusFarmed.tsx:29
+#: src/components/farm/card/FarmCardTotalChiaFarmed.tsx:29
 msgid "{currencyCode} Total Cactus Farmed"
 msgstr "{currencyCode} Chioja Farmaroitu"
 

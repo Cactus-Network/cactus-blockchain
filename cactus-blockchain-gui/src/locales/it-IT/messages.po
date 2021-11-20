@@ -297,6 +297,18 @@ msgstr "Compra"
 #~ msgid "CCListItems.title"
 #~ msgstr ""
 
+#: src/electron/main.tsx:428
+msgid "Cactus"
+msgstr "Cactus"
+
+#: src/electron/main.tsx:367
+msgid "Cactus Blockchain Wiki"
+msgstr "Wiki della Blockchain Cactus"
+
+#: src/components/wallet/standard/WalletStandard.tsx:642
+msgid "Cactus Wallet"
+msgstr "Portafoglio Cactus"
+
 #: src/components/selectKey/SelectKey.tsx:212
 msgid "Can be backed up to mnemonic seed"
 msgstr "Può essere eseguito il backup su seed mnemonico"
@@ -353,18 +365,6 @@ msgstr "Cambia Pool"
 #: src/electron/main.tsx:410
 msgid "Chat on KeyBase"
 msgstr "Chatta su KeyBase"
-
-#: src/electron/main.tsx:428
-msgid "Cactus"
-msgstr "Cactus"
-
-#: src/electron/main.tsx:367
-msgid "Cactus Blockchain Wiki"
-msgstr "Wiki della Blockchain Cactus"
-
-#: src/components/wallet/standard/WalletStandard.tsx:642
-msgid "Cactus Wallet"
-msgstr "Portafoglio Cactus"
 
 #: src/components/plot/add/PlotAddNumberOfPlots.tsx:34
 msgid "Choose Number of Plots"
@@ -2794,12 +2794,12 @@ msgstr "Stato Wallet:"
 msgid "Wallet does not exists"
 msgstr ""
 
-#: src/components/wallet/Wallets.tsx:34
-#~ msgid "WalletItem.ccWallet"
-#~ msgstr ""
-
 #: src/components/wallet/Wallets.tsx:30
 #~ msgid "WalletItem.cactusWallet"
+#~ msgstr ""
+
+#: src/components/wallet/Wallets.tsx:34
+#~ msgid "WalletItem.ccWallet"
 #~ msgstr ""
 
 #: src/components/wallet/Wallets.tsx:48
@@ -3083,7 +3083,7 @@ msgstr "{0} punti {1} - {2} ore fa"
 msgid "{currencyCode} Block Rewards"
 msgstr "{currencyCode} Ricompense Blocco"
 
-#: src/components/farm/card/FarmCardTotalCactusFarmed.tsx:29
+#: src/components/farm/card/FarmCardTotalChiaFarmed.tsx:29
 msgid "{currencyCode} Total Cactus Farmed"
 msgstr "{currencyCode} Cactus Farmati in Totale"
 

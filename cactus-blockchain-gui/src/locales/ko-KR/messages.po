@@ -297,6 +297,18 @@ msgstr "매수"
 #~ msgid "CCListItems.title"
 #~ msgstr ""
 
+#: src/electron/main.tsx:428
+msgid "Cactus"
+msgstr "치아"
+
+#: src/electron/main.tsx:367
+msgid "Cactus Blockchain Wiki"
+msgstr "치아 블록체인 위키"
+
+#: src/components/wallet/standard/WalletStandard.tsx:642
+msgid "Cactus Wallet"
+msgstr "치아 지갑"
+
 #: src/components/selectKey/SelectKey.tsx:212
 msgid "Can be backed up to mnemonic seed"
 msgstr "니모닉 시드에 백업할 수 있습니다"
@@ -353,18 +365,6 @@ msgstr ""
 #: src/electron/main.tsx:410
 msgid "Chat on KeyBase"
 msgstr "키베이스에서 채팅하기"
-
-#: src/electron/main.tsx:428
-msgid "Cactus"
-msgstr "치아"
-
-#: src/electron/main.tsx:367
-msgid "Cactus Blockchain Wiki"
-msgstr "치아 블록체인 위키"
-
-#: src/components/wallet/standard/WalletStandard.tsx:642
-msgid "Cactus Wallet"
-msgstr "치아 지갑"
 
 #: src/components/plot/add/PlotAddNumberOfPlots.tsx:34
 msgid "Choose Number of Plots"
@@ -2794,12 +2794,12 @@ msgstr ""
 msgid "Wallet does not exists"
 msgstr ""
 
-#: src/components/wallet/Wallets.tsx:34
-#~ msgid "WalletItem.ccWallet"
-#~ msgstr ""
-
 #: src/components/wallet/Wallets.tsx:30
 #~ msgid "WalletItem.cactusWallet"
+#~ msgstr ""
+
+#: src/components/wallet/Wallets.tsx:34
+#~ msgid "WalletItem.ccWallet"
 #~ msgstr ""
 
 #: src/components/wallet/Wallets.tsx:48
@@ -3083,7 +3083,7 @@ msgstr ""
 msgid "{currencyCode} Block Rewards"
 msgstr "{currencyCode} 블록 보상"
 
-#: src/components/farm/card/FarmCardTotalCactusFarmed.tsx:29
+#: src/components/farm/card/FarmCardTotalChiaFarmed.tsx:29
 msgid "{currencyCode} Total Cactus Farmed"
 msgstr "{currencyCode} 채굴된 총 Cactus"
 

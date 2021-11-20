@@ -301,6 +301,18 @@ msgstr "خریدن"
 #~ msgid "CCListItems.title"
 #~ msgstr ""
 
+#: src/electron/main.tsx:428
+msgid "Cactus"
+msgstr "چیـا"
+
+#: src/electron/main.tsx:367
+msgid "Cactus Blockchain Wiki"
+msgstr "ویکی زنجیره بلوکی چیـا"
+
+#: src/components/wallet/standard/WalletStandard.tsx:642
+msgid "Cactus Wallet"
+msgstr "کیف پول چیـا"
+
 #: src/components/selectKey/SelectKey.tsx:212
 msgid "Can be backed up to mnemonic seed"
 msgstr "میتواند در دانه های کمک یادآوری، پشتیبان گیری شود"
@@ -357,18 +369,6 @@ msgstr "Change Pool"
 #: src/electron/main.tsx:410
 msgid "Chat on KeyBase"
 msgstr "در اپلیکیشن KeyBase صبحت کنید"
-
-#: src/electron/main.tsx:428
-msgid "Cactus"
-msgstr "چیـا"
-
-#: src/electron/main.tsx:367
-msgid "Cactus Blockchain Wiki"
-msgstr "ویکی زنجیره بلوکی چیـا"
-
-#: src/components/wallet/standard/WalletStandard.tsx:642
-msgid "Cactus Wallet"
-msgstr "کیف پول چیـا"
 
 #: src/components/plot/add/PlotAddNumberOfPlots.tsx:34
 msgid "Choose Number of Plots"
@@ -2802,12 +2802,12 @@ msgstr "Wallet Status:"
 msgid "Wallet does not exists"
 msgstr ""
 
-#: src/components/wallet/Wallets.tsx:34
-#~ msgid "WalletItem.ccWallet"
-#~ msgstr ""
-
 #: src/components/wallet/Wallets.tsx:30
 #~ msgid "WalletItem.cactusWallet"
+#~ msgstr ""
+
+#: src/components/wallet/Wallets.tsx:34
+#~ msgid "WalletItem.ccWallet"
 #~ msgstr ""
 
 #: src/components/wallet/Wallets.tsx:48
@@ -3095,7 +3095,7 @@ msgstr "{0} points {1} - {2} hours ago"
 msgid "{currencyCode} Block Rewards"
 msgstr "{currencyCode} جایزه بلوک"
 
-#: src/components/farm/card/FarmCardTotalCactusFarmed.tsx:29
+#: src/components/farm/card/FarmCardTotalChiaFarmed.tsx:29
 msgid "{currencyCode} Total Cactus Farmed"
 msgstr "{currencyCode} مجموع چیـا برداشت شده"
 

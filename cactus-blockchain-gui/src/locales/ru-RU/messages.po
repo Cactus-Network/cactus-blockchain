@@ -297,63 +297,6 @@ msgstr "Покупка"
 #~ msgid "CCListItems.title"
 #~ msgstr ""
 
-#: src/components/selectKey/SelectKey.tsx:212
-msgid "Can be backed up to mnemonic seed"
-msgstr "может быть сохранен в качестве резервной копии при помощи мнемонического зерна"
-
-#: src/components/app/AppPassPrompt.tsx:256
-#: src/components/backup/BackupCreate.tsx:50
-#: src/components/core/components/ConfirmDialog/ConfirmDialog.tsx:86
-#: src/components/farm/FarmManageFarmingRewards.tsx:200
-#: src/components/fullNode/FullNodeAddConnection.tsx:89
-#: src/components/plotNFT/PlotNFTPayoutInstructionsDialog.tsx:128
-#: src/components/plotNFT/select/PlotNFTSelectBase.tsx:86
-#: src/components/plotNFT/select/PlotNFTSelectFaucet.tsx:30
-#: src/components/selectKey/SelectKey.tsx:138
-#: src/components/settings/ChangePassphrasePrompt.tsx:240
-#: src/components/settings/RemovePassphrasePrompt.tsx:152
-#: src/components/settings/SetPassphrasePrompt.tsx:211
-#: src/components/trading/CreateOffer.jsx:139
-#: src/components/trading/TradingOverview.jsx:400
-#: src/components/trading/ViewOffer.jsx:71
-msgid "Cancel"
-msgstr "Отмена"
-
-#: src/components/trading/TradingOverview.jsx:389
-msgid "Cancel and Spend"
-msgstr "Отменить и отправить"
-
-#: src/components/plot/PlotsNotFound.tsx:39
-msgid "Caution, deleting these plots will delete them forever. Check that the storage devices are properly connected."
-msgstr "Внимание! Удаление этих участков приведет к безвозвратному удалению файлов навсегда. Убедитесь, что устройства хранения правильно подключены."
-
-#: src/components/farm/FarmLastAttemptedProof.tsx:16
-msgid "Challenge"
-msgstr "Испытание"
-
-#: src/components/farm/FarmLatestBlockChallenges.tsx:14
-msgid "Challenge Hash"
-msgstr "Хэш испытания"
-
-#: src/components/plotNFT/PlotNFTChangePool.tsx:118
-msgid "Change"
-msgstr "Изменить"
-
-#: src/components/settings/ChangePassphrasePrompt.tsx:248
-#: src/components/settings/Settings.tsx:158
-msgid "Change Passphrase"
-msgstr ""
-
-#: src/components/plotNFT/PlotNFTCard.tsx:408
-#: src/components/plotNFT/PlotNFTChangePool.tsx:117
-#: src/components/pool/PoolOverview.tsx:115
-msgid "Change Pool"
-msgstr "Сменить пул"
-
-#: src/electron/main.tsx:410
-msgid "Chat on KeyBase"
-msgstr "Чат в KeyBase"
-
 #: src/electron/main.tsx:428
 msgid "Cactus"
 msgstr "Чиа"
@@ -537,6 +480,63 @@ msgstr ""
 #: src/components/wallet/standard/WalletStandard.tsx:642
 msgid "Cactus Wallet"
 msgstr "Кошелек Cactus"
+
+#: src/components/selectKey/SelectKey.tsx:212
+msgid "Can be backed up to mnemonic seed"
+msgstr "может быть сохранен в качестве резервной копии при помощи мнемонического зерна"
+
+#: src/components/app/AppPassPrompt.tsx:256
+#: src/components/backup/BackupCreate.tsx:50
+#: src/components/core/components/ConfirmDialog/ConfirmDialog.tsx:86
+#: src/components/farm/FarmManageFarmingRewards.tsx:200
+#: src/components/fullNode/FullNodeAddConnection.tsx:89
+#: src/components/plotNFT/PlotNFTPayoutInstructionsDialog.tsx:128
+#: src/components/plotNFT/select/PlotNFTSelectBase.tsx:86
+#: src/components/plotNFT/select/PlotNFTSelectFaucet.tsx:30
+#: src/components/selectKey/SelectKey.tsx:138
+#: src/components/settings/ChangePassphrasePrompt.tsx:240
+#: src/components/settings/RemovePassphrasePrompt.tsx:152
+#: src/components/settings/SetPassphrasePrompt.tsx:211
+#: src/components/trading/CreateOffer.jsx:139
+#: src/components/trading/TradingOverview.jsx:400
+#: src/components/trading/ViewOffer.jsx:71
+msgid "Cancel"
+msgstr "Отмена"
+
+#: src/components/trading/TradingOverview.jsx:389
+msgid "Cancel and Spend"
+msgstr "Отменить и отправить"
+
+#: src/components/plot/PlotsNotFound.tsx:39
+msgid "Caution, deleting these plots will delete them forever. Check that the storage devices are properly connected."
+msgstr "Внимание! Удаление этих участков приведет к безвозвратному удалению файлов навсегда. Убедитесь, что устройства хранения правильно подключены."
+
+#: src/components/farm/FarmLastAttemptedProof.tsx:16
+msgid "Challenge"
+msgstr "Испытание"
+
+#: src/components/farm/FarmLatestBlockChallenges.tsx:14
+msgid "Challenge Hash"
+msgstr "Хэш испытания"
+
+#: src/components/plotNFT/PlotNFTChangePool.tsx:118
+msgid "Change"
+msgstr "Изменить"
+
+#: src/components/settings/ChangePassphrasePrompt.tsx:248
+#: src/components/settings/Settings.tsx:158
+msgid "Change Passphrase"
+msgstr ""
+
+#: src/components/plotNFT/PlotNFTCard.tsx:408
+#: src/components/plotNFT/PlotNFTChangePool.tsx:117
+#: src/components/pool/PoolOverview.tsx:115
+msgid "Change Pool"
+msgstr "Сменить пул"
+
+#: src/electron/main.tsx:410
+msgid "Chat on KeyBase"
+msgstr "Чат в KeyBase"
 
 #: src/components/plot/add/PlotAddNumberOfPlots.tsx:34
 msgid "Choose Number of Plots"
@@ -2966,12 +2966,12 @@ msgstr "Статус кошелька:"
 msgid "Wallet does not exists"
 msgstr ""
 
-#: src/components/wallet/Wallets.tsx:34
-#~ msgid "WalletItem.ccWallet"
-#~ msgstr ""
-
 #: src/components/wallet/Wallets.tsx:30
 #~ msgid "WalletItem.cactusWallet"
+#~ msgstr ""
+
+#: src/components/wallet/Wallets.tsx:34
+#~ msgid "WalletItem.ccWallet"
 #~ msgstr ""
 
 #: src/components/wallet/Wallets.tsx:48
@@ -3255,7 +3255,7 @@ msgstr "{0} очков {1} - {2} часов назад"
 msgid "{currencyCode} Block Rewards"
 msgstr "{currencyCode} Награда за блок"
 
-#: src/components/farm/card/FarmCardTotalCactusFarmed.tsx:29
+#: src/components/farm/card/FarmCardTotalChiaFarmed.tsx:29
 msgid "{currencyCode} Total Cactus Farmed"
 msgstr "{currencyCode} Всего Чиа выращено"
 
