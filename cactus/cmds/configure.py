@@ -119,7 +119,7 @@ def configure(
 
         elif testnet == "false" or testnet == "f":
             print("Setting Mainnet")
-            mainnet_port = "8444"
+            mainnet_port = "11444"
             mainnet_introducer = "introducer.cactus.net"
             mainnet_dns_introducer = "dns-introducer.cactus.net"
             net = "mainnet"
