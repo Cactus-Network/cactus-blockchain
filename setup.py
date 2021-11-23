@@ -48,7 +48,7 @@ dev_dependencies = [
 kwargs = dict(
     name="cactus-blockchain",
     description="Cactus blockchain full node, farmer, timelord, and wallet.",
-    url="https://cactus.net/",
+    url="https://cactus-network.net/",
     license="Apache License",
     python_requires=">=3.7, <4",
     keywords="cactus blockchain node",
