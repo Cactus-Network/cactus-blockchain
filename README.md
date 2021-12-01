@@ -71,5 +71,8 @@ sh install.sh<p>
 . ./activate<p>
 
 cactus init<p>
-cactus start all 
+cactus start farmer 
+  </p>
+  <p>
+ *Note, if you would like to run the Timelord to support the Cactus ecosystem, run 'sh install-timelord.sh', then cactus start timelord. If you receive errors during the installation process, your system is missing dependencies. In this case, thank you for trying :)
   </p>
