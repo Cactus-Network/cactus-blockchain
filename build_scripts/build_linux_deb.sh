@@ -1,21 +1,14 @@
 #!/bin/bash
 
-if [ ! "$1" ]; then
-  echo "This script requires either amd64 of arm64 as an argument"
-	exit 1
-elif [ "$1" = "amd64" ]; then
-	PLATFORM="$1"
-	DIR_NAME="cactus-blockchain-linux-x64"
-else
 	PLATFORM="$1"
 	DIR_NAME="cactus-blockchain-linux-arm64"
-fi
+
 
 pip install setuptools_scm
 # The environment variable CACTUS_INSTALLER_VERSION needs to be defined
 # If the env variable NOTARIZE and the username and password variables are
 # set, this will attempt to Notarize the signed DMG
-CACTUS_INSTALLER_VERSION=$(python installer-version.py)
+CACTUS_INSTALLER_VERSION="1.2.11"
 
 if [ ! "$CACTUS_INSTALLER_VERSION" ]; then
 	echo "WARNING: No environment variable CACTUS_INSTALLER_VERSION set. Using 0.0.0."
@@ -33,7 +26,7 @@ mkdir dist
 
 echo "Create executables with pyinstaller"
 pip install pyinstaller==4.5
-SPEC_FILE=$(python -c 'import cactus; print(cactus.PYINSTALLER_SPEC_PATH)')
+SPEC_FILE=$(python3 -c 'import cactus; print(cactus.PYINSTALLER_SPEC_PATH)')
 pyinstaller --log-level=INFO "$SPEC_FILE"
 LAST_EXIT_CODE=$?
 if [ "$LAST_EXIT_CODE" -ne 0 ]; then
@@ -56,8 +49,8 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 fi
 
 # sets the version for cactus-blockchain in package.json
-cp package.json package.json.orig
-jq --arg VER "$CACTUS_INSTALLER_VERSION" '.version=$VER' package.json > temp.json && mv temp.json package.json
+#cp package.json package.json.orig
+#jq --arg VER "$CACTUS_INSTALLER_VERSION" '.version=$VER' package.json > temp.json && mv temp.json package.json
 
 electron-packager . cactus-blockchain --asar.unpack="**/daemon/**" --platform=linux \
 --icon=src/assets/img/Cactus.icns --overwrite --app-bundle-id=net.cactus.blockchain \
