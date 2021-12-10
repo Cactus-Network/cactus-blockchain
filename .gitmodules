@@ -3,4 +3,4 @@
 	url = https://github.com/Chia-Network/mozilla-ca/
 [submodule "cactus-blockchain-gui"]
 	path = cactus-blockchain-gui
-	url = https://github.com/dominick01234/cactus-blockchain-gui
+	url = https://github.com/Cactus-Network/cactus-blockchain-gui
