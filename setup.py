@@ -66,13 +66,13 @@ dev_dependencies = [
 
 kwargs = dict(
     name="chia-blockchain",
-    author="Mariano Sorgente",
-    author_email="mariano@chia.net",
+    author="Dommer",
+    author_email="dommer@chia.net",
     description="Chia blockchain full node, farmer, timelord, and wallet.",
     url="https://chia.net/",
     license="Apache License",
     python_requires=">=3.7, <4",
-    keywords="chia blockchain node",
+    keywords="cactus blockchain node",
     install_requires=dependencies,
     extras_require=dict(
         uvloop=["uvloop"],
