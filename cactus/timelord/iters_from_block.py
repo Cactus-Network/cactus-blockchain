@@ -1,9 +1,9 @@
 from typing import Optional, Tuple, Union
 
-from chia.consensus.pot_iterations import calculate_ip_iters, calculate_iterations_quality, calculate_sp_iters
-from chia.types.blockchain_format.reward_chain_block import RewardChainBlock, RewardChainBlockUnfinished
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.ints import uint64
+from cactus.consensus.pot_iterations import calculate_ip_iters, calculate_iterations_quality, calculate_sp_iters
+from cactus.types.blockchain_format.reward_chain_block import RewardChainBlock, RewardChainBlockUnfinished
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.ints import uint64
 
 
 def iters_from_block(

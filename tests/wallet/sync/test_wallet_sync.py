@@ -5,12 +5,12 @@ import pytest
 import pytest_asyncio
 from colorlog import getLogger
 
-from chia.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
-from chia.protocols import full_node_protocol
-from chia.simulator.simulator_protocol import FarmNewBlockProtocol
-from chia.types.peer_info import PeerInfo
-from chia.util.ints import uint16, uint32
-from chia.wallet.wallet_state_manager import WalletStateManager
+from cactus.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
+from cactus.protocols import full_node_protocol
+from cactus.simulator.simulator_protocol import FarmNewBlockProtocol
+from cactus.types.peer_info import PeerInfo
+from cactus.util.ints import uint16, uint32
+from cactus.wallet.wallet_state_manager import WalletStateManager
 from tests.connection_utils import disconnect_all_and_reconnect
 from tests.pools.test_pool_rpc import wallet_is_synced
 from tests.setup_nodes import setup_node_and_wallet, setup_simulators_and_wallets, test_constants

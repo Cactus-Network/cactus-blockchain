@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from chia.types.name_puzzle_condition import NPC
-from chia.util.ints import uint16, uint64
-from chia.util.streamable import Streamable, streamable
+from cactus.types.name_puzzle_condition import NPC
+from cactus.util.ints import uint16, uint64
+from cactus.util.streamable import Streamable, streamable
 
 
 @dataclass(frozen=True)

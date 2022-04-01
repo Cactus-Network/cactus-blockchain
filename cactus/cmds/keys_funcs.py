@@ -6,13 +6,13 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from chia.consensus.coinbase import create_puzzlehash_for_pk
-from chia.util.bech32m import encode_puzzle_hash
-from chia.util.config import load_config
-from chia.util.default_root import DEFAULT_ROOT_PATH
-from chia.util.ints import uint32
-from chia.util.keychain import Keychain, bytes_to_mnemonic, generate_mnemonic, mnemonic_to_seed, unlocks_keyring
-from chia.wallet.derive_keys import (
+from cactus.consensus.coinbase import create_puzzlehash_for_pk
+from cactus.util.bech32m import encode_puzzle_hash
+from cactus.util.config import load_config
+from cactus.util.default_root import DEFAULT_ROOT_PATH
+from cactus.util.ints import uint32
+from cactus.util.keychain import Keychain, bytes_to_mnemonic, generate_mnemonic, mnemonic_to_seed, unlocks_keyring
+from cactus.wallet.derive_keys import (
     master_sk_to_farmer_sk,
     master_sk_to_pool_sk,
     master_sk_to_wallet_sk,
@@ -28,7 +28,7 @@ def generate_and_print():
     mnemonic = generate_mnemonic()
     print("Generating private key. Mnemonic (24 secret words):")
     print(mnemonic)
-    print("Note that this key has not been added to the keychain. Run chia keys add")
+    print("Note that this key has not been added to the keychain. Run cactus keys add")
     return mnemonic
 
 
@@ -126,7 +126,7 @@ def derive_sk_from_hd_path(master_sk: PrivateKey, hd_path_root: str) -> Tuple[Pr
     and returns the derived key and the HD path that was used to derive it.
     """
 
-    from chia.wallet.derive_keys import _derive_path, _derive_path_unhardened
+    from cactus.wallet.derive_keys import _derive_path, _derive_path_unhardened
 
     class DerivationType(Enum):
         NONOBSERVER = 0
@@ -184,8 +184,8 @@ def verify(message: str, public_key: str, signature: str):
 
 
 def migrate_keys():
-    from chia.util.keyring_wrapper import KeyringWrapper
-    from chia.util.misc import prompt_yes_no
+    from cactus.util.keyring_wrapper import KeyringWrapper
+    from cactus.util.misc import prompt_yes_no
 
     # Check if the keyring needs a full migration (i.e. if it's using the old keyring)
     if Keychain.needs_migration():
@@ -251,7 +251,7 @@ def _search_derived(
     the provided search terms.
     """
 
-    from chia.wallet.derive_keys import _derive_path, _derive_path_unhardened
+    from cactus.wallet.derive_keys import _derive_path, _derive_path_unhardened
 
     class DerivedSearchResultType(Enum):
         PUBLIC_KEY = "public key"
@@ -291,7 +291,7 @@ def _search_derived(
         if search_address:
             # Generate a wallet address using the standard p2_delegated_puzzle_or_hidden_puzzle puzzle
             # TODO: consider generating addresses using other puzzles
-            address = encode_puzzle_hash(create_puzzlehash_for_pk(child_pk), "xch")
+            address = encode_puzzle_hash(create_puzzlehash_for_pk(child_pk), "cac")
 
         for term in remaining_search_terms:
             found_item: Any = None
@@ -543,7 +543,7 @@ def derive_child_key(
     Derive child keys from the provided master key.
     """
 
-    from chia.wallet.derive_keys import _derive_path, _derive_path_unhardened
+    from cactus.wallet.derive_keys import _derive_path, _derive_path_unhardened
 
     derivation_root_sk: Optional[PrivateKey] = None
     hd_path_root: Optional[str] = None

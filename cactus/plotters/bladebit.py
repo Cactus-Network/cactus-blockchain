@@ -7,8 +7,8 @@ import logging
 
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
-from chia.plotting.create_plots import resolve_plot_keys
-from chia.plotters.plotters_util import run_plotter, run_command
+from cactus.plotting.create_plots import resolve_plot_keys
+from cactus.plotters.plotters_util import run_plotter, run_command
 
 log = logging.getLogger(__name__)
 
@@ -144,7 +144,7 @@ def install_bladebit(root_path):
                 "git",
                 "clone",
                 "--recursive",
-                "https://github.com/Chia-Network/bladebit.git",
+                "https://github.com/Cactus-Network/bladebit.git",
             ],
             "Could not clone bladebit repository",
             cwd=os.fspath(root_path),
@@ -165,7 +165,7 @@ def install_bladebit(root_path):
         raise RuntimeError("Platform not supported yet for bladebit plotter.")
 
 
-def plot_bladebit(args, chia_root_path, root_path):
+def plot_bladebit(args, cactus_root_path, root_path):
     if not os.path.exists(get_bladebit_executable_path(root_path)):
         print("Installing bladebit plotter.")
         try:
@@ -179,7 +179,7 @@ def plot_bladebit(args, chia_root_path, root_path):
             None,
             None if args.pool_key == b"" else args.pool_key.hex(),
             None if args.contract == "" else args.contract,
-            chia_root_path,
+            cactus_root_path,
             log,
             args.connect_to_daemon,
         )

@@ -5,27 +5,27 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
 
-from chia import __version__
-from chia.consensus.coinbase import create_puzzlehash_for_pk
-from chia.ssl.create_ssl import (
+from cactus import __version__
+from cactus.consensus.coinbase import create_puzzlehash_for_pk
+from cactus.ssl.create_ssl import (
     ensure_ssl_dirs,
     generate_ca_signed_cert,
-    get_chia_ca_crt_key,
+    get_cactus_ca_crt_key,
     make_ca_cert,
     write_ssl_cert_and_key,
 )
-from chia.util.bech32m import encode_puzzle_hash
-from chia.util.config import (
-    create_default_chia_config,
+from cactus.util.bech32m import encode_puzzle_hash
+from cactus.util.config import (
+    create_default_cactus_config,
     initial_config_file,
     load_config,
     save_config,
     unflatten_properties,
     get_config_lock,
 )
-from chia.util.keychain import Keychain
-from chia.util.path import mkdir, path_from_root
-from chia.util.ssl_check import (
+from cactus.util.keychain import Keychain
+from cactus.util.path import mkdir, path_from_root
+from cactus.util.ssl_check import (
     DEFAULT_PERMISSIONS_CERT_FILE,
     DEFAULT_PERMISSIONS_KEY_FILE,
     RESTRICT_MASK_CERT_FILE,
@@ -33,14 +33,14 @@ from chia.util.ssl_check import (
     check_and_fix_permissions_for_ssl_file,
     fix_ssl,
 )
-from chia.wallet.derive_keys import (
+from cactus.wallet.derive_keys import (
     master_sk_to_pool_sk,
     master_sk_to_wallet_sk_intermediate,
     master_sk_to_wallet_sk_unhardened_intermediate,
     _derive_path,
     _derive_path_unhardened,
 )
-from chia.cmds.configure import configure
+from cactus.cmds.configure import configure
 
 private_node_names = {"full_node", "wallet", "farmer", "harvester", "timelord", "crawler", "daemon"}
 public_node_names = {"full_node", "wallet", "farmer", "introducer", "timelord"}
@@ -72,15 +72,15 @@ def check_keys(new_root: Path, keychain: Optional[Keychain] = None) -> None:
         keychain = Keychain()
     all_sks = keychain.get_all_private_keys()
     if len(all_sks) == 0:
-        print("No keys are present in the keychain. Generate them with 'chia keys generate'")
+        print("No keys are present in the keychain. Generate them with 'cactus keys generate'")
         return None
 
     with get_config_lock(new_root, "config.yaml"):
         config: Dict = load_config(new_root, "config.yaml", acquire_lock=False)
         pool_child_pubkeys = [master_sk_to_pool_sk(sk).get_g1() for sk, _ in all_sks]
         all_targets = []
-        stop_searching_for_farmer = "xch_target_address" not in config["farmer"]
-        stop_searching_for_pool = "xch_target_address" not in config["pool"]
+        stop_searching_for_farmer = "cac_target_address" not in config["farmer"]
+        stop_searching_for_pool = "cac_target_address" not in config["pool"]
         number_of_ph_to_search = 50
         selected = config["selected_network"]
         prefix = config["network_overrides"]["config"][selected]["address_prefix"]
@@ -107,46 +107,46 @@ def check_keys(new_root: Path, keychain: Optional[Keychain] = None) -> None:
                 all_targets.append(
                     encode_puzzle_hash(create_puzzlehash_for_pk(_derive_path(intermediate_n, [i]).get_g1()), prefix)
                 )
-                if all_targets[-1] == config["farmer"].get("xch_target_address") or all_targets[-2] == config[
+                if all_targets[-1] == config["farmer"].get("cac_target_address") or all_targets[-2] == config[
                     "farmer"
-                ].get("xch_target_address"):
+                ].get("cac_target_address"):
                     stop_searching_for_farmer = True
-                if all_targets[-1] == config["pool"].get("xch_target_address") or all_targets[-2] == config["pool"].get(
-                    "xch_target_address"
+                if all_targets[-1] == config["pool"].get("cac_target_address") or all_targets[-2] == config["pool"].get(
+                    "cac_target_address"
                 ):
                     stop_searching_for_pool = True
 
         # Set the destinations, if necessary
         updated_target: bool = False
-        if "xch_target_address" not in config["farmer"]:
+        if "cac_target_address" not in config["farmer"]:
             print(
-                f"Setting the xch destination for the farmer reward (1/8 plus fees, solo and pooling)"
+                f"Setting the cac destination for the farmer reward (1/8 plus fees, solo and pooling)"
                 f" to {all_targets[0]}"
             )
-            config["farmer"]["xch_target_address"] = all_targets[0]
+            config["farmer"]["cac_target_address"] = all_targets[0]
             updated_target = True
-        elif config["farmer"]["xch_target_address"] not in all_targets:
+        elif config["farmer"]["cac_target_address"] not in all_targets:
             print(
                 f"WARNING: using a farmer address which we might not have the private"
                 f" keys for. We searched the first {number_of_ph_to_search} addresses. Consider overriding "
-                f"{config['farmer']['xch_target_address']} with {all_targets[0]}"
+                f"{config['farmer']['cac_target_address']} with {all_targets[0]}"
             )
 
         if "pool" not in config:
             config["pool"] = {}
-        if "xch_target_address" not in config["pool"]:
-            print(f"Setting the xch destination address for pool reward (7/8 for solo only) to {all_targets[0]}")
-            config["pool"]["xch_target_address"] = all_targets[0]
+        if "cac_target_address" not in config["pool"]:
+            print(f"Setting the cac destination address for pool reward (7/8 for solo only) to {all_targets[0]}")
+            config["pool"]["cac_target_address"] = all_targets[0]
             updated_target = True
-        elif config["pool"]["xch_target_address"] not in all_targets:
+        elif config["pool"]["cac_target_address"] not in all_targets:
             print(
                 f"WARNING: using a pool address which we might not have the private"
                 f" keys for. We searched the first {number_of_ph_to_search} addresses. Consider overriding "
-                f"{config['pool']['xch_target_address']} with {all_targets[0]}"
+                f"{config['pool']['cac_target_address']} with {all_targets[0]}"
             )
         if updated_target:
             print(
-                f"To change the XCH destination addresses, edit the `xch_target_address` entries in"
+                f"To change the CAC destination addresses, edit the `cac_target_address` entries in"
                 f" {(new_root / 'config' / 'config.yaml').absolute()}."
             )
 
@@ -229,10 +229,10 @@ def create_all_ssl(root_path: Path):
 
     private_ca_key_path = ca_dir / "private_ca.key"
     private_ca_crt_path = ca_dir / "private_ca.crt"
-    chia_ca_crt, chia_ca_key = get_chia_ca_crt_key()
-    chia_ca_crt_path = ca_dir / "chia_ca.crt"
-    chia_ca_key_path = ca_dir / "chia_ca.key"
-    write_ssl_cert_and_key(chia_ca_crt_path, chia_ca_crt, chia_ca_key_path, chia_ca_key)
+    cactus_ca_crt, cactus_ca_key = get_cactus_ca_crt_key()
+    cactus_ca_crt_path = ca_dir / "cactus_ca.crt"
+    cactus_ca_key_path = ca_dir / "cactus_ca.key"
+    write_ssl_cert_and_key(cactus_ca_crt_path, cactus_ca_crt, cactus_ca_key_path, cactus_ca_key)
 
     if not private_ca_key_path.exists() or not private_ca_crt_path.exists():
         # Create private CA
@@ -249,8 +249,8 @@ def create_all_ssl(root_path: Path):
         ca_crt = private_ca_crt_path.read_bytes()
         generate_ssl_for_nodes(ssl_dir, ca_crt, ca_key, True)
 
-    chia_ca_crt, chia_ca_key = get_chia_ca_crt_key()
-    generate_ssl_for_nodes(ssl_dir, chia_ca_crt, chia_ca_key, False, overwrite=False)
+    cactus_ca_crt, cactus_ca_key = get_cactus_ca_crt_key()
+    generate_ssl_for_nodes(ssl_dir, cactus_ca_crt, cactus_ca_key, False, overwrite=False)
 
 
 def generate_ssl_for_nodes(ssl_dir: Path, ca_crt: bytes, ca_key: bytes, private: bool, overwrite=True):
@@ -308,7 +308,7 @@ def init(
             print(f"** {root_path} does not exist. Executing core init **")
             # sanity check here to prevent infinite recursion
             if (
-                chia_init(
+                cactus_init(
                     root_path,
                     fix_ssl_permissions=fix_ssl_permissions,
                     testnet=testnet,
@@ -322,10 +322,10 @@ def init(
             print(f"** {root_path} was not created. Exiting **")
             return -1
     else:
-        return chia_init(root_path, fix_ssl_permissions=fix_ssl_permissions, testnet=testnet, v1_db=v1_db)
+        return cactus_init(root_path, fix_ssl_permissions=fix_ssl_permissions, testnet=testnet, v1_db=v1_db)
 
 
-def chia_version_number() -> Tuple[str, str, str, str]:
+def cactus_version_number() -> Tuple[str, str, str, str]:
     scm_full_version = __version__
     left_full_version = scm_full_version.split("+")
 
@@ -373,18 +373,18 @@ def chia_version_number() -> Tuple[str, str, str, str]:
     return major_release_number, minor_release_number, patch_release_number, dev_release_number
 
 
-def chia_minor_release_number():
-    res = int(chia_version_number()[2])
+def cactus_minor_release_number():
+    res = int(cactus_version_number()[2])
     print(f"Install release number: {res}")
     return res
 
 
-def chia_full_version_str() -> str:
-    major, minor, patch, dev = chia_version_number()
+def cactus_full_version_str() -> str:
+    major, minor, patch, dev = cactus_version_number()
     return f"{major}.{minor}.{patch}{dev}"
 
 
-def chia_init(
+def cactus_init(
     root_path: Path,
     *,
     should_check_keys: bool = True,
@@ -400,16 +400,16 @@ def chia_init(
     protected Keychain. When launching the daemon from the GUI, we want the GUI to
     handle unlocking the keychain.
     """
-    if os.environ.get("CHIA_ROOT", None) is not None:
+    if os.environ.get("CACTUS_ROOT", None) is not None:
         print(
-            f"warning, your CHIA_ROOT is set to {os.environ['CHIA_ROOT']}. "
-            f"Please unset the environment variable and run chia init again\n"
+            f"warning, your CACTUS_ROOT is set to {os.environ['CACTUS_ROOT']}. "
+            f"Please unset the environment variable and run cactus init again\n"
             f"or manually migrate config.yaml"
         )
 
-    print(f"Chia directory {root_path}")
+    print(f"Cactus directory {root_path}")
     if root_path.is_dir() and Path(root_path / "config" / "config.yaml").exists():
-        # This is reached if CHIA_ROOT is set, or if user has run chia init twice
+        # This is reached if CACTUS_ROOT is set, or if user has run cactus init twice
         # before a new update.
         if testnet:
             configure(
@@ -436,7 +436,7 @@ def chia_init(
         print(f"{root_path} already exists, no migration action taken")
         return -1
 
-    create_default_chia_config(root_path)
+    create_default_cactus_config(root_path)
     if testnet:
         configure(
             root_path,
@@ -483,6 +483,6 @@ def chia_init(
             connection.commit()
 
     print("")
-    print("To see your keys, run 'chia keys show --show-mnemonic-seed'")
+    print("To see your keys, run 'cactus keys show --show-mnemonic-seed'")
 
     return 0

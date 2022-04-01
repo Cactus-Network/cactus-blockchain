@@ -4,10 +4,10 @@ import asyncio
 from secrets import token_bytes
 from typing import Dict, List
 
-from chia.consensus.constants import ConsensusConstants
-from chia.full_node.full_node_api import FullNodeAPI
-from chia.server.start_service import Service
-from chia.server.start_wallet import service_kwargs_for_wallet
+from cactus.consensus.constants import ConsensusConstants
+from cactus.full_node.full_node_api import FullNodeAPI
+from cactus.server.start_service import Service
+from cactus.server.start_wallet import service_kwargs_for_wallet
 from tests.block_tools import create_block_tools_async, test_constants, BlockTools
 from tests.setup_services import (
     setup_full_node,
@@ -21,9 +21,9 @@ from tests.setup_services import (
 )
 from tests.util.keyring import TempKeyring
 from tests.util.socket import find_available_listen_port
-from chia.util.hash import std_hash
-from chia.util.ints import uint16, uint32
-from chia.util.keychain import bytes_to_mnemonic
+from cactus.util.hash import std_hash
+from cactus.util.ints import uint16, uint32
+from cactus.util.keychain import bytes_to_mnemonic
 from tests.time_out_assert import time_out_assert_custom_interval
 
 

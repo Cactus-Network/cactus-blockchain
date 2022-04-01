@@ -10,8 +10,8 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from blspy import G1Element
 from chiapos import DiskProver
 
-from chia.consensus.pos_quality import UI_ACTUAL_SPACE_CONSTANT_FACTOR, _expected_plot_size
-from chia.plotting.util import (
+from cactus.consensus.pos_quality import UI_ACTUAL_SPACE_CONSTANT_FACTOR, _expected_plot_size
+from cactus.plotting.util import (
     PlotInfo,
     PlotRefreshResult,
     PlotsRefreshParameter,
@@ -19,13 +19,13 @@ from chia.plotting.util import (
     get_plot_filenames,
     parse_plot_info,
 )
-from chia.util.generator_tools import list_to_batches
-from chia.util.ints import uint16
-from chia.util.path import mkdir
-from chia.util.streamable import Streamable, streamable
-from chia.types.blockchain_format.proof_of_space import ProofOfSpace
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.wallet.derive_keys import master_sk_to_local_sk
+from cactus.util.generator_tools import list_to_batches
+from cactus.util.ints import uint16
+from cactus.util.path import mkdir
+from cactus.util.streamable import Streamable, streamable
+from cactus.types.blockchain_format.proof_of_space import ProofOfSpace
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.wallet.derive_keys import master_sk_to_local_sk
 
 log = logging.getLogger(__name__)
 

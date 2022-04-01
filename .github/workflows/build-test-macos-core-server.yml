@@ -1,5 +1,5 @@
 #
-# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chia-blockchain/tree/main/tests#readme
+# THIS FILE IS GENERATED. SEE https://github.com/Cactus-Network/cactus-blockchain/tree/main/tests#readme
 #
 name: MacOS core-server Tests
 
@@ -43,10 +43,10 @@ jobs:
 
     - name: Create keychain for CI use
       run: |
-        security create-keychain -p foo chiachain
-        security default-keychain -s chiachain
-        security unlock-keychain -p foo chiachain
-        security set-keychain-settings -t 7200 -u chiachain
+        security create-keychain -p foo cactuschain
+        security default-keychain -s cactuschain
+        security unlock-keychain -p foo cactuschain
+        security set-keychain-settings -t 7200 -u cactuschain
 
     - name: Get pip cache dir
       id: pip-cache
@@ -65,17 +65,17 @@ jobs:
     - name: Checkout test blocks and plots
       uses: actions/checkout@v2
       with:
-        repository: 'Chia-Network/test-cache'
-        path: '.chia'
+        repository: 'Cactus-Network/test-cache'
+        path: '.cactus'
         ref: '0.28.0'
         fetch-depth: 1
 
     - name: Link home directory
       run: |
         cd $HOME
-        ln -s $GITHUB_WORKSPACE/.chia
-        echo "$HOME/.chia"
-        ls -al $HOME/.chia
+        ln -s $GITHUB_WORKSPACE/.cactus
+        echo "$HOME/.cactus"
+        ls -al $HOME/.cactus
 
     - name: Run install script
       env:
@@ -96,5 +96,5 @@ jobs:
         . ./activate
         ./venv/bin/py.test tests/core/server/test_*.py -s -v --durations 0
 #
-# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chia-blockchain/tree/main/tests#readme
+# THIS FILE IS GENERATED. SEE https://github.com/Cactus-Network/cactus-blockchain/tree/main/tests#readme
 #

@@ -4,16 +4,16 @@ from typing import Dict, List, Optional, Tuple, Any
 import aiosqlite
 import zstd
 
-from chia.consensus.block_record import BlockRecord
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.full_block import FullBlock
-from chia.types.blockchain_format.program import SerializedProgram
-from chia.types.weight_proof import SubEpochChallengeSegment, SubEpochSegments
-from chia.util.errors import Err
-from chia.util.db_wrapper import DBWrapper
-from chia.util.ints import uint32
-from chia.util.lru_cache import LRUCache
-from chia.util.full_block_utils import generator_from_block
+from cactus.consensus.block_record import BlockRecord
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.full_block import FullBlock
+from cactus.types.blockchain_format.program import SerializedProgram
+from cactus.types.weight_proof import SubEpochChallengeSegment, SubEpochSegments
+from cactus.util.errors import Err
+from cactus.util.db_wrapper import DBWrapper
+from cactus.util.ints import uint32
+from cactus.util.lru_cache import LRUCache
+from cactus.util.full_block_utils import generator_from_block
 
 log = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ class BlockStore:
             await self.db.execute("CREATE TABLE IF NOT EXISTS current_peak(key int PRIMARY KEY, hash blob)")
 
             # If any of these indices are altered, they should also be altered
-            # in the chia/cmds/db_upgrade.py file
+            # in the cactus/cmds/db_upgrade.py file
             await self.db.execute("CREATE INDEX IF NOT EXISTS height on full_blocks(height)")
 
             # Sub epoch segments for weight proofs
@@ -67,7 +67,7 @@ class BlockStore:
             )
 
             # If any of these indices are altered, they should also be altered
-            # in the chia/cmds/db_upgrade.py file
+            # in the cactus/cmds/db_upgrade.py file
             await self.db.execute(
                 "CREATE INDEX IF NOT EXISTS is_fully_compactified ON"
                 " full_blocks(is_fully_compactified, in_main_chain) WHERE in_main_chain=1"

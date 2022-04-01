@@ -7,23 +7,23 @@ import signal
 from sys import platform
 from typing import Any, Callable, List, Optional, Tuple
 
-from chia.daemon.server import singleton, service_launch_lock_path
-from chia.server.ssl_context import chia_ssl_ca_paths, private_ssl_ca_paths
+from cactus.daemon.server import singleton, service_launch_lock_path
+from cactus.server.ssl_context import cactus_ssl_ca_paths, private_ssl_ca_paths
 
 try:
     import uvloop
 except ImportError:
     uvloop = None
 
-from chia.rpc.rpc_server import start_rpc_server
-from chia.server.outbound_message import NodeType
-from chia.server.server import ChiaServer
-from chia.server.upnp import UPnP
-from chia.types.peer_info import PeerInfo
-from chia.util.chia_logging import initialize_logging
-from chia.util.config import load_config, load_config_cli
-from chia.util.setproctitle import setproctitle
-from chia.util.ints import uint16
+from cactus.rpc.rpc_server import start_rpc_server
+from cactus.server.outbound_message import NodeType
+from cactus.server.server import CactusServer
+from cactus.server.upnp import UPnP
+from cactus.types.peer_info import PeerInfo
+from cactus.util.cactus_logging import initialize_logging
+from cactus.util.config import load_config, load_config_cli
+from cactus.util.setproctitle import setproctitle
+from cactus.util.ints import uint16
 
 from .reconnect_task import start_reconnect_task
 
@@ -68,7 +68,7 @@ class Service:
         self._network_id: str = network_id
         self._handle_signals = handle_signals
 
-        proctitle_name = f"chia_{service_name_prefix}{service_name}"
+        proctitle_name = f"cactus_{service_name_prefix}{service_name}"
         setproctitle(proctitle_name)
         self._log = logging.getLogger(service_name)
 
@@ -80,7 +80,7 @@ class Service:
 
         self._rpc_info = rpc_info
         private_ca_crt, private_ca_key = private_ssl_ca_paths(root_path, self.config)
-        chia_ca_crt, chia_ca_key = chia_ssl_ca_paths(root_path, self.config)
+        cactus_ca_crt, cactus_ca_key = cactus_ssl_ca_paths(root_path, self.config)
         inbound_rlp = self.config.get("inbound_rate_limit_percent")
         outbound_rlp = self.config.get("outbound_rate_limit_percent")
         if node_type == NodeType.WALLET:
@@ -88,7 +88,7 @@ class Service:
             outbound_rlp = 60
 
         assert inbound_rlp and outbound_rlp
-        self._server = ChiaServer(
+        self._server = CactusServer(
             advertised_port,
             node,
             peer_api,
@@ -100,7 +100,7 @@ class Service:
             root_path,
             service_config,
             (private_ca_crt, private_ca_key),
-            (chia_ca_crt, chia_ca_key),
+            (cactus_ca_crt, cactus_ca_key),
             name=f"{service_name}_server",
         )
         f = getattr(node, "set_server", None)
@@ -247,7 +247,7 @@ class Service:
 
         self._log.info("Waiting for socket to be closed (if opened)")
 
-        self._log.info("Waiting for ChiaServer to be closed")
+        self._log.info("Waiting for CactusServer to be closed")
         await self._server.await_closed()
 
         if self._rpc_close_task:

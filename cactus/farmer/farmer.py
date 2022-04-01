@@ -9,18 +9,18 @@ import traceback
 import aiohttp
 from blspy import AugSchemeMPL, G1Element, G2Element, PrivateKey
 
-import chia.server.ws_connection as ws  # lgtm [py/import-and-import-from]
-from chia.consensus.coinbase import create_puzzlehash_for_pk
-from chia.consensus.constants import ConsensusConstants
-from chia.daemon.keychain_proxy import (
+import cactus.server.ws_connection as ws  # lgtm [py/import-and-import-from]
+from cactus.consensus.coinbase import create_puzzlehash_for_pk
+from cactus.consensus.constants import ConsensusConstants
+from cactus.daemon.keychain_proxy import (
     KeychainProxy,
     KeychainProxyConnectionFailure,
     connect_to_keychain_and_validate,
     wrap_local_keychain,
 )
-from chia.pools.pool_config import PoolWalletConfig, load_pool_config, add_auth_key
-from chia.protocols import farmer_protocol, harvester_protocol
-from chia.protocols.pool_protocol import (
+from cactus.pools.pool_config import PoolWalletConfig, load_pool_config, add_auth_key
+from cactus.protocols import farmer_protocol, harvester_protocol
+from cactus.protocols.pool_protocol import (
     ErrorResponse,
     get_current_authentication_token,
     GetFarmerResponse,
@@ -31,27 +31,27 @@ from chia.protocols.pool_protocol import (
     PutFarmerRequest,
     AuthenticationPayload,
 )
-from chia.protocols.protocol_message_types import ProtocolMessageTypes
-from chia.server.outbound_message import NodeType, make_msg
-from chia.server.server import ssl_context_for_root
-from chia.server.ws_connection import WSChiaConnection
-from chia.ssl.create_ssl import get_mozilla_ca_crt
-from chia.types.blockchain_format.proof_of_space import ProofOfSpace
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.bech32m import decode_puzzle_hash
-from chia.util.byte_types import hexstr_to_bytes
-from chia.util.config import load_config, save_config, config_path_for_filename, get_config_lock
-from chia.util.hash import std_hash
-from chia.util.ints import uint8, uint16, uint32, uint64
-from chia.util.keychain import Keychain
-from chia.wallet.derive_keys import (
+from cactus.protocols.protocol_message_types import ProtocolMessageTypes
+from cactus.server.outbound_message import NodeType, make_msg
+from cactus.server.server import ssl_context_for_root
+from cactus.server.ws_connection import WSCactusConnection
+from cactus.ssl.create_ssl import get_mozilla_ca_crt
+from cactus.types.blockchain_format.proof_of_space import ProofOfSpace
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.bech32m import decode_puzzle_hash
+from cactus.util.byte_types import hexstr_to_bytes
+from cactus.util.config import load_config, save_config, config_path_for_filename, get_config_lock
+from cactus.util.hash import std_hash
+from cactus.util.ints import uint8, uint16, uint32, uint64
+from cactus.util.keychain import Keychain
+from cactus.wallet.derive_keys import (
     master_sk_to_farmer_sk,
     master_sk_to_pool_sk,
     master_sk_to_wallet_sk,
     find_authentication_sk,
     find_owner_sk,
 )
-from chia.wallet.puzzles.singleton_top_layer import SINGLETON_MOD
+from cactus.wallet.puzzles.singleton_top_layer import SINGLETON_MOD
 
 singleton_mod_hash = SINGLETON_MOD.get_tree_hash()
 
@@ -154,7 +154,7 @@ class Farmer:
         return await keychain_proxy.get_all_private_keys()
 
     async def setup_keys(self) -> bool:
-        no_keys_error_str = "No keys exist. Please run 'chia keys generate' or open the UI."
+        no_keys_error_str = "No keys exist. Please run 'cactus keys generate' or open the UI."
         self.all_root_sks: List[PrivateKey] = [sk for sk, _ in await self.get_all_private_keys()]
         self._private_keys = [master_sk_to_farmer_sk(sk) for sk in self.all_root_sks] + [
             master_sk_to_pool_sk(sk) for sk in self.all_root_sks
@@ -165,22 +165,22 @@ class Farmer:
             return False
 
         config = load_config(self._root_path, "config.yaml")
-        if "xch_target_address" not in self.config:
+        if "cac_target_address" not in self.config:
             self.config = config["farmer"]
-        if "xch_target_address" not in self.pool_config:
+        if "cac_target_address" not in self.pool_config:
             self.pool_config = config["pool"]
-        if "xch_target_address" not in self.config or "xch_target_address" not in self.pool_config:
-            log.debug("xch_target_address missing in the config")
+        if "cac_target_address" not in self.config or "cac_target_address" not in self.pool_config:
+            log.debug("cac_target_address missing in the config")
             return False
 
         # This is the farmer configuration
-        self.farmer_target_encoded = self.config["xch_target_address"]
+        self.farmer_target_encoded = self.config["cac_target_address"]
         self.farmer_target = decode_puzzle_hash(self.farmer_target_encoded)
 
         self.pool_public_keys = [G1Element.from_bytes(bytes.fromhex(pk)) for pk in self.config["pool_public_keys"]]
 
         # This is the self pooling configuration, which is only used for original self-pooled plots
-        self.pool_target_encoded = self.pool_config["xch_target_address"]
+        self.pool_target_encoded = self.pool_config["cac_target_address"]
         self.pool_target = decode_puzzle_hash(self.pool_target_encoded)
         self.pool_sks_map: Dict = {}
         for key in self.get_private_keys():
@@ -222,7 +222,7 @@ class Farmer:
     def _set_state_changed_callback(self, callback: Callable):
         self.state_changed_callback = callback
 
-    async def on_connect(self, peer: WSChiaConnection):
+    async def on_connect(self, peer: WSCactusConnection):
         self.state_changed("add_connection", {})
 
         async def handshake_task():
@@ -266,7 +266,7 @@ class Farmer:
             ErrorResponse(uint16(PoolErrorCode.REQUEST_FAILED.value), error_message).to_json_dict()
         )
 
-    def on_disconnect(self, connection: ws.WSChiaConnection):
+    def on_disconnect(self, connection: ws.WSCactusConnection):
         self.log.info(f"peer disconnected {connection.get_peer_logging()}")
         self.state_changed("close_connection", {})
 
@@ -586,11 +586,11 @@ class Farmer:
             if farmer_target_encoded is not None:
                 self.farmer_target_encoded = farmer_target_encoded
                 self.farmer_target = decode_puzzle_hash(farmer_target_encoded)
-                config["farmer"]["xch_target_address"] = farmer_target_encoded
+                config["farmer"]["cac_target_address"] = farmer_target_encoded
             if pool_target_encoded is not None:
                 self.pool_target_encoded = pool_target_encoded
                 self.pool_target = decode_puzzle_hash(pool_target_encoded)
-                config["pool"]["xch_target_address"] = pool_target_encoded
+                config["pool"]["cac_target_address"] = pool_target_encoded
             save_config(self._root_path, "config.yaml", config)
 
     async def set_payout_instructions(self, launcher_id: bytes32, payout_instructions: str):
@@ -687,7 +687,7 @@ class Farmer:
                     )
         return updated
 
-    async def get_cached_harvesters(self, connection: WSChiaConnection) -> HarvesterCacheEntry:
+    async def get_cached_harvesters(self, connection: WSCactusConnection) -> HarvesterCacheEntry:
         host_cache = self.harvester_cache.get(connection.peer_host)
         if host_cache is None:
             host_cache = {}

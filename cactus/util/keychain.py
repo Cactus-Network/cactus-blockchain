@@ -6,8 +6,8 @@ import unicodedata
 
 from bitstring import BitArray  # pyright: reportMissingImports=false
 from blspy import AugSchemeMPL, G1Element, PrivateKey  # pyright: reportMissingImports=false
-from chia.util.hash import std_hash
-from chia.util.keyring_wrapper import KeyringWrapper
+from cactus.util.hash import std_hash
+from cactus.util.keyring_wrapper import KeyringWrapper
 from hashlib import pbkdf2_hmac
 from pathlib import Path
 from secrets import token_bytes
@@ -16,8 +16,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 
 CURRENT_KEY_VERSION = "1.8"
-DEFAULT_USER = f"user-chia-{CURRENT_KEY_VERSION}"  # e.g. user-chia-1.8
-DEFAULT_SERVICE = f"chia-{DEFAULT_USER}"  # e.g. chia-user-chia-1.8
+DEFAULT_USER = f"user-cactus-{CURRENT_KEY_VERSION}"  # e.g. user-cactus-1.8
+DEFAULT_SERVICE = f"cactus-{DEFAULT_USER}"  # e.g. cactus-user-cactus-1.8
 DEFAULT_PASSPHRASE_PROMPT = (
     colorama.Fore.YELLOW + colorama.Style.BRIGHT + "(Unlock Keyring)" + colorama.Style.RESET_ALL + " Passphrase: "
 )  # noqa: E501
@@ -48,8 +48,8 @@ class KeyringNotSet(Exception):
 
 
 def supports_keyring_passphrase() -> bool:
-    # Support can be disabled by setting CHIA_PASSPHRASE_SUPPORT to 0/false
-    return os.environ.get("CHIA_PASSPHRASE_SUPPORT", "true").lower() in ["1", "true"]
+    # Support can be disabled by setting CACTUS_PASSPHRASE_SUPPORT to 0/false
+    return os.environ.get("CACTUS_PASSPHRASE_SUPPORT", "true").lower() in ["1", "true"]
 
 
 def supports_os_passphrase_storage() -> bool:
@@ -80,7 +80,7 @@ def obtain_current_passphrase(prompt: str = DEFAULT_PASSPHRASE_PROMPT, use_passp
     prompted interactively to enter their passphrase a max of MAX_RETRIES times
     before failing.
     """
-    from chia.cmds.passphrase_funcs import prompt_for_passphrase
+    from cactus.cmds.passphrase_funcs import prompt_for_passphrase
 
     if use_passphrase_cache:
         passphrase, validated = KeyringWrapper.get_shared_instance().get_cached_master_passphrase()
@@ -516,7 +516,7 @@ class Keychain:
 
         migration_version_file: Path = KeyringWrapper.get_shared_instance().keys_root_path / ".last_legacy_migration"
         if migration_version_file.exists():
-            current_version_str = pkg_resources.get_distribution("chia-blockchain").version
+            current_version_str = pkg_resources.get_distribution("cactus-blockchain").version
             with migration_version_file.open("r") as f:
                 last_migration_version_str = f.read().strip()
             return compare_versions(current_version_str, last_migration_version_str) <= 0
@@ -529,7 +529,7 @@ class Keychain:
         Marks the current client version as having checked the legacy keyring for keys needing migration.
         """
         migration_version_file: Path = KeyringWrapper.get_shared_instance().keys_root_path / ".last_legacy_migration"
-        current_version_str = pkg_resources.get_distribution("chia-blockchain").version
+        current_version_str = pkg_resources.get_distribution("cactus-blockchain").version
         with migration_version_file.open("w") as f:
             f.write(current_version_str)
 

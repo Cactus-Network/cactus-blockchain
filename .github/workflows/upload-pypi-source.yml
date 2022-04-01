@@ -54,7 +54,7 @@ jobs:
 
     - name: Lint source with flake8
       run: |
-        flake8 chia tests
+        flake8 cactus tests
 
     - name: Lint source with mypy
       run: |

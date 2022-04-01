@@ -10,32 +10,32 @@ from blspy import GTElement
 from chiabip158 import PyBIP158
 from clvm.casts import int_from_bytes
 
-from chia.util import cached_bls
-from chia.consensus.block_record import BlockRecord
-from chia.consensus.constants import ConsensusConstants
-from chia.consensus.cost_calculator import NPCResult
-from chia.full_node.bundle_tools import simple_solution_generator
-from chia.full_node.coin_store import CoinStore
-from chia.full_node.mempool import Mempool
-from chia.full_node.mempool_check_conditions import mempool_check_conditions_dict, get_name_puzzle_conditions
-from chia.full_node.pending_tx_cache import PendingTxCache
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import SerializedProgram
-from chia.types.blockchain_format.sized_bytes import bytes32, bytes48
-from chia.types.coin_record import CoinRecord
-from chia.types.condition_opcodes import ConditionOpcode
-from chia.types.condition_with_args import ConditionWithArgs
-from chia.types.mempool_inclusion_status import MempoolInclusionStatus
-from chia.types.mempool_item import MempoolItem
-from chia.types.spend_bundle import SpendBundle
-from chia.util.cached_bls import LOCAL_CACHE
-from chia.util.condition_tools import pkm_pairs
-from chia.util.errors import Err, ValidationError
-from chia.util.generator_tools import additions_for_npc
-from chia.util.ints import uint32, uint64
-from chia.util.lru_cache import LRUCache
-from chia.util.setproctitle import getproctitle, setproctitle
-from chia.util.streamable import recurse_jsonify
+from cactus.util import cached_bls
+from cactus.consensus.block_record import BlockRecord
+from cactus.consensus.constants import ConsensusConstants
+from cactus.consensus.cost_calculator import NPCResult
+from cactus.full_node.bundle_tools import simple_solution_generator
+from cactus.full_node.coin_store import CoinStore
+from cactus.full_node.mempool import Mempool
+from cactus.full_node.mempool_check_conditions import mempool_check_conditions_dict, get_name_puzzle_conditions
+from cactus.full_node.pending_tx_cache import PendingTxCache
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import SerializedProgram
+from cactus.types.blockchain_format.sized_bytes import bytes32, bytes48
+from cactus.types.coin_record import CoinRecord
+from cactus.types.condition_opcodes import ConditionOpcode
+from cactus.types.condition_with_args import ConditionWithArgs
+from cactus.types.mempool_inclusion_status import MempoolInclusionStatus
+from cactus.types.mempool_item import MempoolItem
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.cached_bls import LOCAL_CACHE
+from cactus.util.condition_tools import pkm_pairs
+from cactus.util.errors import Err, ValidationError
+from cactus.util.generator_tools import additions_for_npc
+from cactus.util.ints import uint32, uint64
+from cactus.util.lru_cache import LRUCache
+from cactus.util.setproctitle import getproctitle, setproctitle
+from cactus.util.streamable import recurse_jsonify
 
 log = logging.getLogger(__name__)
 
@@ -95,7 +95,7 @@ class MempoolManager:
         self.lock = asyncio.Lock()
 
         # The fee per cost must be above this amount to consider the fee "nonzero", and thus able to kick out other
-        # transactions. This prevents spam. This is equivalent to 0.055 XCH per block, or about 0.00005 XCH for two
+        # transactions. This prevents spam. This is equivalent to 0.055 CAC per block, or about 0.00005 CAC for two
         # spends.
         self.nonzero_fee_minimum_fpc = 5
 
@@ -204,7 +204,7 @@ class MempoolManager:
 
     @staticmethod
     def get_min_fee_increase() -> int:
-        # 0.00001 XCH
+        # 0.00001 CAC
         return 10000000
 
     def can_replace(
@@ -439,14 +439,14 @@ class MempoolManager:
                 log.warning(f"{npc.puzzle_hash} != {coin_record.coin.puzzle_hash}")
                 return None, MempoolInclusionStatus.FAILED, Err.WRONG_PUZZLE_HASH
 
-            chialisp_height = (
+            cactuslisp_height = (
                 self.peak.prev_transaction_block_height if not self.peak.is_transaction_block else self.peak.height
             )
             assert self.peak.timestamp is not None
             error = mempool_check_conditions_dict(
                 coin_record,
                 npc.condition_dict,
-                uint32(chialisp_height),
+                uint32(cactuslisp_height),
                 self.peak.timestamp,
             )
 

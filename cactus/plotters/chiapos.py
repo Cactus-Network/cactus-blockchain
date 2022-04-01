@@ -1,11 +1,11 @@
 """
-NOTE: This contains duplicate code from `chia.cmds.plots`.
-After `chia plots create` becomes obsolete, consider removing it from there.
+NOTE: This contains duplicate code from `cactus.cmds.plots`.
+After `cactus plots create` becomes obsolete, consider removing it from there.
 """
 import asyncio
 import logging
 import pkg_resources
-from chia.plotting.create_plots import create_plots, resolve_plot_keys
+from cactus.plotting.create_plots import create_plots, resolve_plot_keys
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 def get_chiapos_install_info() -> Optional[Dict[str, Any]]:
     chiapos_version: str = pkg_resources.get_distribution("chiapos").version
-    return {"display_name": "Chia Proof of Space", "version": chiapos_version, "installed": True}
+    return {"display_name": "Cactus Proof of Space", "version": chiapos_version, "installed": True}
 
 
 class Params:
@@ -34,7 +34,7 @@ class Params:
         self.exclude_final_dir = args.exclude_final_dir
 
 
-def plot_chia(args, root_path):
+def plot_cactus(args, root_path):
     if args.size < 32 and not args.override:
         print("k=32 is the minimum size for farming.")
         print("If you are testing and you want to use smaller size please add the --override flag.")

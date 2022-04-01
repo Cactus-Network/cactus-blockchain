@@ -4,18 +4,18 @@ from typing import Dict, List, Optional
 from clvm_rs import MEMPOOL_MODE, COND_CANON_INTS, NO_NEG_DIV
 
 from clvm.casts import int_from_bytes, int_to_bytes
-from chia.consensus.cost_calculator import NPCResult
-from chia.consensus.default_constants import DEFAULT_CONSTANTS
-from chia.full_node.generator import create_generator_args, setup_generator_args
-from chia.types.coin_record import CoinRecord
-from chia.types.condition_opcodes import ConditionOpcode
-from chia.types.condition_with_args import ConditionWithArgs
-from chia.types.generator_types import BlockGenerator
-from chia.types.name_puzzle_condition import NPC
-from chia.util.errors import Err
-from chia.util.ints import uint32, uint64, uint16
-from chia.wallet.puzzles.generator_loader import GENERATOR_FOR_SINGLE_COIN_MOD
-from chia.wallet.puzzles.rom_bootstrap_generator import get_generator
+from cactus.consensus.cost_calculator import NPCResult
+from cactus.consensus.default_constants import DEFAULT_CONSTANTS
+from cactus.full_node.generator import create_generator_args, setup_generator_args
+from cactus.types.coin_record import CoinRecord
+from cactus.types.condition_opcodes import ConditionOpcode
+from cactus.types.condition_with_args import ConditionWithArgs
+from cactus.types.generator_types import BlockGenerator
+from cactus.types.name_puzzle_condition import NPC
+from cactus.util.errors import Err
+from cactus.util.ints import uint32, uint64, uint16
+from cactus.wallet.puzzles.generator_loader import GENERATOR_FOR_SINGLE_COIN_MOD
+from cactus.wallet.puzzles.rom_bootstrap_generator import get_generator
 
 GENERATOR_MOD = get_generator()
 

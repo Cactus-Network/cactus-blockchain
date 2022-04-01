@@ -1,15 +1,15 @@
 from typing import Any, Callable, Dict, List, Optional
 
-from chia.farmer.farmer import Farmer
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.byte_types import hexstr_to_bytes
-from chia.util.ws_message import WsRpcMessage, create_payload_dict
+from cactus.farmer.farmer import Farmer
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.byte_types import hexstr_to_bytes
+from cactus.util.ws_message import WsRpcMessage, create_payload_dict
 
 
 class FarmerRpcApi:
     def __init__(self, farmer: Farmer):
         self.service = farmer
-        self.service_name = "chia_farmer"
+        self.service_name = "cactus_farmer"
 
     def get_routes(self) -> Dict[str, Callable]:
         return {

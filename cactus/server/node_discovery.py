@@ -7,19 +7,19 @@ from secrets import randbits
 from typing import Dict, Optional, List, Set
 
 
-import chia.server.ws_connection as ws
+import cactus.server.ws_connection as ws
 import dns.asyncresolver
-from chia.protocols import full_node_protocol, introducer_protocol
-from chia.protocols.protocol_message_types import ProtocolMessageTypes
-from chia.server.address_manager import AddressManager, ExtendedPeerInfo
-from chia.server.address_manager_store import AddressManagerStore
-from chia.server.address_manager_sqlite_store import create_address_manager_from_db
-from chia.server.outbound_message import NodeType, make_msg
-from chia.server.peer_store_resolver import PeerStoreResolver
-from chia.server.server import ChiaServer
-from chia.types.peer_info import PeerInfo, TimestampedPeerInfo
-from chia.util.hash import std_hash
-from chia.util.ints import uint64
+from cactus.protocols import full_node_protocol, introducer_protocol
+from cactus.protocols.protocol_message_types import ProtocolMessageTypes
+from cactus.server.address_manager import AddressManager, ExtendedPeerInfo
+from cactus.server.address_manager_store import AddressManagerStore
+from cactus.server.address_manager_sqlite_store import create_address_manager_from_db
+from cactus.server.outbound_message import NodeType, make_msg
+from cactus.server.peer_store_resolver import PeerStoreResolver
+from cactus.server.server import CactusServer
+from cactus.types.peer_info import PeerInfo, TimestampedPeerInfo
+from cactus.util.hash import std_hash
+from cactus.util.ints import uint64
 
 MAX_PEERS_RECEIVED_PER_REQUEST = 1000
 MAX_TOTAL_PEERS_RECEIVED = 3000
@@ -37,7 +37,7 @@ class FullNodeDiscovery:
 
     def __init__(
         self,
-        server: ChiaServer,
+        server: CactusServer,
         target_outbound_count: int,
         peer_store_resolver: PeerStoreResolver,
         introducer_info: Optional[Dict],
@@ -47,7 +47,7 @@ class FullNodeDiscovery:
         default_port: Optional[int],
         log,
     ):
-        self.server: ChiaServer = server
+        self.server: CactusServer = server
         self.message_queue: asyncio.Queue = asyncio.Queue()
         self.is_closed = False
         self.target_outbound_count = target_outbound_count
@@ -138,7 +138,7 @@ class FullNodeDiscovery:
     def add_message(self, message, data):
         self.message_queue.put_nowait((message, data))
 
-    async def on_connect(self, peer: ws.WSChiaConnection):
+    async def on_connect(self, peer: ws.WSCactusConnection):
         if (
             peer.is_outbound is False
             and peer.peer_server_port is not None
@@ -165,7 +165,7 @@ class FullNodeDiscovery:
             await peer.send_message(msg)
 
     # Updates timestamps each time we receive a message for outbound connections.
-    async def update_peer_timestamp_on_message(self, peer: ws.WSChiaConnection):
+    async def update_peer_timestamp_on_message(self, peer: ws.WSCactusConnection):
         if (
             peer.is_outbound
             and peer.peer_server_port is not None
@@ -203,7 +203,7 @@ class FullNodeDiscovery:
         if self.introducer_info is None:
             return None
 
-        async def on_connect(peer: ws.WSChiaConnection):
+        async def on_connect(peer: ws.WSCactusConnection):
             msg = make_msg(ProtocolMessageTypes.request_peers_introducer, introducer_protocol.RequestPeersIntroducer())
             await peer.send_message(msg)
 
@@ -236,7 +236,7 @@ class FullNodeDiscovery:
         except Exception as e:
             self.log.warn(f"querying DNS introducer failed: {e}")
 
-    async def on_connect_callback(self, peer: ws.WSChiaConnection):
+    async def on_connect_callback(self, peer: ws.WSCactusConnection):
         if self.server.on_connect is not None:
             await self.server.on_connect(peer)
         else:

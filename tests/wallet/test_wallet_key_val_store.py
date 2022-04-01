@@ -2,10 +2,10 @@ from pathlib import Path
 import aiosqlite
 import pytest
 
-from chia.types.full_block import FullBlock
-from chia.types.header_block import HeaderBlock
-from chia.util.db_wrapper import DBWrapper
-from chia.wallet.key_val_store import KeyValStore
+from cactus.types.full_block import FullBlock
+from cactus.types.header_block import HeaderBlock
+from cactus.util.db_wrapper import DBWrapper
+from cactus.wallet.key_val_store import KeyValStore
 
 
 class TestWalletKeyValStore:

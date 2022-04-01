@@ -5,10 +5,10 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
-import chia.server.ws_connection as ws  # lgtm [py/import-and-import-from]
-from chia.consensus.constants import ConsensusConstants
-from chia.plotting.manager import PlotManager
-from chia.plotting.util import (
+import cactus.server.ws_connection as ws  # lgtm [py/import-and-import-from]
+from cactus.consensus.constants import ConsensusConstants
+from cactus.plotting.manager import PlotManager
+from cactus.plotting.util import (
     add_plot_directory,
     get_plot_directories,
     remove_plot_directory,
@@ -17,7 +17,7 @@ from chia.plotting.util import (
     PlotRefreshResult,
     PlotRefreshEvents,
 )
-from chia.util.streamable import dataclass_from_dict
+from cactus.util.streamable import dataclass_from_dict
 
 log = logging.getLogger(__name__)
 
@@ -89,7 +89,7 @@ class Harvester:
         if len(update_result.loaded) > 0:
             self.event_loop.call_soon_threadsafe(self._state_changed, "plots")
 
-    def on_disconnect(self, connection: ws.WSChiaConnection):
+    def on_disconnect(self, connection: ws.WSCactusConnection):
         self.log.info(f"peer disconnected {connection.get_peer_logging()}")
         self._state_changed("close_connection")
 

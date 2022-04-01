@@ -2,9 +2,9 @@ from dataclasses import dataclass
 
 from typing import List
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.blockchain_format.program import Program
-from chia.util.ints import uint64
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.blockchain_format.program import Program
+from cactus.util.ints import uint64
 
 
 # This class is supposed to correspond to a CREATE_COIN condition

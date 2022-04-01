@@ -1,10 +1,10 @@
 import pytest
 import pytest_asyncio
 
-from chia.simulator.simulator_protocol import FarmNewBlockProtocol
-from chia.types.peer_info import PeerInfo
-from chia.util.ints import uint16, uint64
-from chia.wallet.rl_wallet.rl_wallet import RLWallet
+from cactus.simulator.simulator_protocol import FarmNewBlockProtocol
+from cactus.types.peer_info import PeerInfo
+from cactus.util.ints import uint16, uint64
+from cactus.wallet.rl_wallet.rl_wallet import RLWallet
 from tests.setup_nodes import setup_simulators_and_wallets
 from tests.time_out_assert import time_out_assert
 
