@@ -314,7 +314,7 @@ timelord:
   multiprocessing_start_method: default
 
   start_rpc_server: True
-  rpc_port: 8557
+  rpc_port: 11557
 
   ssl:
     private_crt:  "config/ssl/timelord/private_timelord.crt"
