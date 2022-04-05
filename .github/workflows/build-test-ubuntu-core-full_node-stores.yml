@@ -1,7 +1,7 @@
 #
 # THIS FILE IS GENERATED. SEE https://github.com/Cactus-Network/cactus-blockchain/tree/main/tests#readme
 #
-name: Ubuntu wallet-rl_wallet Test
+name: Ubuntu core-full_node-stores Test
 
 on:
   push:
@@ -20,9 +20,9 @@ concurrency:
 
 jobs:
   build:
-    name: Ubuntu wallet-rl_wallet Test
+    name: Ubuntu core-full_node-stores Test
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       max-parallel: 4
@@ -96,11 +96,16 @@ jobs:
         sh install-timelord.sh
         ./vdf_bench square_asm 400000
 
-    - name: Test wallet-rl_wallet code with pytest
+    - name: Test core-full_node-stores code with pytest
       run: |
         . ./activate
-        ./venv/bin/py.test tests/wallet/rl_wallet/test_*.py -s -v --durations 0
+        ./venv/bin/py.test tests/core/full_node/stores/test_*.py -s -v --durations 0
 
+
+    - name: Check resource usage
+      run: |
+        sqlite3 -readonly -separator " " .pymon "select item,cpu_usage,total_time,mem_usage from TEST_METRICS order by mem_usage desc;" >metrics.out
+        ./tests/check_pytest_monitor_output.py <metrics.out
 
 #
 # THIS FILE IS GENERATED. SEE https://github.com/Cactus-Network/cactus-blockchain/tree/main/tests#readme
