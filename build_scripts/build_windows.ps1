@@ -11,7 +11,7 @@ Write-Output "   ---"
 Write-Output "curl miniupnpc"
 Write-Output "   ---"
 # download.cactus-network.net is the CDN url behind all the files that are actually on pypi.chia.net/simple now
-Invoke-WebRequest -Uri "https://download.cactus-network.net/simple/miniupnpc/miniupnpc-2.2.2-cp39-cp39-win_amd64.whl" -OutFile "miniupnpc-2.2.2-cp39-cp39-win_amd64.whl"
+Invoke-WebRequest -Uri "https://download.chia.net/simple/miniupnpc/miniupnpc-2.2.2-cp39-cp39-win_amd64.whl" -OutFile "miniupnpc-2.2.2-cp39-cp39-win_amd64.whl"
 Write-Output "Using win_amd64 python 3.9 wheel from https://github.com/miniupnp/miniupnp/pull/475 (2.2.0-RC1)"
 Write-Output "Actual build from https://github.com/miniupnp/miniupnp/commit/7783ac1545f70e3341da5866069bde88244dd848"
 If ($LastExitCode -gt 0){
