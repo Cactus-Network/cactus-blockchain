@@ -8,6 +8,13 @@ for setuptools_scm/PEP 440 reasons.
 
 ## [Unreleased]
 
+# 1.3.3 Cactus blockchain 2022-4-05
+
+### Fixed
+
+- Fixed OpenSSL vulnerability for Windows Installer.
+- Other 'install.sh' issues corrected
+
 # 1.3.2 Cactus blockchain 2022-4-01
 
 ### Fixed
