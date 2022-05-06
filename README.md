@@ -64,7 +64,7 @@ npm run electron &
 cactus stop -d all<p>
 deactivate<p>
 git fetch<p>
-git reset --hard FETCH_HEAD --recurse-submodules<p>
+git reset --hard origin/main<p>
 
 sh install.sh<p>
 
