@@ -51,4 +51,4 @@ fi
 echo "### Starting GUI"
 cd "${SCRIPT_DIR}/cactus-blockchain-gui/"
 echo "npm run electron"
-npm run electron
+npm run electron &

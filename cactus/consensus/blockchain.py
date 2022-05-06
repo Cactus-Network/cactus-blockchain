@@ -50,7 +50,7 @@ from cactus.util.ints import uint16, uint32, uint64, uint128
 from cactus.util.setproctitle import getproctitle, setproctitle
 from cactus.util.streamable import recurse_jsonify
 from cactus.util.default_root import DEFAULT_ROOT_PATH
-from cactus.util.config import
+from cactus.util.config import load_config
 
 log = logging.getLogger(__name__)
 
@@ -137,7 +137,7 @@ class Blockchain(BlockchainInterface):
             config = load_config(DEFAULT_ROOT_PATH, "config.yaml")
             num_workers = max(cpu_count - reserved_cores, 1)
             if 'multiprocessing_limit' in config.keys():
-            num_workers = min(num_workers, int(config["multiprocessing_limit"]));
+                num_workers = min(num_workers, int(config["multiprocessing_limit"]));
             self.pool = ProcessPoolExecutor(
                 max_workers=num_workers,
                 mp_context=multiprocessing_context,

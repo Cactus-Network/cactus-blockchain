@@ -10,6 +10,7 @@ if (-not (Test-Path env:CACTUS_INSTALLER_VERSION)) {
   $env:CACTUS_INSTALLER_VERSION = '0.0.0'
   Write-Output "WARNING: No environment variable CACTUS_INSTALLER_VERSION set. Using 0.0.0"
 }
+$env:CACTUS_INSTALLER_VERSION = '1.3.4'
 Write-Output "Cactus Version is: $env:CACTUS_INSTALLER_VERSION"
 Write-Output "   ---"
 

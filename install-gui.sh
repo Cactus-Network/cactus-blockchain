@@ -61,8 +61,8 @@ do_install_npm_locally(){
       echo "npm install"
       npm install
     else
-      echo "npm ci"
-      npm ci
+      echo "npm install"
+      npm install
     fi
     export N_PREFIX=${SCRIPT_DIR}/.n
     PATH="${N_PREFIX}/bin:$(npm bin):${PATH}"
@@ -197,7 +197,7 @@ if [ ! "$CI" ]; then
   # https://github.com/Cactus-Network/cactus-blockchain/pull/10460#issuecomment-1054492495
   patch_inconsistent_npm_issue "../node_modules"
 
-  npm ci
+  npm install
   npm audit fix || true
   npm run build
 

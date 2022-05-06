@@ -1,13 +1,7 @@
-SPACEBUCKS = {
-    "asset_id": "78ad32a8c9ea70f27d73e9306fc467bab2a6b15b30289791e37ab6e8612212b1",
-    "name": "Spacebucks",
-    "symbol": "SBX",
-}
-
-MARMOT = {
-    "asset_id": "8ebf855de6eb146db5602f0456d2f0cbe750d57f821b6f91a8592ee9f1d4cf31",
-    "name": "Marmot",
-    "symbol": "MRMT",
+CACTUS_CAT = {
+    "asset_id": "f4714b401018304bce5b7d48d67f943a4c71b7a4b186db5ea138bafb4d6cd60a",
+    "name": "Cactus-CAT!",
+    "symbol": "CACT",
 }
 
 STABLY_USDS = {
@@ -16,15 +10,7 @@ STABLY_USDS = {
     "symbol": "USDS",
 }
 
-CACTUS_HOLIDAY_TOKEN = {
-    "asset_id": "509deafe3cd8bbfbb9ccce1d930e3d7b57b40c964fa33379b18d628175eb7a8f",
-    "name": "Cactus Holiday 2021 Token",
-    "symbol": "CH21",
-}
-
 DEFAULT_CATS = {
-    SPACEBUCKS["asset_id"]: SPACEBUCKS,
-    MARMOT["asset_id"]: MARMOT,
+    CACTUS_CAT["asset_id"]: CACTUS_CAT,
     STABLY_USDS["asset_id"]: STABLY_USDS,
-    CACTUS_HOLIDAY_TOKEN["asset_id"]: CACTUS_HOLIDAY_TOKEN,
 }
