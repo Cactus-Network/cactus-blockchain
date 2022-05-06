@@ -1,14 +1,14 @@
 import os
-from chia.plotters.bladebit import install_bladebit
-from chia.plotters.madmax import install_madmax
+from cactus.plotters.bladebit import install_bladebit
+from cactus.plotters.madmax import install_madmax
 
 
 def install_plotter(plotter, root_path):
     if plotter == "chiapos":
-        print("Chiapos already installed. No action taken.")
+        print("Cactuspos already installed. No action taken.")
         return
     elif plotter == "madmax":
-        if not os.path.exists(root_path / "madmax-plotter/build/chia_plot"):
+        if not os.path.exists(root_path / "madmax-plotter/build/cactus_plot"):
             print("Installing madmax plotter.")
             try:
                 install_madmax(root_path)

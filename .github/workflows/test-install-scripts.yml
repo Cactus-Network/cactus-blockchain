@@ -252,7 +252,7 @@ jobs:
         INSTALL_PYTHON_VERSION: ${{ matrix.python-version }}
       run: sh install.sh -a
 
-    - name: Run chia --help
+    - name: Run cactus --help
       run: |
         . ./activate
-        chia --help
+        cactus --help

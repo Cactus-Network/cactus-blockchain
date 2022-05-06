@@ -5,7 +5,7 @@ from typing import Callable, Optional, TextIO, TypeVar
 T = TypeVar("T")
 
 
-# Cribbed mostly from chia/daemon/server.py
+# Cribbed mostly from cactus/daemon/server.py
 def create_exclusive_lock(lockfile: str) -> Optional[TextIO]:
     """
     Open a lockfile exclusively.

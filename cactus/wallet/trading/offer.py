@@ -2,29 +2,29 @@ from dataclasses import dataclass
 from typing import List, Optional, Dict, Set, Tuple
 from blspy import G2Element
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import Program
-from chia.types.announcement import Announcement
-from chia.types.coin_spend import CoinSpend
-from chia.types.spend_bundle import SpendBundle
-from chia.util.bech32m import bech32_encode, bech32_decode, convertbits
-from chia.util.ints import uint64
-from chia.wallet.util.puzzle_compression import (
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import Program
+from cactus.types.announcement import Announcement
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.bech32m import bech32_encode, bech32_decode, convertbits
+from cactus.util.ints import uint64
+from cactus.wallet.util.puzzle_compression import (
     compress_object_with_puzzles,
     decompress_object_with_puzzles,
     lowest_best_version,
 )
-from chia.wallet.cat_wallet.cat_utils import (
+from cactus.wallet.cat_wallet.cat_utils import (
     CAT_MOD,
     SpendableCAT,
     construct_cat_puzzle,
     match_cat_puzzle,
     unsigned_spend_bundle_for_spendable_cats,
 )
-from chia.wallet.lineage_proof import LineageProof
-from chia.wallet.puzzles.load_clvm import load_clvm
-from chia.wallet.payment import Payment
+from cactus.wallet.lineage_proof import LineageProof
+from cactus.wallet.puzzles.load_clvm import load_clvm
+from cactus.wallet.payment import Payment
 
 OFFER_MOD = load_clvm("settlement_payments.clvm")
 ZERO_32 = bytes32([0] * 32)
@@ -55,7 +55,7 @@ class Offer:
 
     @staticmethod
     def notarize_payments(
-        requested_payments: Dict[Optional[bytes32], List[Payment]],  # `None` means you are requesting XCH
+        requested_payments: Dict[Optional[bytes32], List[Payment]],  # `None` means you are requesting CAC
         coins: List[Coin],
     ) -> Dict[Optional[bytes32], List[NotarizedPayment]]:
         # This sort should be reproducible in CLVM with `>s`
@@ -168,7 +168,7 @@ class Offer:
             new_dic: Dict[str, int] = {}
             for key in dic:
                 if key is None:
-                    new_dic["xch"] = dic[key]
+                    new_dic["cac"] = dic[key]
                 else:
                     new_dic[key.hex()] = dic[key]
             return new_dic
@@ -185,7 +185,7 @@ class Offer:
         pending_dict: Dict[str, int] = {}
         # First we add up the amounts of all coins that share an ancestor with the offered coins (i.e. a primary coin)
         for asset_id, coins in self.get_offered_coins().items():
-            name = "xch" if asset_id is None else asset_id.hex()
+            name = "cac" if asset_id is None else asset_id.hex()
             pending_dict[name] = 0
             for coin in coins:
                 root_removal: Coin = self.get_root_removal(coin)

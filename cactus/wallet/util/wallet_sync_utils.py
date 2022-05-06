@@ -3,9 +3,9 @@ import logging
 import random
 from typing import List, Optional, Tuple, Union, Dict
 
-from chia.consensus.constants import ConsensusConstants
-from chia.protocols import wallet_protocol
-from chia.protocols.wallet_protocol import (
+from cactus.consensus.constants import ConsensusConstants
+from cactus.protocols import wallet_protocol
+from cactus.protocols.wallet_protocol import (
     RequestAdditions,
     RespondAdditions,
     RejectAdditionsRequest,
@@ -19,19 +19,19 @@ from chia.protocols.wallet_protocol import (
     RespondHeaderBlocks,
     RequestHeaderBlocks,
 )
-from chia.server.ws_connection import WSChiaConnection
-from chia.types.blockchain_format.coin import hash_coin_ids, Coin
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.full_block import FullBlock
-from chia.types.header_block import HeaderBlock
-from chia.util.ints import uint32
-from chia.util.merkle_set import confirm_not_included_already_hashed, confirm_included_already_hashed, MerkleSet
-from chia.wallet.util.peer_request_cache import PeerRequestCache
+from cactus.server.ws_connection import WSCactusConnection
+from cactus.types.blockchain_format.coin import hash_coin_ids, Coin
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.full_block import FullBlock
+from cactus.types.header_block import HeaderBlock
+from cactus.util.ints import uint32
+from cactus.util.merkle_set import confirm_not_included_already_hashed, confirm_included_already_hashed, MerkleSet
+from cactus.wallet.util.peer_request_cache import PeerRequestCache
 
 log = logging.getLogger(__name__)
 
 
-async def fetch_last_tx_from_peer(height: uint32, peer: WSChiaConnection) -> Optional[HeaderBlock]:
+async def fetch_last_tx_from_peer(height: uint32, peer: WSCactusConnection) -> Optional[HeaderBlock]:
     request_height: int = height
     while True:
         if request_height == -1:
@@ -50,7 +50,7 @@ async def fetch_last_tx_from_peer(height: uint32, peer: WSChiaConnection) -> Opt
 
 async def subscribe_to_phs(
     puzzle_hashes: List[bytes32],
-    peer: WSChiaConnection,
+    peer: WSCactusConnection,
     min_height: int,
 ) -> List[CoinState]:
     """
@@ -65,7 +65,7 @@ async def subscribe_to_phs(
 
 async def subscribe_to_coin_updates(
     coin_names: List[bytes32],
-    peer: WSChiaConnection,
+    peer: WSCactusConnection,
     min_height: int,
 ) -> List[CoinState]:
     """
@@ -191,7 +191,7 @@ def validate_removals(
 
 
 async def request_and_validate_removals(
-    peer: WSChiaConnection, height: uint32, header_hash: bytes32, coin_name: bytes32, removals_root: bytes32
+    peer: WSCactusConnection, height: uint32, header_hash: bytes32, coin_name: bytes32, removals_root: bytes32
 ) -> bool:
     removals_request = RequestRemovals(height, header_hash, [coin_name])
 
@@ -205,7 +205,7 @@ async def request_and_validate_removals(
 
 
 async def request_and_validate_additions(
-    peer: WSChiaConnection, height: uint32, header_hash: bytes32, puzzle_hash: bytes32, additions_root: bytes32
+    peer: WSCactusConnection, height: uint32, header_hash: bytes32, puzzle_hash: bytes32, additions_root: bytes32
 ):
     additions_request = RequestAdditions(height, header_hash, [puzzle_hash])
     additions_res: Optional[Union[RespondAdditions, RejectAdditionsRequest]] = await peer.request_additions(
@@ -289,7 +289,7 @@ def last_change_height_cs(cs: CoinState) -> uint32:
 
 
 async def _fetch_header_blocks_inner(
-    all_peers: List[WSChiaConnection],
+    all_peers: List[WSCactusConnection],
     request: RequestHeaderBlocks,
 ) -> Optional[RespondHeaderBlocks]:
     # We will modify this list, don't modify passed parameters.
@@ -315,7 +315,7 @@ async def fetch_header_blocks_in_range(
     start: uint32,
     end: uint32,
     peer_request_cache: PeerRequestCache,
-    all_peers: List[WSChiaConnection],
+    all_peers: List[WSCactusConnection],
 ) -> Optional[List[HeaderBlock]]:
     blocks: List[HeaderBlock] = []
     for i in range(start - (start % 32), end + 1, 32):

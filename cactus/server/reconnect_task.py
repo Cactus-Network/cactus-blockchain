@@ -2,12 +2,12 @@ import asyncio
 
 from typing import Optional
 
-from chia.server.server import ChiaServer
-from chia.types.peer_info import PeerInfo
-from chia.util.network import get_host_addr
+from cactus.server.server import CactusServer
+from cactus.types.peer_info import PeerInfo
+from cactus.util.network import get_host_addr
 
 
-def start_reconnect_task(server: ChiaServer, peer_info_arg: PeerInfo, log, auth: bool, prefer_ipv6: Optional[bool]):
+def start_reconnect_task(server: CactusServer, peer_info_arg: PeerInfo, log, auth: bool, prefer_ipv6: Optional[bool]):
     """
     Start a background task that checks connection and reconnects periodically to a peer.
     """

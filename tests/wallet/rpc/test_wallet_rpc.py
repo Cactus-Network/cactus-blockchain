@@ -7,37 +7,37 @@ import pytest
 import pytest_asyncio
 from blspy import G2Element
 
-from chia.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
-from chia.consensus.coinbase import create_puzzlehash_for_pk
-from chia.rpc.full_node_rpc_api import FullNodeRpcApi
-from chia.rpc.full_node_rpc_client import FullNodeRpcClient
-from chia.rpc.rpc_server import start_rpc_server
-from chia.rpc.wallet_rpc_api import WalletRpcApi
-from chia.rpc.wallet_rpc_client import WalletRpcClient
-from chia.server.server import ChiaServer
-from chia.simulator.full_node_simulator import FullNodeSimulator
-from chia.simulator.simulator_protocol import FarmNewBlockProtocol
-from chia.types.announcement import Announcement
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_record import CoinRecord
-from chia.types.coin_spend import CoinSpend
-from chia.types.peer_info import PeerInfo
-from chia.types.spend_bundle import SpendBundle
-from chia.util.bech32m import decode_puzzle_hash, encode_puzzle_hash
-from chia.util.config import lock_and_load_config, save_config
-from chia.util.hash import std_hash
-from chia.util.ints import uint16, uint32, uint64
-from chia.wallet.cat_wallet.cat_constants import DEFAULT_CATS
-from chia.wallet.cat_wallet.cat_wallet import CATWallet
-from chia.wallet.derive_keys import master_sk_to_wallet_sk, master_sk_to_wallet_sk_unhardened
-from chia.wallet.trading.trade_status import TradeStatus
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.transaction_sorting import SortKey
-from chia.wallet.util.compute_memos import compute_memos
-from chia.wallet.util.wallet_types import WalletType
-from chia.wallet.wallet import Wallet
-from chia.wallet.wallet_node import WalletNode
+from cactus.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
+from cactus.consensus.coinbase import create_puzzlehash_for_pk
+from cactus.rpc.full_node_rpc_api import FullNodeRpcApi
+from cactus.rpc.full_node_rpc_client import FullNodeRpcClient
+from cactus.rpc.rpc_server import start_rpc_server
+from cactus.rpc.wallet_rpc_api import WalletRpcApi
+from cactus.rpc.wallet_rpc_client import WalletRpcClient
+from cactus.server.server import CactusServer
+from cactus.simulator.full_node_simulator import FullNodeSimulator
+from cactus.simulator.simulator_protocol import FarmNewBlockProtocol
+from cactus.types.announcement import Announcement
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_record import CoinRecord
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.peer_info import PeerInfo
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.bech32m import decode_puzzle_hash, encode_puzzle_hash
+from cactus.util.config import lock_and_load_config, save_config
+from cactus.util.hash import std_hash
+from cactus.util.ints import uint16, uint32, uint64
+from cactus.wallet.cat_wallet.cat_constants import DEFAULT_CATS
+from cactus.wallet.cat_wallet.cat_wallet import CATWallet
+from cactus.wallet.derive_keys import master_sk_to_wallet_sk, master_sk_to_wallet_sk_unhardened
+from cactus.wallet.trading.trade_status import TradeStatus
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.transaction_sorting import SortKey
+from cactus.wallet.util.compute_memos import compute_memos
+from cactus.wallet.util.wallet_types import WalletType
+from cactus.wallet.wallet import Wallet
+from cactus.wallet.wallet_node import WalletNode
 from tests.block_tools import BlockTools
 from tests.pools.test_pool_rpc import wallet_is_synced
 from tests.time_out_assert import time_out_assert
@@ -55,7 +55,7 @@ class WalletBundle:
 
 @dataclasses.dataclass
 class FullNodeBundle:
-    server: ChiaServer
+    server: CactusServer
     api: FullNodeSimulator
     rpc_client: FullNodeRpcClient
 
@@ -230,7 +230,7 @@ async def test_wallet_rpc(wallet_rpc_environment: WalletRpcTestEnvironment):
     generated_funds = await generate_funds(full_node_api, env.wallet_1)
 
     ph_2 = await wallet_2.get_new_puzzlehash()
-    addr = encode_puzzle_hash(await wallet_2.get_new_puzzlehash(), "txch")
+    addr = encode_puzzle_hash(await wallet_2.get_new_puzzlehash(), "tcac")
     tx_amount = uint64(15600000)
     with pytest.raises(ValueError):
         await client.send_transaction("1", uint64(100000000000000001), addr)
@@ -432,7 +432,7 @@ async def test_wallet_rpc(wallet_rpc_environment: WalletRpcTestEnvironment):
     assert all_transactions == sorted(all_transactions, key=attrgetter("confirmed_at_height"), reverse=True)
 
     # Test RELEVANCE
-    await client.send_transaction("1", uint64(1), encode_puzzle_hash(ph_2, "txch"))  # Create a pending tx
+    await client.send_transaction("1", uint64(1), encode_puzzle_hash(ph_2, "tcac"))  # Create a pending tx
 
     all_transactions = await client.get_transactions("1", sort_key=SortKey.RELEVANCE)
     sorted_transactions = sorted(all_transactions, key=attrgetter("created_at_time"), reverse=True)
@@ -464,10 +464,10 @@ async def test_wallet_rpc(wallet_rpc_environment: WalletRpcTestEnvironment):
 
     # Test get_transactions to address
     ph_by_addr = await wallet.get_new_puzzlehash()
-    await client.send_transaction("1", uint64(1), encode_puzzle_hash(ph_by_addr, "txch"))
-    await client.farm_block(encode_puzzle_hash(ph_by_addr, "txch"))
+    await client.send_transaction("1", uint64(1), encode_puzzle_hash(ph_by_addr, "tcac"))
+    await client.farm_block(encode_puzzle_hash(ph_by_addr, "tcac"))
     await time_out_assert(10, wallet_is_synced, True, wallet_node, full_node_api)
-    tx_for_address = await client.get_transactions("1", to_address=encode_puzzle_hash(ph_by_addr, "txch"))
+    tx_for_address = await client.get_transactions("1", to_address=encode_puzzle_hash(ph_by_addr, "tcac"))
     assert len(tx_for_address) == 1
     assert tx_for_address[0].to_puzzle_hash == ph_by_addr
 
@@ -563,7 +563,7 @@ async def test_wallet_rpc(wallet_rpc_environment: WalletRpcTestEnvironment):
     # Offers #
     ##########
 
-    # Create an offer of 5 chia for one CAT
+    # Create an offer of 5 cactus for one CAT
     offer, trade_record = await client.create_offer_for_ids({uint32(1): -5, cat_0_id: 1}, validate_only=True)
     all_offers = await client.get_all_offers()
     assert len(all_offers) == 0
@@ -573,7 +573,7 @@ async def test_wallet_rpc(wallet_rpc_environment: WalletRpcTestEnvironment):
     assert offer is not None
 
     summary = await client.get_offer_summary(offer)
-    assert summary == {"offered": {"xch": 5}, "requested": {col.hex(): 1}, "fees": 1}
+    assert summary == {"offered": {"cac": 5}, "requested": {col.hex(): 1}, "fees": 1}
 
     assert await client.check_offer_validity(offer)
 
@@ -683,11 +683,11 @@ async def test_wallet_rpc(wallet_rpc_environment: WalletRpcTestEnvironment):
     sk = await wallet_node.get_key_for_fingerprint(pks[0])
     test_ph = create_puzzlehash_for_pk(master_sk_to_wallet_sk(sk, uint32(0)).get_g1())
     with lock_and_load_config(wallet_node.root_path, "config.yaml") as test_config:
-        test_config["farmer"]["xch_target_address"] = encode_puzzle_hash(test_ph, "txch")
+        test_config["farmer"]["cac_target_address"] = encode_puzzle_hash(test_ph, "tcac")
         # set pool to second private key
         sk = await wallet_node.get_key_for_fingerprint(pks[1])
         test_ph = create_puzzlehash_for_pk(master_sk_to_wallet_sk(sk, uint32(0)).get_g1())
-        test_config["pool"]["xch_target_address"] = encode_puzzle_hash(test_ph, "txch")
+        test_config["pool"]["cac_target_address"] = encode_puzzle_hash(test_ph, "tcac")
         save_config(wallet_node.root_path, "config.yaml", test_config)
 
     # Check first key
@@ -713,11 +713,11 @@ async def test_wallet_rpc(wallet_rpc_environment: WalletRpcTestEnvironment):
     sk = await wallet_node.get_key_for_fingerprint(pks[0])
     test_ph = create_puzzlehash_for_pk(master_sk_to_wallet_sk_unhardened(sk, uint32(0)).get_g1())
     with lock_and_load_config(wallet_node.root_path, "config.yaml") as test_config:
-        test_config["farmer"]["xch_target_address"] = encode_puzzle_hash(test_ph, "txch")
+        test_config["farmer"]["cac_target_address"] = encode_puzzle_hash(test_ph, "tcac")
         # set pool to second private key
         sk = await wallet_node.get_key_for_fingerprint(pks[1])
         test_ph = create_puzzlehash_for_pk(master_sk_to_wallet_sk_unhardened(sk, uint32(0)).get_g1())
-        test_config["pool"]["xch_target_address"] = encode_puzzle_hash(test_ph, "txch")
+        test_config["pool"]["cac_target_address"] = encode_puzzle_hash(test_ph, "tcac")
         save_config(wallet_node.root_path, "config.yaml", test_config)
 
     # Check first key

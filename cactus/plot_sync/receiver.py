@@ -3,8 +3,8 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Collection, Coroutine, Dict, List, Optional
 
-from chia.plot_sync.delta import Delta, PathListDelta, PlotListDelta
-from chia.plot_sync.exceptions import (
+from cactus.plot_sync.delta import Delta, PathListDelta, PlotListDelta
+from cactus.plot_sync.exceptions import (
     InvalidIdentifierError,
     InvalidLastSyncIdError,
     PlotAlreadyAvailableError,
@@ -12,8 +12,8 @@ from chia.plot_sync.exceptions import (
     PlotSyncException,
     SyncIdsMatchError,
 )
-from chia.plot_sync.util import ErrorCodes, State
-from chia.protocols.harvester_protocol import (
+from cactus.plot_sync.util import ErrorCodes, State
+from cactus.protocols.harvester_protocol import (
     Plot,
     PlotSyncDone,
     PlotSyncError,
@@ -23,11 +23,11 @@ from chia.protocols.harvester_protocol import (
     PlotSyncResponse,
     PlotSyncStart,
 )
-from chia.server.ws_connection import ProtocolMessageTypes, WSChiaConnection, make_msg
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.ints import int16, uint32, uint64
-from chia.util.misc import get_list_or_len
-from chia.util.streamable import _T_Streamable
+from cactus.server.ws_connection import ProtocolMessageTypes, WSCactusConnection, make_msg
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.ints import int16, uint32, uint64
+from cactus.util.misc import get_list_or_len
+from cactus.util.streamable import _T_Streamable
 
 log = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ class Sync:
 
 
 class Receiver:
-    _connection: WSChiaConnection
+    _connection: WSCactusConnection
     _current_sync: Sync
     _last_sync: Sync
     _plots: Dict[str, Plot]
@@ -65,7 +65,7 @@ class Receiver:
 
     def __init__(
         self,
-        connection: WSChiaConnection,
+        connection: WSCactusConnection,
         update_callback: Callable[[bytes32, Optional[Delta]], Coroutine[Any, Any, None]],
     ) -> None:
         self._connection = connection
@@ -93,7 +93,7 @@ class Receiver:
         self._duplicates.clear()
         self._total_plot_size = 0
 
-    def connection(self) -> WSChiaConnection:
+    def connection(self) -> WSCactusConnection:
         return self._connection
 
     def current_sync(self) -> Sync:

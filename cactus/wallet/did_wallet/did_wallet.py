@@ -5,28 +5,28 @@ import json
 from typing import Dict, Optional, List, Any, Set, Tuple
 from blspy import AugSchemeMPL, G1Element
 from secrets import token_bytes
-from chia.protocols import wallet_protocol
-from chia.protocols.wallet_protocol import CoinState
-from chia.types.announcement import Announcement
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.types.spend_bundle import SpendBundle
-from chia.util.ints import uint64, uint32, uint8, uint128
-from chia.wallet.util.transaction_type import TransactionType
+from cactus.protocols import wallet_protocol
+from cactus.protocols.wallet_protocol import CoinState
+from cactus.types.announcement import Announcement
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.ints import uint64, uint32, uint8, uint128
+from cactus.wallet.util.transaction_type import TransactionType
 
-from chia.wallet.did_wallet.did_info import DIDInfo
-from chia.wallet.lineage_proof import LineageProof
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.util.wallet_types import WalletType
-from chia.wallet.util.compute_memos import compute_memos
-from chia.wallet.wallet import Wallet
-from chia.wallet.wallet_coin_record import WalletCoinRecord
-from chia.wallet.wallet_info import WalletInfo
-from chia.wallet.derivation_record import DerivationRecord
-from chia.wallet.did_wallet import did_wallet_puzzles
-from chia.wallet.derive_keys import master_sk_to_wallet_sk_unhardened
+from cactus.wallet.did_wallet.did_info import DIDInfo
+from cactus.wallet.lineage_proof import LineageProof
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.util.wallet_types import WalletType
+from cactus.wallet.util.compute_memos import compute_memos
+from cactus.wallet.wallet import Wallet
+from cactus.wallet.wallet_coin_record import WalletCoinRecord
+from cactus.wallet.wallet_info import WalletInfo
+from cactus.wallet.derivation_record import DerivationRecord
+from cactus.wallet.did_wallet import did_wallet_puzzles
+from cactus.wallet.derive_keys import master_sk_to_wallet_sk_unhardened
 
 
 class DIDWallet:

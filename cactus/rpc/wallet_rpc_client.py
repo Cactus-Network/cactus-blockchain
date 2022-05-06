@@ -1,16 +1,16 @@
 from typing import Dict, List, Optional, Any, Tuple
 
-from chia.pools.pool_wallet_info import PoolWalletInfo
-from chia.rpc.rpc_client import RpcClient
-from chia.types.announcement import Announcement
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.ints import uint32, uint64
-from chia.wallet.trade_record import TradeRecord
-from chia.wallet.trading.offer import Offer
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.transaction_sorting import SortKey
-from chia.wallet.util.wallet_types import WalletType
+from cactus.pools.pool_wallet_info import PoolWalletInfo
+from cactus.rpc.rpc_client import RpcClient
+from cactus.types.announcement import Announcement
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.ints import uint32, uint64
+from cactus.wallet.trade_record import TradeRecord
+from cactus.wallet.trading.offer import Offer
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.transaction_sorting import SortKey
+from cactus.wallet.util.wallet_types import WalletType
 
 
 def parse_result_transactions(result: Dict[str, Any]) -> Dict[str, Any]:
@@ -22,9 +22,9 @@ def parse_result_transactions(result: Dict[str, Any]) -> Dict[str, Any]:
 
 class WalletRpcClient(RpcClient):
     """
-    Client to Chia RPC, connects to a local wallet. Uses HTTP/JSON, and converts back from
+    Client to Cactus RPC, connects to a local wallet. Uses HTTP/JSON, and converts back from
     JSON into native python objects before returning. All api calls use POST requests.
-    Note that this is not the same as the peer protocol, or wallet protocol (which run Chia's
+    Note that this is not the same as the peer protocol, or wallet protocol (which run Cactus's
     protocol on top of TCP), it's a separate protocol on top of HTTP that provides easy access
     to the full node.
     """

@@ -1,5 +1,5 @@
 #
-# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chia-blockchain/tree/main/tests#readme
+# THIS FILE IS GENERATED. SEE https://github.com/Cactus-Network/cactus-blockchain/tree/main/tests#readme
 #
 name: Ubuntu clvm Test
 
@@ -32,7 +32,7 @@ jobs:
         python-version: ['3.7', '3.8', '3.9', '3.10']
         os: [ubuntu-latest]
     env:
-      CHIA_ROOT: ${{ github.workspace }}/.chia/mainnet
+      CACTUS_ROOT: ${{ github.workspace }}/.cactus/mainnet
       JOB_FILE_NAME: tests_${{ matrix.os }}_python-${{ matrix.python-version }}_clvm
 
     steps:
@@ -67,7 +67,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
 
-# Omitted checking out blocks and plots repo Chia-Network/test-cache
+# Omitted checking out blocks and plots repo Cactus-Network/test-cache
 
     - name: Run install script
       env:
@@ -80,7 +80,7 @@ jobs:
     - name: Test clvm code with pytest
       run: |
         . ./activate
-        venv/bin/coverage run --rcfile=.coveragerc --module pytest --durations=10  -n 4 -m "not benchmark" -p no:monitor tests/clvm/test_chialisp_deserialization.py tests/clvm/test_clvm_compilation.py tests/clvm/test_clvm_step.py tests/clvm/test_program.py tests/clvm/test_puzzle_compression.py tests/clvm/test_puzzles.py tests/clvm/test_serialized_program.py tests/clvm/test_singletons.py tests/clvm/test_spend_sim.py
+        venv/bin/coverage run --rcfile=.coveragerc --module pytest --durations=10  -n 4 -m "not benchmark" -p no:monitor tests/clvm/test_cactuslisp_deserialization.py tests/clvm/test_clvm_compilation.py tests/clvm/test_clvm_step.py tests/clvm/test_program.py tests/clvm/test_puzzle_compression.py tests/clvm/test_puzzles.py tests/clvm/test_serialized_program.py tests/clvm/test_singletons.py tests/clvm/test_spend_sim.py
 
     - name: Process coverage data
       run: |
@@ -101,5 +101,5 @@ jobs:
 # Omitted resource usage check
 
 #
-# THIS FILE IS GENERATED. SEE https://github.com/Chia-Network/chia-blockchain/tree/main/tests#readme
+# THIS FILE IS GENERATED. SEE https://github.com/Cactus-Network/cactus-blockchain/tree/main/tests#readme
 #

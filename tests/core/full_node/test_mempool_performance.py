@@ -5,11 +5,11 @@ import time
 
 import pytest
 
-from chia.protocols import full_node_protocol
-from chia.types.peer_info import PeerInfo
-from chia.util.ints import uint16
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.wallet_node import WalletNode
+from cactus.protocols import full_node_protocol
+from cactus.types.peer_info import PeerInfo
+from cactus.util.ints import uint16
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.wallet_node import WalletNode
 from tests.connection_utils import connect_and_get_peer
 from tests.time_out_assert import time_out_assert
 

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from chia.types.blockchain_format.vdf import VDFInfo, VDFProof
-from chia.util.streamable import Streamable, streamable
+from cactus.types.blockchain_format.vdf import VDFInfo, VDFProof
+from cactus.util.streamable import Streamable, streamable
 
 
 @streamable

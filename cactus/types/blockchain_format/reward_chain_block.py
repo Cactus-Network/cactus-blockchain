@@ -3,11 +3,11 @@ from typing import Optional
 
 from blspy import G2Element
 
-from chia.types.blockchain_format.proof_of_space import ProofOfSpace
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.blockchain_format.vdf import VDFInfo
-from chia.util.ints import uint8, uint32, uint128
-from chia.util.streamable import Streamable, streamable
+from cactus.types.blockchain_format.proof_of_space import ProofOfSpace
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.blockchain_format.vdf import VDFInfo
+from cactus.util.ints import uint8, uint32, uint128
+from cactus.util.streamable import Streamable, streamable
 
 
 @streamable

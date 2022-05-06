@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from chia.types.spend_bundle_conditions import SpendBundleConditions
-from chia.util.ints import uint16, uint64
-from chia.util.streamable import Streamable, streamable
+from cactus.types.spend_bundle_conditions import SpendBundleConditions
+from cactus.util.ints import uint16, uint64
+from cactus.util.streamable import Streamable, streamable
 
 
 @streamable

@@ -3,8 +3,8 @@ from hashlib import sha256
 
 import pytest
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.merkle_set import MerkleSet, confirm_included_already_hashed
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.merkle_set import MerkleSet, confirm_included_already_hashed
 
 
 class TestMerkleSet:

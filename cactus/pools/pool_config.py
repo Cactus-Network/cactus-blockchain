@@ -5,10 +5,10 @@ from typing import List
 
 from blspy import G1Element
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.byte_types import hexstr_to_bytes
-from chia.util.config import load_config, lock_and_load_config, save_config
-from chia.util.streamable import Streamable, streamable
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.byte_types import hexstr_to_bytes
+from cactus.util.config import load_config, lock_and_load_config, save_config
+from cactus.util.streamable import Streamable, streamable
 
 """
 Config example

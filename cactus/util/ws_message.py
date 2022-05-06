@@ -1,7 +1,7 @@
 from secrets import token_bytes
 from typing import Any, Dict
 
-from chia.util.json_util import dict_to_json_str
+from cactus.util.json_util import dict_to_json_str
 
 from typing_extensions import TypedDict
 

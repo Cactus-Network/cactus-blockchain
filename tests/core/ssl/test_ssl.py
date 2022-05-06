@@ -4,18 +4,18 @@ import aiohttp
 import pytest
 import pytest_asyncio
 
-from chia.protocols.shared_protocol import protocol_version
-from chia.server.outbound_message import NodeType
-from chia.server.server import ChiaServer, ssl_context_for_client
-from chia.server.ws_connection import WSChiaConnection
-from chia.ssl.create_ssl import generate_ca_signed_cert
-from chia.types.peer_info import PeerInfo
-from chia.util.ints import uint16
+from cactus.protocols.shared_protocol import protocol_version
+from cactus.server.outbound_message import NodeType
+from cactus.server.server import CactusServer, ssl_context_for_client
+from cactus.server.ws_connection import WSCactusConnection
+from cactus.ssl.create_ssl import generate_ca_signed_cert
+from cactus.types.peer_info import PeerInfo
+from cactus.util.ints import uint16
 from tests.block_tools import test_constants
 from tests.setup_nodes import setup_harvester_farmer
 
 
-async def establish_connection(server: ChiaServer, self_hostname: str, ssl_context) -> bool:
+async def establish_connection(server: CactusServer, self_hostname: str, ssl_context) -> bool:
     timeout = aiohttp.ClientTimeout(total=10)
     session = aiohttp.ClientSession(timeout=timeout)
     dummy_port = 5  # this does not matter
@@ -23,7 +23,7 @@ async def establish_connection(server: ChiaServer, self_hostname: str, ssl_conte
         incoming_queue: asyncio.Queue = asyncio.Queue()
         url = f"wss://{self_hostname}:{server._port}/ws"
         ws = await session.ws_connect(url, autoclose=False, autoping=True, ssl=ssl_context)
-        wsc = WSChiaConnection(
+        wsc = WSCactusConnection(
             NodeType.FULL_NODE,
             ws,
             server._port,
@@ -56,7 +56,7 @@ class TestSSL:
     async def test_public_connections(self, wallet_node_sim_and_wallet, self_hostname):
         full_nodes, wallets = wallet_node_sim_and_wallet
         full_node_api = full_nodes[0]
-        server_1: ChiaServer = full_node_api.full_node.server
+        server_1: CactusServer = full_node_api.full_node.server
         wallet_node, server_2 = wallets[0]
 
         success = await server_2.start_client(PeerInfo(self_hostname, uint16(server_1._port)), None)
@@ -87,10 +87,10 @@ class TestSSL:
         pub_crt = farmer_server._private_key_path.parent / "non_valid.crt"
         pub_key = farmer_server._private_key_path.parent / "non_valid.key"
         generate_ca_signed_cert(
-            farmer_server.chia_ca_crt_path.read_bytes(), farmer_server.chia_ca_key_path.read_bytes(), pub_crt, pub_key
+            farmer_server.cactus_ca_crt_path.read_bytes(), farmer_server.cactus_ca_key_path.read_bytes(), pub_crt, pub_key
         )
         ssl_context = ssl_context_for_client(
-            farmer_server.chia_ca_crt_path, farmer_server.chia_ca_key_path, pub_crt, pub_key
+            farmer_server.cactus_ca_crt_path, farmer_server.cactus_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(farmer_server, self_hostname, ssl_context)
         assert connected is False
@@ -110,13 +110,13 @@ class TestSSL:
         pub_crt = full_node_server._private_key_path.parent / "p2p.crt"
         pub_key = full_node_server._private_key_path.parent / "p2p.key"
         generate_ca_signed_cert(
-            full_node_server.chia_ca_crt_path.read_bytes(),
-            full_node_server.chia_ca_key_path.read_bytes(),
+            full_node_server.cactus_ca_crt_path.read_bytes(),
+            full_node_server.cactus_ca_key_path.read_bytes(),
             pub_crt,
             pub_key,
         )
         ssl_context = ssl_context_for_client(
-            full_node_server.chia_ca_crt_path, full_node_server.chia_ca_key_path, pub_crt, pub_key
+            full_node_server.cactus_ca_crt_path, full_node_server.cactus_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(full_node_server, self_hostname, ssl_context)
         assert connected is True
@@ -130,10 +130,10 @@ class TestSSL:
         pub_crt = wallet_server._private_key_path.parent / "p2p.crt"
         pub_key = wallet_server._private_key_path.parent / "p2p.key"
         generate_ca_signed_cert(
-            wallet_server.chia_ca_crt_path.read_bytes(), wallet_server.chia_ca_key_path.read_bytes(), pub_crt, pub_key
+            wallet_server.cactus_ca_crt_path.read_bytes(), wallet_server.cactus_ca_key_path.read_bytes(), pub_crt, pub_key
         )
         ssl_context = ssl_context_for_client(
-            wallet_server.chia_ca_crt_path, wallet_server.chia_ca_key_path, pub_crt, pub_key
+            wallet_server.cactus_ca_crt_path, wallet_server.cactus_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(wallet_server, self_hostname, ssl_context)
         assert connected is False
@@ -162,13 +162,13 @@ class TestSSL:
         pub_crt = harvester_server._private_key_path.parent / "p2p.crt"
         pub_key = harvester_server._private_key_path.parent / "p2p.key"
         generate_ca_signed_cert(
-            harvester_server.chia_ca_crt_path.read_bytes(),
-            harvester_server.chia_ca_key_path.read_bytes(),
+            harvester_server.cactus_ca_crt_path.read_bytes(),
+            harvester_server.cactus_ca_key_path.read_bytes(),
             pub_crt,
             pub_key,
         )
         ssl_context = ssl_context_for_client(
-            harvester_server.chia_ca_crt_path, harvester_server.chia_ca_key_path, pub_crt, pub_key
+            harvester_server.cactus_ca_crt_path, harvester_server.cactus_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(harvester_server, self_hostname, ssl_context)
         assert connected is False
@@ -193,16 +193,16 @@ class TestSSL:
         introducer_api, introducer_server = introducer
 
         # Create not authenticated cert
-        pub_crt = introducer_server.chia_ca_key_path.parent / "p2p.crt"
-        pub_key = introducer_server.chia_ca_key_path.parent / "p2p.key"
+        pub_crt = introducer_server.cactus_ca_key_path.parent / "p2p.crt"
+        pub_key = introducer_server.cactus_ca_key_path.parent / "p2p.key"
         generate_ca_signed_cert(
-            introducer_server.chia_ca_crt_path.read_bytes(),
-            introducer_server.chia_ca_key_path.read_bytes(),
+            introducer_server.cactus_ca_crt_path.read_bytes(),
+            introducer_server.cactus_ca_key_path.read_bytes(),
             pub_crt,
             pub_key,
         )
         ssl_context = ssl_context_for_client(
-            introducer_server.chia_ca_crt_path, introducer_server.chia_ca_key_path, pub_crt, pub_key
+            introducer_server.cactus_ca_crt_path, introducer_server.cactus_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(introducer_server, self_hostname, ssl_context)
         assert connected is True
@@ -215,13 +215,13 @@ class TestSSL:
         pub_crt = timelord_server._private_key_path.parent / "p2p.crt"
         pub_key = timelord_server._private_key_path.parent / "p2p.key"
         generate_ca_signed_cert(
-            timelord_server.chia_ca_crt_path.read_bytes(),
-            timelord_server.chia_ca_key_path.read_bytes(),
+            timelord_server.cactus_ca_crt_path.read_bytes(),
+            timelord_server.cactus_ca_key_path.read_bytes(),
             pub_crt,
             pub_key,
         )
         ssl_context = ssl_context_for_client(
-            timelord_server.chia_ca_crt_path, timelord_server.chia_ca_key_path, pub_crt, pub_key
+            timelord_server.cactus_ca_crt_path, timelord_server.cactus_ca_key_path, pub_crt, pub_key
         )
         connected = await establish_connection(timelord_server, self_hostname, ssl_context)
         assert connected is False

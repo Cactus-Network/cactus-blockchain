@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from chia.types.condition_opcodes import ConditionOpcode
+from cactus.types.condition_opcodes import ConditionOpcode
 
 
 def make_create_coin_condition(puzzle_hash, amount, memos: Optional[List[bytes]]) -> List:

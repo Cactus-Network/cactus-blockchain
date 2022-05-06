@@ -2,9 +2,9 @@ import time
 
 import pytest
 
-from chia.protocols import full_node_protocol
-from chia.types.peer_info import PeerInfo
-from chia.util.ints import uint16
+from cactus.protocols import full_node_protocol
+from cactus.types.peer_info import PeerInfo
+from cactus.util.ints import uint16
 from tests.connection_utils import connect_and_get_peer
 from tests.time_out_assert import time_out_assert
 

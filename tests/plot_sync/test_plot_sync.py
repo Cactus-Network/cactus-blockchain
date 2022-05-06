@@ -7,19 +7,19 @@ import pytest
 import pytest_asyncio
 from blspy import G1Element
 
-from chia.farmer.farmer_api import Farmer
-from chia.harvester.harvester_api import Harvester
-from chia.plot_sync.delta import Delta, PathListDelta, PlotListDelta
-from chia.plot_sync.receiver import Receiver
-from chia.plot_sync.sender import Sender
-from chia.plot_sync.util import State
-from chia.plotting.manager import PlotManager
-from chia.plotting.util import add_plot_directory, remove_plot_directory
-from chia.protocols.harvester_protocol import Plot
-from chia.server.start_service import Service
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.config import create_default_chia_config, lock_and_load_config, save_config
-from chia.util.ints import uint8, uint64
+from cactus.farmer.farmer_api import Farmer
+from cactus.harvester.harvester_api import Harvester
+from cactus.plot_sync.delta import Delta, PathListDelta, PlotListDelta
+from cactus.plot_sync.receiver import Receiver
+from cactus.plot_sync.sender import Sender
+from cactus.plot_sync.util import State
+from cactus.plotting.manager import PlotManager
+from cactus.plotting.util import add_plot_directory, remove_plot_directory
+from cactus.protocols.harvester_protocol import Plot
+from cactus.server.start_service import Service
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.config import create_default_cactus_config, lock_and_load_config, save_config
+from cactus.util.ints import uint8, uint64
 from tests.block_tools import BlockTools
 from tests.plot_sync.util import start_harvester_service
 from tests.plotting.test_plot_manager import MockPlotInfo, TestDirectory
@@ -280,7 +280,7 @@ async def environment(
     dir_invalid: TestDirectory = new_test_dir("invalid", plots_invalid)
     dir_keys_missing: TestDirectory = new_test_dir("keys_missing", plots_keys_missing)
     dir_duplicates: TestDirectory = new_test_dir("duplicates", directories[3].plots)
-    create_default_chia_config(tmp_path)
+    create_default_cactus_config(tmp_path)
 
     # Invalidate the plots in `dir_invalid`
     for path in dir_invalid.path_list():

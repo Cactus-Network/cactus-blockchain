@@ -8,23 +8,23 @@ from typing import Any, Awaitable, Callable, Dict, List, Optional, Tuple
 
 import aiohttp
 
-from chia.cmds.show import print_connections
-from chia.cmds.units import units
-from chia.rpc.wallet_rpc_client import WalletRpcClient
-from chia.server.outbound_message import NodeType
-from chia.server.start_wallet import SERVICE_NAME
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.bech32m import encode_puzzle_hash
-from chia.util.config import load_config
-from chia.util.default_root import DEFAULT_ROOT_PATH
-from chia.util.ints import uint16, uint32, uint64
-from chia.cmds.cmds_util import transaction_submitted_msg, transaction_status_msg
-from chia.wallet.trade_record import TradeRecord
-from chia.wallet.trading.offer import Offer
-from chia.wallet.trading.trade_status import TradeStatus
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.util.transaction_type import TransactionType
-from chia.wallet.util.wallet_types import WalletType
+from cactus.cmds.show import print_connections
+from cactus.cmds.units import units
+from cactus.rpc.wallet_rpc_client import WalletRpcClient
+from cactus.server.outbound_message import NodeType
+from cactus.server.start_wallet import SERVICE_NAME
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.bech32m import encode_puzzle_hash
+from cactus.util.config import load_config
+from cactus.util.default_root import DEFAULT_ROOT_PATH
+from cactus.util.ints import uint16, uint32, uint64
+from cactus.cmds.cmds_util import transaction_submitted_msg, transaction_status_msg
+from cactus.wallet.trade_record import TradeRecord
+from cactus.wallet.trading.offer import Offer
+from cactus.wallet.trading.trade_status import TradeStatus
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.util.transaction_type import TransactionType
+from cactus.wallet.util.wallet_types import WalletType
 
 CATNameResolver = Callable[[bytes32], Awaitable[Optional[Tuple[Optional[uint32], str]]]]
 
@@ -47,12 +47,12 @@ def print_transaction(tx: TransactionRecord, verbose: bool, name, address_prefix
     if verbose:
         print(tx)
     else:
-        chia_amount = Decimal(int(tx.amount)) / mojo_per_unit
+        cactus_amount = Decimal(int(tx.amount)) / mojo_per_unit
         to_address = encode_puzzle_hash(tx.to_puzzle_hash, address_prefix)
         print(f"Transaction {tx.name}")
         print(f"Status: {'Confirmed' if tx.confirmed else ('In mempool' if tx.is_in_mempool() else 'Pending')}")
         description = transaction_description_from_type(tx)
-        print(f"Amount {description}: {chia_amount} {name}")
+        print(f"Amount {description}: {cactus_amount} {name}")
         print(f"To address: {to_address}")
         print("Created at:", datetime.fromtimestamp(tx.created_at_time).strftime("%Y-%m-%d %H:%M:%S"))
         print("")
@@ -61,7 +61,7 @@ def print_transaction(tx: TransactionRecord, verbose: bool, name, address_prefix
 def get_mojo_per_unit(wallet_type: WalletType) -> int:
     mojo_per_unit: int
     if wallet_type == WalletType.STANDARD_WALLET or wallet_type == WalletType.POOLING_WALLET:
-        mojo_per_unit = units["chia"]
+        mojo_per_unit = units["cactus"]
     elif wallet_type == WalletType.CAT:
         mojo_per_unit = units["cat"]
     else:
@@ -209,10 +209,10 @@ async def send(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> 
         print(f"Wallet id: {wallet_id} not found.")
         return
 
-    final_fee = uint64(int(fee * units["chia"]))
+    final_fee = uint64(int(fee * units["cactus"]))
     final_amount: uint64
     if typ == WalletType.STANDARD_WALLET:
-        final_amount = uint64(int(amount * units["chia"]))
+        final_amount = uint64(int(amount * units["cactus"]))
         print("Submitting transaction...")
         res = await wallet_client.send_transaction(str(wallet_id), final_amount, address, final_fee, memos)
     elif typ == WalletType.CAT:
@@ -234,7 +234,7 @@ async def send(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> 
             return None
 
     print("Transaction not yet submitted to nodes")
-    print(f"Do 'chia wallet get_transaction -f {fingerprint} -tx 0x{tx_id}' to get status")
+    print(f"Do 'cactus wallet get_transaction -f {fingerprint} -tx 0x{tx_id}' to get status")
 
 
 async def get_address(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> None:
@@ -276,7 +276,7 @@ async def make_offer(args: dict, wallet_client: WalletRpcClient, fingerprint: in
     offers: List[str] = args["offers"]
     requests: List[str] = args["requests"]
     filepath: str = args["filepath"]
-    fee: int = int(Decimal(args["fee"]) * units["chia"])
+    fee: int = int(Decimal(args["fee"]) * units["cactus"])
 
     if [] in [offers, requests]:
         print("Not creating offer: Must be offering and requesting at least one asset")
@@ -286,8 +286,8 @@ async def make_offer(args: dict, wallet_client: WalletRpcClient, fingerprint: in
         for item in [*offers, *requests]:
             wallet_id, amount = tuple(item.split(":")[0:2])
             if int(wallet_id) == 1:
-                name: str = "XCH"
-                unit: int = units["chia"]
+                name: str = "CAC"
+                unit: int = units["cactus"]
             else:
                 name = await wallet_client.get_cat_name(wallet_id)
                 unit = units["cat"]
@@ -322,7 +322,7 @@ async def make_offer(args: dict, wallet_client: WalletRpcClient, fingerprint: in
                     with open(pathlib.Path(filepath), "w") as file:
                         file.write(offer.to_bech32())
                     print(f"Created offer with ID {trade_record.trade_id}")
-                    print(f"Use chia wallet get_offers --id {trade_record.trade_id} -f {fingerprint} to view status")
+                    print(f"Use cactus wallet get_offers --id {trade_record.trade_id} -f {fingerprint} to view status")
                 else:
                     print("Error creating offer")
 
@@ -334,11 +334,11 @@ def timestamp_to_time(timestamp):
 async def print_offer_summary(cat_name_resolver: CATNameResolver, sum_dict: Dict[str, int], has_fee: bool = False):
     for asset_id, amount in sum_dict.items():
         description: str = ""
-        unit: int = units["chia"]
-        wid: str = "1" if asset_id == "xch" else ""
+        unit: int = units["cactus"]
+        wid: str = "1" if asset_id == "cac" else ""
         mojo_amount: int = int(Decimal(amount))
-        name: str = "XCH"
-        if asset_id != "xch":
+        name: str = "CAC"
+        if asset_id != "cac":
             name = asset_id
             if asset_id == "unknown":
                 name = "Unknown"
@@ -385,7 +385,7 @@ async def print_trade_record(record, wallet_client: WalletRpcClient, summaries: 
         await print_offer_summary(cat_name_resolver, requested)
         print("Pending Outbound Balances:")
         await print_offer_summary(cat_name_resolver, outbound_balances, has_fee=(fees > 0))
-        print(f"Included Fees: {fees / units['chia']}")
+        print(f"Included Fees: {fees / units['cactus']}")
     print("---------------")
 
 
@@ -444,7 +444,7 @@ async def take_offer(args: dict, wallet_client: WalletRpcClient, fingerprint: in
         offer_hex = args["file"]
 
     examine_only: bool = args["examine_only"]
-    fee: int = int(Decimal(args["fee"]) * units["chia"])
+    fee: int = int(Decimal(args["fee"]) * units["cactus"])
 
     try:
         offer = Offer.from_bech32(offer_hex)
@@ -459,20 +459,20 @@ async def take_offer(args: dict, wallet_client: WalletRpcClient, fingerprint: in
     await print_offer_summary(cat_name_resolver, offered)
     print("  REQUESTED:")
     await print_offer_summary(cat_name_resolver, requested)
-    print(f"Included Fees: {Decimal(offer.bundle.fees()) / units['chia']}")
+    print(f"Included Fees: {Decimal(offer.bundle.fees()) / units['cactus']}")
 
     if not examine_only:
         confirmation = input("Would you like to take this offer? (y/n): ")
         if confirmation in ["y", "yes"]:
             trade_record = await wallet_client.take_offer(offer, fee=fee)
             print(f"Accepted offer with ID {trade_record.trade_id}")
-            print(f"Use chia wallet get_offers --id {trade_record.trade_id} -f {fingerprint} to view its status")
+            print(f"Use cactus wallet get_offers --id {trade_record.trade_id} -f {fingerprint} to view its status")
 
 
 async def cancel_offer(args: dict, wallet_client: WalletRpcClient, fingerprint: int) -> None:
     id = bytes32.from_hexstr(args["id"])
     secure: bool = not args["insecure"]
-    fee: int = int(Decimal(args["fee"]) * units["chia"])
+    fee: int = int(Decimal(args["fee"]) * units["cactus"])
 
     trade_record = await wallet_client.get_offer(id, file_contents=True)
     await print_trade_record(trade_record, wallet_client, summaries=True)
@@ -482,14 +482,14 @@ async def cancel_offer(args: dict, wallet_client: WalletRpcClient, fingerprint: 
         await wallet_client.cancel_offer(id, secure=secure, fee=fee)
         print(f"Cancelled offer with ID {trade_record.trade_id}")
         if secure:
-            print(f"Use chia wallet get_offers --id {trade_record.trade_id} -f {fingerprint} to view cancel status")
+            print(f"Use cactus wallet get_offers --id {trade_record.trade_id} -f {fingerprint} to view cancel status")
 
 
 def wallet_coin_unit(typ: WalletType, address_prefix: str) -> Tuple[str, int]:
     if typ == WalletType.CAT:
         return "", units["cat"]
     if typ in [WalletType.STANDARD_WALLET, WalletType.POOLING_WALLET, WalletType.MULTI_SIG, WalletType.RATE_LIMITED]:
-        return address_prefix, units["chia"]
+        return address_prefix, units["cactus"]
     return "", units["mojo"]
 
 
@@ -560,7 +560,7 @@ async def get_wallet(wallet_client: WalletRpcClient, fingerprint: int = None) ->
     else:
         fingerprints = await wallet_client.get_public_keys()
     if len(fingerprints) == 0:
-        print("No keys loaded. Run 'chia keys generate' or import a key")
+        print("No keys loaded. Run 'cactus keys generate' or import a key")
         return None
     if len(fingerprints) == 1:
         fingerprint = fingerprints[0]
@@ -637,7 +637,7 @@ async def execute_with_wallet(
         if isinstance(e, aiohttp.ClientConnectorError):
             print(
                 f"Connection error. Check if the wallet is running at {wallet_rpc_port}. "
-                "You can run the wallet via:\n\tchia start wallet"
+                "You can run the wallet via:\n\tcactus start wallet"
             )
         else:
             print(f"Exception from 'wallet' {e}")

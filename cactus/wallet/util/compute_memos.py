@@ -1,11 +1,11 @@
 from typing import List, Dict
 
 from clvm.casts import int_from_bytes
-from chia.types.blockchain_format.program import INFINITE_COST
-from chia.types.spend_bundle import SpendBundle
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.blockchain_format.coin import Coin
-from chia.types.condition_opcodes import ConditionOpcode
+from cactus.types.blockchain_format.program import INFINITE_COST
+from cactus.types.spend_bundle import SpendBundle
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.condition_opcodes import ConditionOpcode
 
 
 def compute_memos(bundle: SpendBundle) -> Dict[bytes32, List[bytes]]:

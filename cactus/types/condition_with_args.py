@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
-from chia.types.condition_opcodes import ConditionOpcode
-from chia.util.streamable import Streamable, streamable
+from cactus.types.condition_opcodes import ConditionOpcode
+from cactus.util.streamable import Streamable, streamable
 
 
 @streamable

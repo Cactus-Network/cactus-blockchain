@@ -1,7 +1,7 @@
 from blspy import AugSchemeMPL, G1Element
-from chia.util import cached_bls
-from chia.util.hash import std_hash
-from chia.util.lru_cache import LRUCache
+from cactus.util import cached_bls
+from cactus.util.hash import std_hash
+from cactus.util.lru_cache import LRUCache
 
 
 def test_cached_bls():

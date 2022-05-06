@@ -11,20 +11,20 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple
 from blspy import AugSchemeMPL, PrivateKey
 from packaging.version import Version
 
-from chia.consensus.block_record import BlockRecord
-from chia.consensus.blockchain import ReceiveBlockResult
-from chia.consensus.constants import ConsensusConstants
-from chia.daemon.keychain_proxy import (
+from cactus.consensus.block_record import BlockRecord
+from cactus.consensus.blockchain import ReceiveBlockResult
+from cactus.consensus.constants import ConsensusConstants
+from cactus.daemon.keychain_proxy import (
     KeychainProxy,
     KeychainProxyConnectionFailure,
     KeyringIsEmpty,
     connect_to_keychain_and_validate,
     wrap_local_keychain,
 )
-from chia.protocols import wallet_protocol
-from chia.protocols.full_node_protocol import RequestProofOfWeight, RespondProofOfWeight
-from chia.protocols.protocol_message_types import ProtocolMessageTypes
-from chia.protocols.wallet_protocol import (
+from cactus.protocols import wallet_protocol
+from cactus.protocols.full_node_protocol import RequestProofOfWeight, RespondProofOfWeight
+from cactus.protocols.protocol_message_types import ProtocolMessageTypes
+from cactus.protocols.wallet_protocol import (
     CoinState,
     RequestHeaderBlocks,
     RequestSESInfo,
@@ -33,31 +33,31 @@ from chia.protocols.wallet_protocol import (
     RespondToCoinUpdates,
     RespondToPhUpdates,
 )
-from chia.server.node_discovery import WalletPeers
-from chia.server.outbound_message import Message, NodeType, make_msg
-from chia.server.peer_store_resolver import PeerStoreResolver
-from chia.server.server import ChiaServer
-from chia.server.ws_connection import WSChiaConnection
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.blockchain_format.sub_epoch_summary import SubEpochSummary
-from chia.types.coin_spend import CoinSpend
-from chia.types.header_block import HeaderBlock
-from chia.types.mempool_inclusion_status import MempoolInclusionStatus
-from chia.types.peer_info import PeerInfo
-from chia.types.weight_proof import SubEpochData, WeightProof
-from chia.util.byte_types import hexstr_to_bytes
-from chia.util.chunks import chunks
-from chia.util.config import WALLET_PEERS_PATH_KEY_DEPRECATED
-from chia.util.default_root import STANDALONE_ROOT_PATH
-from chia.util.ints import uint32, uint64
-from chia.util.keychain import Keychain, KeyringIsLocked
-from chia.util.path import mkdir, path_from_root
-from chia.util.profiler import profile_task
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.util.new_peak_queue import NewPeakItem, NewPeakQueue, NewPeakQueueTypes
-from chia.wallet.util.peer_request_cache import PeerRequestCache, can_use_peer_request_cache
-from chia.wallet.util.wallet_sync_utils import (
+from cactus.server.node_discovery import WalletPeers
+from cactus.server.outbound_message import Message, NodeType, make_msg
+from cactus.server.peer_store_resolver import PeerStoreResolver
+from cactus.server.server import CactusServer
+from cactus.server.ws_connection import WSCactusConnection
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.blockchain_format.sub_epoch_summary import SubEpochSummary
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.header_block import HeaderBlock
+from cactus.types.mempool_inclusion_status import MempoolInclusionStatus
+from cactus.types.peer_info import PeerInfo
+from cactus.types.weight_proof import SubEpochData, WeightProof
+from cactus.util.byte_types import hexstr_to_bytes
+from cactus.util.chunks import chunks
+from cactus.util.config import WALLET_PEERS_PATH_KEY_DEPRECATED
+from cactus.util.default_root import STANDALONE_ROOT_PATH
+from cactus.util.ints import uint32, uint64
+from cactus.util.keychain import Keychain, KeyringIsLocked
+from cactus.util.path import mkdir, path_from_root
+from cactus.util.profiler import profile_task
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.util.new_peak_queue import NewPeakItem, NewPeakQueue, NewPeakQueueTypes
+from cactus.wallet.util.peer_request_cache import PeerRequestCache, can_use_peer_request_cache
+from cactus.wallet.util.wallet_sync_utils import (
     fetch_header_blocks_in_range,
     fetch_last_tx_from_peer,
     last_change_height_cs,
@@ -66,16 +66,16 @@ from chia.wallet.util.wallet_sync_utils import (
     subscribe_to_coin_updates,
     subscribe_to_phs,
 )
-from chia.wallet.wallet_action import WalletAction
-from chia.wallet.wallet_coin_record import WalletCoinRecord
-from chia.wallet.wallet_state_manager import WalletStateManager
+from cactus.wallet.wallet_action import WalletAction
+from cactus.wallet.wallet_coin_record import WalletCoinRecord
+from cactus.wallet.wallet_state_manager import WalletStateManager
 
 
 class WalletNode:
     key_config: Dict
     config: Dict
     constants: ConsensusConstants
-    server: Optional[ChiaServer]
+    server: Optional[CactusServer]
     log: logging.Logger
     # Maintains the state of the wallet (blockchain and transactions), handles DB connections
     wallet_state_manager: Optional[WalletStateManager]
@@ -167,7 +167,7 @@ class WalletNode:
             keychain_proxy = await self.ensure_keychain_proxy()
             key = await keychain_proxy.get_key_for_fingerprint(fingerprint)
         except KeyringIsEmpty:
-            self.log.warning("No keys present. Create keys with the UI, or with the 'chia keys' program.")
+            self.log.warning("No keys present. Create keys with the UI, or with the 'cactus keys' program.")
             return None
         except KeyringIsLocked:
             self.log.warning("Keyring is locked")
@@ -353,7 +353,7 @@ class WalletNode:
         while not self._shut_down:
             # Here we process four types of messages in the queue, where the first one has higher priority (lower
             # number in the queue), and priority decreases for each type.
-            peer: Optional[WSChiaConnection] = None
+            peer: Optional[WSCactusConnection] = None
             item: Optional[NewPeakItem] = None
             try:
                 peer, item = None, None
@@ -403,7 +403,7 @@ class WalletNode:
                 if peer is not None:
                     await peer.close(9999)
 
-    def set_server(self, server: ChiaServer):
+    def set_server(self, server: CactusServer):
         self.server = server
         self.initialize_wallet_peers()
 
@@ -426,7 +426,7 @@ class WalletNode:
                     default_peers_file_path="wallet/db/wallet_peers.dat",
                 ),
                 self.config["introducer_peer"],
-                self.config.get("dns_servers", ["dns-introducer.chia.net"]),
+                self.config.get("dns_servers", ["dns-introducer.cactus-network.net"]),
                 self.config["peer_connect_interval"],
                 network_name,
                 None,
@@ -434,7 +434,7 @@ class WalletNode:
             )
             asyncio.create_task(self.wallet_peers.start())
 
-    def on_disconnect(self, peer: WSChiaConnection):
+    def on_disconnect(self, peer: WSCactusConnection):
         if self.is_trusted(peer):
             self.local_node_synced = False
             self.initialize_wallet_peers()
@@ -446,7 +446,7 @@ class WalletNode:
         if peer.peer_node_id in self.node_peaks:
             self.node_peaks.pop(peer.peer_node_id)
 
-    async def on_connect(self, peer: WSChiaConnection):
+    async def on_connect(self, peer: WSCactusConnection):
         if self.wallet_state_manager is None:
             return None
 
@@ -502,7 +502,7 @@ class WalletNode:
     async def long_sync(
         self,
         target_height: uint32,
-        full_node: WSChiaConnection,
+        full_node: WSCactusConnection,
         fork_height: int,
         *,
         rollback: bool,
@@ -605,7 +605,7 @@ class WalletNode:
     async def receive_state_from_peer(
         self,
         items_input: List[CoinState],
-        peer: WSChiaConnection,
+        peer: WSCactusConnection,
         fork_height: Optional[uint32] = None,
         height: Optional[uint32] = None,
         header_hash: Optional[bytes32] = None,
@@ -763,7 +763,7 @@ class WalletNode:
         return coin_state.coin_states
 
     async def is_peer_synced(
-        self, peer: WSChiaConnection, header_block: HeaderBlock, request_time: uint64
+        self, peer: WSCactusConnection, header_block: HeaderBlock, request_time: uint64
     ) -> Optional[uint64]:
         # Get last timestamp
         last_tx: Optional[HeaderBlock] = await fetch_last_tx_from_peer(header_block.height, peer)
@@ -795,7 +795,7 @@ class WalletNode:
             self.race_cache[header_hash] = set()
         self.race_cache[header_hash].add(coin_state)
 
-    async def state_update_received(self, request: wallet_protocol.CoinStateUpdate, peer: WSChiaConnection) -> None:
+    async def state_update_received(self, request: wallet_protocol.CoinStateUpdate, peer: WSCactusConnection) -> None:
         # This gets called every time there is a new coin or puzzle hash change in the DB
         # that is of interest to this wallet. It is not guaranteed to come for every height. This message is guaranteed
         # to come before the corresponding new_peak for each height. We handle this differently for trusted and
@@ -812,7 +812,7 @@ class WalletNode:
                 request.peak_hash,
             )
 
-    def get_full_node_peer(self) -> Optional[WSChiaConnection]:
+    def get_full_node_peer(self) -> Optional[WSCactusConnection]:
         if self.server is None:
             return None
 
@@ -857,7 +857,7 @@ class WalletNode:
             if cache_ts is not None:
                 return cache_ts
 
-        peer: Optional[WSChiaConnection] = self.get_full_node_peer()
+        peer: Optional[WSCactusConnection] = self.get_full_node_peer()
         if peer is None:
             raise ValueError("Cannot fetch timestamp, no peers")
         self.log.debug(f"Fetching block at height: {height}")
@@ -868,7 +868,7 @@ class WalletNode:
         self.get_cache_for_peer(peer).add_to_blocks(last_tx_block)
         return last_tx_block.foliage_transaction_block.timestamp
 
-    async def new_peak_wallet(self, new_peak: wallet_protocol.NewPeakWallet, peer: WSChiaConnection):
+    async def new_peak_wallet(self, new_peak: wallet_protocol.NewPeakWallet, peer: WSCactusConnection):
         if self.wallet_state_manager is None:
             # When logging out of wallet
             return
@@ -1049,7 +1049,7 @@ class WalletNode:
             await self.wallet_state_manager.blockchain.set_finished_sync_up_to(new_peak.height)
         await self.wallet_state_manager.new_peak(new_peak)
 
-    async def wallet_short_sync_backtrack(self, header_block: HeaderBlock, peer: WSChiaConnection) -> int:
+    async def wallet_short_sync_backtrack(self, header_block: HeaderBlock, peer: WSCactusConnection) -> int:
         assert self.wallet_state_manager is not None
         peak: Optional[HeaderBlock] = await self.wallet_state_manager.blockchain.get_peak_block()
 
@@ -1096,7 +1096,7 @@ class WalletNode:
             self.wallet_state_manager.state_changed("coin_added", wallet_id)
 
     async def fetch_and_validate_the_weight_proof(
-        self, peer: WSChiaConnection, peak: HeaderBlock
+        self, peer: WSCactusConnection, peak: HeaderBlock
     ) -> Tuple[bool, Optional[WeightProof], List[SubEpochSummary], List[BlockRecord]]:
         assert self.wallet_state_manager is not None
         assert self.wallet_state_manager.weight_proof_handler is not None
@@ -1158,7 +1158,7 @@ class WalletNode:
     async def validate_received_state_from_peer(
         self,
         coin_state: CoinState,
-        peer: WSChiaConnection,
+        peer: WSCactusConnection,
         peer_request_cache: PeerRequestCache,
         fork_height: Optional[uint32],
     ) -> bool:
@@ -1294,7 +1294,7 @@ class WalletNode:
         return True
 
     async def validate_block_inclusion(
-        self, block: HeaderBlock, peer: WSChiaConnection, peer_request_cache: PeerRequestCache
+        self, block: HeaderBlock, peer: WSCactusConnection, peer_request_cache: PeerRequestCache
     ) -> bool:
         assert self.wallet_state_manager is not None
         assert self.server is not None
@@ -1413,7 +1413,7 @@ class WalletNode:
                         return False
             return True
 
-    async def fetch_puzzle_solution(self, peer: WSChiaConnection, height: uint32, coin: Coin) -> CoinSpend:
+    async def fetch_puzzle_solution(self, peer: WSCactusConnection, height: uint32, coin: Coin) -> CoinSpend:
         solution_response = await peer.request_puzzle_solution(
             wallet_protocol.RequestPuzzleSolution(coin.name(), height)
         )
@@ -1429,7 +1429,7 @@ class WalletNode:
         )
 
     async def get_coin_state(
-        self, coin_names: List[bytes32], fork_height: Optional[uint32] = None, peer: Optional[WSChiaConnection] = None
+        self, coin_names: List[bytes32], fork_height: Optional[uint32] = None, peer: Optional[WSCactusConnection] = None
     ) -> List[CoinState]:
         assert self.server is not None
         all_nodes = self.server.connection_by_type[NodeType.FULL_NODE]
@@ -1462,7 +1462,7 @@ class WalletNode:
         return coin_state.coin_states
 
     async def fetch_children(
-        self, peer: WSChiaConnection, coin_name: bytes32, fork_height: Optional[uint32] = None
+        self, peer: WSCactusConnection, coin_name: bytes32, fork_height: Optional[uint32] = None
     ) -> List[CoinState]:
         response: Optional[wallet_protocol.RespondChildren] = await peer.request_children(
             wallet_protocol.RequestChildren(coin_name)

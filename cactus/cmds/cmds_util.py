@@ -1,6 +1,6 @@
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.mempool_submission_status import MempoolSubmissionStatus
-from chia.wallet.transaction_record import TransactionRecord
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.mempool_submission_status import MempoolSubmissionStatus
+from cactus.wallet.transaction_record import TransactionRecord
 
 
 def transaction_submitted_msg(tx: TransactionRecord) -> str:
@@ -9,4 +9,4 @@ def transaction_submitted_msg(tx: TransactionRecord) -> str:
 
 
 def transaction_status_msg(fingerprint: int, tx_id: bytes32) -> str:
-    return f"Run 'chia wallet get_transaction -f {fingerprint} -tx 0x{tx_id}' to get status"
+    return f"Run 'cactus wallet get_transaction -f {fingerprint} -tx 0x{tx_id}' to get status"

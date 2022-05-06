@@ -3,7 +3,7 @@ from typing import Callable, Optional
 from blspy import G1Element, G2Element
 from chia_rs import serialized_length
 
-from chia.types.blockchain_format.program import SerializedProgram
+from cactus.types.blockchain_format.program import SerializedProgram
 
 
 def skip_list(buf: memoryview, skip_item: Callable[[memoryview], memoryview]) -> memoryview:

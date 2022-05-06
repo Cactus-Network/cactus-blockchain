@@ -1,9 +1,9 @@
 from typing import Any, Optional, Union, Dict
 
-from chia.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.blockchain_format.sized_bytes import bytes32
 import click
 
-from chia.util.network import is_trusted_inner
+from cactus.util.network import is_trusted_inner
 
 
 async def print_connections(client, time, NodeType, trusted_peers: Dict):
@@ -71,16 +71,16 @@ async def show_async(
     import traceback
     import time
     from typing import List, Optional
-    from chia.consensus.block_record import BlockRecord
-    from chia.rpc.full_node_rpc_client import FullNodeRpcClient
-    from chia.server.outbound_message import NodeType
-    from chia.types.full_block import FullBlock
-    from chia.util.bech32m import encode_puzzle_hash
-    from chia.util.byte_types import hexstr_to_bytes
-    from chia.util.config import load_config
-    from chia.util.default_root import DEFAULT_ROOT_PATH
-    from chia.util.ints import uint16
-    from chia.util.misc import format_bytes
+    from cactus.consensus.block_record import BlockRecord
+    from cactus.rpc.full_node_rpc_client import FullNodeRpcClient
+    from cactus.server.outbound_message import NodeType
+    from cactus.types.full_block import FullBlock
+    from cactus.util.bech32m import encode_puzzle_hash
+    from cactus.util.byte_types import hexstr_to_bytes
+    from cactus.util.config import load_config
+    from cactus.util.default_root import DEFAULT_ROOT_PATH
+    from cactus.util.ints import uint16
+    from cactus.util.misc import format_bytes
 
     try:
         config = load_config(DEFAULT_ROOT_PATH, "config.yaml")
@@ -127,7 +127,7 @@ async def show_async(
                 print(f"Current Blockchain Status: Not Synced. Peak height: {peak.height}")
             else:
                 print("\nSearching for an initial chain\n")
-                print("You may be able to expedite with 'chia show -a host:port' using a known node.\n")
+                print("You may be able to expedite with 'cactus show -a host:port' using a known node.\n")
 
             if peak is not None:
                 if peak.is_transaction_block:

@@ -1,6 +1,6 @@
 import aiosqlite
 
-from chia.server.address_manager import AddressManager, ExtendedPeerInfo, NEW_BUCKETS_PER_ADDRESS
+from cactus.server.address_manager import AddressManager, ExtendedPeerInfo, NEW_BUCKETS_PER_ADDRESS
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 

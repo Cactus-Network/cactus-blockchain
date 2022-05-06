@@ -13,7 +13,7 @@ if ($d)
 
 if ([Environment]::Is64BitOperatingSystem -eq $false)
 {
-    Write-Output "Chia requires a 64-bit Windows installation"
+    Write-Output "Cactus requires a 64-bit Windows installation"
     Exit 1
 }
 
@@ -107,13 +107,13 @@ venv\scripts\pip install --extra-index-url https://pypi.chia.net/simple/ miniupn
 venv\scripts\pip install --editable ".$extras_cli" --extra-index-url https://pypi.chia.net/simple/
 
 Write-Output ""
-Write-Output "Chia blockchain .\Install.ps1 complete."
+Write-Output "Cactus blockchain .\Install.ps1 complete."
 Write-Output "For assistance join us on Keybase in the #support chat channel:"
-Write-Output "https://keybase.io/team/chia_network.public"
+Write-Output "https://keybase.io/team/cactus_network.public"
 Write-Output ""
-Write-Output "Try the Quick Start Guide to running chia-blockchain:"
-Write-Output "https://github.com/Chia-Network/chia-blockchain/wiki/Quick-Start-Guide"
+Write-Output "Try the Quick Start Guide to running cactus-blockchain:"
+Write-Output "https://github.com/Cactus-Network/cactus-blockchain/wiki/Quick-Start-Guide"
 Write-Output ""
 Write-Output "To install the GUI type '.\Install-gui.ps1' after '.\venv\scripts\Activate.ps1'."
 Write-Output ""
-Write-Output "Type '.\venv\Scripts\Activate.ps1' and then 'chia init' to begin."
+Write-Output "Type '.\venv\Scripts\Activate.ps1' and then 'cactus init' to begin."
