@@ -63,6 +63,7 @@ npm run electron &
 <p>Delete ('rm -rf) your 'cactus-blockchain' folder (**not your '.cactus' folder**), and navigate to your home directory. Now clone 'cactus-blockchain'.
   <p>
    git clone https://github.com/Cactus-Network/cactus-blockchain.git --recurse-submodules
+   <p>cd cactus-blockchain
 <p>sh install.sh
   <p> . ./activate
     <p> cactus init
