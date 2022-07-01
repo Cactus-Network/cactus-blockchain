@@ -148,22 +148,22 @@ class Farmer:
             return False
 
         config = load_config(self._root_path, "config.yaml")
-        if "xch_target_address" not in self.config:
+        if "cac_target_address" not in self.config:
             self.config = config["farmer"]
-        if "xch_target_address" not in self.pool_config:
+        if "cac_target_address" not in self.pool_config:
             self.pool_config = config["pool"]
-        if "xch_target_address" not in self.config or "xch_target_address" not in self.pool_config:
-            log.debug("xch_target_address missing in the config")
+        if "cac_target_address" not in self.config or "cac_target_address" not in self.pool_config:
+            log.debug("cac_target_address missing in the config")
             return False
 
         # This is the farmer configuration
-        self.farmer_target_encoded = self.config["xch_target_address"]
+        self.farmer_target_encoded = self.config["cac_target_address"]
         self.farmer_target = decode_puzzle_hash(self.farmer_target_encoded)
 
         self.pool_public_keys = [G1Element.from_bytes(bytes.fromhex(pk)) for pk in self.config["pool_public_keys"]]
 
         # This is the self pooling configuration, which is only used for original self-pooled plots
-        self.pool_target_encoded = self.pool_config["xch_target_address"]
+        self.pool_target_encoded = self.pool_config["cac_target_address"]
         self.pool_target = decode_puzzle_hash(self.pool_target_encoded)
         self.pool_sks_map: Dict = {}
         for key in self.get_private_keys():
@@ -591,11 +591,11 @@ class Farmer:
             if farmer_target_encoded is not None:
                 self.farmer_target_encoded = farmer_target_encoded
                 self.farmer_target = decode_puzzle_hash(farmer_target_encoded)
-                config["farmer"]["xch_target_address"] = farmer_target_encoded
+                config["farmer"]["cac_target_address"] = farmer_target_encoded
             if pool_target_encoded is not None:
                 self.pool_target_encoded = pool_target_encoded
                 self.pool_target = decode_puzzle_hash(pool_target_encoded)
-                config["pool"]["xch_target_address"] = pool_target_encoded
+                config["pool"]["cac_target_address"] = pool_target_encoded
             save_config(self._root_path, "config.yaml", config)
 
     async def set_payout_instructions(self, launcher_id: bytes32, payout_instructions: str):

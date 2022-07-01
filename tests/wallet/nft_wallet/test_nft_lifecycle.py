@@ -298,7 +298,7 @@ async def test_default_transfer_program(setup_sim: Tuple[SpendSim, SimClient]) -
         cat_coin = (
             await sim_client.get_coin_records_by_puzzle_hash(FAKE_CAT.get_tree_hash(), include_spent_coins=False)
         )[0].coin
-        xch_coin = (await sim_client.get_coin_records_by_puzzle_hash(ACS_PH, include_spent_coins=False))[0].coin
+        cac_coin = (await sim_client.get_coin_records_by_puzzle_hash(ACS_PH, include_spent_coins=False))[0].coin
 
         ownership_spend = CoinSpend(
             ownership_coin,
@@ -317,8 +317,8 @@ async def test_default_transfer_program(setup_sim: Tuple[SpendSim, SimClient]) -
         expected_announcement_data = Program.to(
             (FAKE_LAUNCHER_ID, [[ROYALTY_ADDRESS, 50, [ROYALTY_ADDRESS]]])
         ).get_tree_hash()
-        xch_announcement_spend = CoinSpend(
-            xch_coin,
+        cac_announcement_spend = CoinSpend(
+            cac_coin,
             ACS,
             Program.to([[62, expected_announcement_data]]),
         )
@@ -328,14 +328,14 @@ async def test_default_transfer_program(setup_sim: Tuple[SpendSim, SimClient]) -
         # Make sure every combo except all of them work
         for i in range(1, 3):
             for announcement_combo in itertools.combinations(
-                [did_announcement_spend, xch_announcement_spend, cat_announcement_spend], i
+                [did_announcement_spend, cac_announcement_spend, cat_announcement_spend], i
             ):
                 result = await sim_client.push_tx(SpendBundle([ownership_spend, *announcement_combo], G2Element()))
                 assert result == (MempoolInclusionStatus.FAILED, Err.ASSERT_ANNOUNCE_CONSUMED_FAILED)
 
         # Make sure all of them together pass
         full_bundle = SpendBundle(
-            [ownership_spend, did_announcement_spend, xch_announcement_spend, cat_announcement_spend], G2Element()
+            [ownership_spend, did_announcement_spend, cac_announcement_spend, cat_announcement_spend], G2Element()
         )
         result = await sim_client.push_tx(full_bundle)
         assert result == (MempoolInclusionStatus.SUCCESS, None)

@@ -79,7 +79,7 @@ jobs:
           p12-file-base64: ${{ secrets.APPLE_DEV_ID_APP }}
           p12-password: ${{ secrets.APPLE_DEV_ID_APP_PASS }}
 
-      # Get the most recent release from cactus-plotter-madmax
+      # Get the most recent release from chia-plotter-madmax
       - uses: actions/github-script@v6
         id: 'latest-madmax'
         with:
@@ -88,15 +88,15 @@ jobs:
           script: |
             const release = await github.rest.repos.getLatestRelease({
               owner: 'Cactus-Network',
-              repo: 'cactus-plotter-madmax',
+              repo: 'chia-plotter-madmax',
             });
             return release.data.tag_name;
 
       - name: Get latest madmax plotter
         run: |
           mkdir "$GITHUB_WORKSPACE/madmax"
-          wget -O "$GITHUB_WORKSPACE/madmax/cactus_plot" https://github.com/Cactus-Network/cactus-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot-${{ steps.latest-madmax.outputs.result }}-macos-m1
-          wget -O "$GITHUB_WORKSPACE/madmax/cactus_plot_k34" https://github.com/Cactus-Network/cactus-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot_k34-${{ steps.latest-madmax.outputs.result }}-macos-m1
+          wget -O "$GITHUB_WORKSPACE/madmax/cactus_plot" https://github.com/Cactus-Network/chia-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot-${{ steps.latest-madmax.outputs.result }}-macos-m1
+          wget -O "$GITHUB_WORKSPACE/madmax/cactus_plot_k34" https://github.com/Cactus-Network/chia-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot_k34-${{ steps.latest-madmax.outputs.result }}-macos-m1
           chmod +x "$GITHUB_WORKSPACE/madmax/cactus_plot"
           chmod +x "$GITHUB_WORKSPACE/madmax/cactus_plot_k34"
 
@@ -150,12 +150,12 @@ jobs:
           GIT_SHORT_HASH=$(echo "${GITHUB_SHA}" | cut -c1-8)
           CACTUS_DEV_BUILD=${CACTUS_INSTALLER_VERSION}-$GIT_SHORT_HASH
           echo "CACTUS_DEV_BUILD=$CACTUS_DEV_BUILD" >>$GITHUB_ENV
-          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${CACTUS_INSTALLER_VERSION}-arm64.dmg s3://download.cactus.net/dev/Cactus-${CACTUS_DEV_BUILD}-arm64.dmg
+          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${CACTUS_INSTALLER_VERSION}-arm64.dmg s3://download.cactus-network.net/dev/Cactus-${CACTUS_DEV_BUILD}-arm64.dmg
 
       - name: Create torrent
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          arch -arm64 py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg -o ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg.torrent --webseed https://download.cactus.net/install/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg
+          arch -arm64 py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg -o ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg.torrent --webseed https://download.cactus-network.net/install/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg
           ls ${{ github.workspace }}/build_scripts/final_installer/
 
       - name: Upload Dev Installer
@@ -166,8 +166,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.INSTALLER_UPLOAD_SECRET }}
           AWS_REGION: us-west-2
         run: |
-          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg s3://download.cactus.net/latest-dev/Cactus-arm64_latest_dev.dmg
-          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg.sha256 s3://download.cactus.net/latest-dev/Cactus-arm64_latest_dev.dmg.sha256
+          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg s3://download.cactus-network.net/latest-dev/Cactus-arm64_latest_dev.dmg
+          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg.sha256 s3://download.cactus-network.net/latest-dev/Cactus-arm64_latest_dev.dmg.sha256
 
       - name: Upload Release Files
         if: steps.check_secrets.outputs.HAS_AWS_SECRET && startsWith(github.ref, 'refs/tags/')
@@ -176,9 +176,9 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.INSTALLER_UPLOAD_SECRET }}
           AWS_REGION: us-west-2
         run: |
-          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg s3://download.cactus.net/install/
-          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg.sha256 s3://download.cactus.net/install/
-          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg.torrent s3://download.cactus.net/torrents/
+          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg s3://download.cactus-network.net/install/
+          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg.sha256 s3://download.cactus-network.net/install/
+          arch -arm64 aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/Cactus-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}-arm64.dmg.torrent s3://download.cactus-network.net/torrents/
 
       - name: Get tag name
         if: startsWith(github.ref, 'refs/tags/')

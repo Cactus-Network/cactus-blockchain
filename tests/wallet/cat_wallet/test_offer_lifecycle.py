@@ -40,7 +40,7 @@ def str_to_cat_hash(tail_str: str) -> bytes32:
     return construct_cat_puzzle(CAT_MOD, str_to_tail_hash(tail_str), acs).get_tree_hash()
 
 
-# This method takes a dictionary of strings mapping to amounts and generates the appropriate CAT/XCH coins
+# This method takes a dictionary of strings mapping to amounts and generates the appropriate CAT/CAC coins
 async def generate_coins(
     sim,
     sim_client,
@@ -193,7 +193,7 @@ class TestOfferLifecycle:
             for key, value in driver_dict.items():
                 driver_dict_as_infos[key.hex()] = value.info
 
-            # Create an XCH Offer for RED
+            # Create an CAC Offer for RED
             cactus_requested_payments: Dict[Optional[bytes32], List[Payment]] = {
                 str_to_tail_hash("red"): [
                     Payment(acs_ph, 100, [b"memo"]),
@@ -209,7 +209,7 @@ class TestOfferLifecycle:
             cactus_offer = Offer(cactus_requested_payments, cactus_secured_bundle, driver_dict)
             assert not cactus_offer.is_valid()
 
-            # Create a RED Offer for XCH
+            # Create a RED Offer for CAC
             red_coins_1 = red_coins[0:1]
             red_coins_2 = red_coins[1:]
             red_requested_payments: Dict[Optional[bytes32], List[Payment]] = {
@@ -253,7 +253,7 @@ class TestOfferLifecycle:
             assert new_offer.get_requested_amounts() == {None: 700, str_to_tail_hash("red"): 300}
             assert new_offer.is_valid()
 
-            # Create yet another offer of BLUE for XCH and RED
+            # Create yet another offer of BLUE for CAC and RED
             blue_requested_payments: Dict[Optional[bytes32], List[Payment]] = {
                 None: [
                     Payment(acs_ph, 200, [b"blue memo"]),
@@ -283,15 +283,15 @@ class TestOfferLifecycle:
             assert new_offer.get_requested_amounts() == {None: 900, str_to_tail_hash("red"): 350}
             assert new_offer.summary() == (
                 {
-                    "xch": 1000,
+                    "cac": 1000,
                     str_to_tail_hash("red").hex(): 350,
                     str_to_tail_hash("blue").hex(): 2000,
                 },
-                {"xch": 900, str_to_tail_hash("red").hex(): 350},
+                {"cac": 900, str_to_tail_hash("red").hex(): 350},
                 driver_dict_as_infos,
             )
             assert new_offer.get_pending_amounts() == {
-                "xch": 1200,
+                "cac": 1200,
                 str_to_tail_hash("red").hex(): 350,
                 str_to_tail_hash("blue").hex(): 3000,
             }

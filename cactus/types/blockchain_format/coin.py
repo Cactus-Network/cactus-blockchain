@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from cactus_rs import Coin
+from chia_rs import Coin
 
 from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.util.hash import std_hash

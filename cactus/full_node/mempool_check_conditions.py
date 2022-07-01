@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, Optional
-from cactus_rs import MEMPOOL_MODE, COND_CANON_INTS, NO_NEG_DIV
+from chia_rs import MEMPOOL_MODE, COND_CANON_INTS, NO_NEG_DIV
 
 from cactus.consensus.default_constants import DEFAULT_CONSTANTS
 from cactus.consensus.cost_calculator import NPCResult

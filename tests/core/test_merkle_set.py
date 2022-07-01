@@ -5,7 +5,7 @@ from itertools import permutations
 from typing import List
 
 import pytest
-from cactus_rs import compute_merkle_set_root
+from chia_rs import compute_merkle_set_root
 
 from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.util.merkle_set import MerkleSet, confirm_included_already_hashed

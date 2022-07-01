@@ -8,7 +8,7 @@ dependencies = [
     "chiapos==1.0.10",  # proof of space
     "clvm==0.9.7",
     "clvm_tools==0.4.4",  # Currying, Program.to, other conveniences
-    "cactus_rs==0.1.5",
+    "chia_rs==0.1.5",
     "clvm-tools-rs==0.1.9",  # Rust implementation of clvm_tools
     "aiohttp==3.8.1",  # HTTP server for full node rpc
     "aiosqlite==0.17.0",  # asyncio wrapper for sqlite, to store blocks
@@ -70,9 +70,9 @@ dev_dependencies = [
 kwargs = dict(
     name="cactus-blockchain",
     author="Mariano Sorgente",
-    author_email="mariano@cactus.net",
+    author_email="mariano@cactus-network.net",
     description="Cactus blockchain full node, farmer, timelord, and wallet.",
-    url="https://cactus.net/",
+    url="https://cactus-network.net/",
     license="Apache License",
     python_requires=">=3.7, <4",
     keywords="cactus blockchain node",

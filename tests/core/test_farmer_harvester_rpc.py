@@ -223,7 +223,7 @@ async def test_farmer_reward_target_endpoints(bt, harvester_farmer_environment):
     new_ph: bytes32 = create_puzzlehash_for_pk(master_sk_to_wallet_sk(bt.farmer_master_sk, uint32(2)).get_g1())
     new_ph_2: bytes32 = create_puzzlehash_for_pk(master_sk_to_wallet_sk(bt.pool_master_sk, uint32(7)).get_g1())
 
-    await farmer_rpc_client.set_reward_targets(encode_puzzle_hash(new_ph, "xch"), encode_puzzle_hash(new_ph_2, "xch"))
+    await farmer_rpc_client.set_reward_targets(encode_puzzle_hash(new_ph, "cac"), encode_puzzle_hash(new_ph_2, "cac"))
     targets_3 = await farmer_rpc_client.get_reward_targets(True, 10)
     assert decode_puzzle_hash(targets_3["farmer_target"]) == new_ph
     assert decode_puzzle_hash(targets_3["pool_target"]) == new_ph_2
@@ -241,7 +241,7 @@ async def test_farmer_reward_target_endpoints(bt, harvester_farmer_environment):
         master_sk_to_wallet_sk_unhardened(bt.pool_master_sk, uint32(7)).get_g1()
     )
     await farmer_rpc_client.set_reward_targets(
-        encode_puzzle_hash(observer_farmer, "xch"), encode_puzzle_hash(observer_pool, "xch")
+        encode_puzzle_hash(observer_farmer, "cac"), encode_puzzle_hash(observer_pool, "cac")
     )
     targets = await farmer_rpc_client.get_reward_targets(True, 10)
     assert decode_puzzle_hash(targets["farmer_target"]) == observer_farmer
@@ -250,10 +250,10 @@ async def test_farmer_reward_target_endpoints(bt, harvester_farmer_environment):
 
     root_path = farmer_api.farmer._root_path
     config = load_config(root_path, "config.yaml")
-    assert config["farmer"]["xch_target_address"] == encode_puzzle_hash(observer_farmer, "xch")
-    assert config["pool"]["xch_target_address"] == encode_puzzle_hash(observer_pool, "xch")
+    assert config["farmer"]["cac_target_address"] == encode_puzzle_hash(observer_farmer, "cac")
+    assert config["pool"]["cac_target_address"] == encode_puzzle_hash(observer_pool, "cac")
 
-    new_ph_2_encoded = encode_puzzle_hash(new_ph_2, "xch")
+    new_ph_2_encoded = encode_puzzle_hash(new_ph_2, "cac")
     added_char = new_ph_2_encoded + "a"
     with pytest.raises(ValueError):
         await farmer_rpc_client.set_reward_targets(None, added_char)

@@ -29,7 +29,7 @@ def print_conditions(spend_bundle: SpendBundle):
 
 
 async def main() -> None:
-    rpc_port: uint16 = uint16(8555)
+    rpc_port: uint16 = uint16(11555)
     self_hostname = "localhost"
     path = DEFAULT_ROOT_PATH
     config = load_config(path, "config.yaml")
@@ -43,8 +43,8 @@ async def main() -> None:
         print(farmer_prefarm.amount, farmer_amounts)
         assert farmer_amounts == farmer_prefarm.amount // 2
         assert pool_amounts == pool_prefarm.amount // 2
-        address1 = "xch1rdatypul5c642jkeh4yp933zu3hw8vv8tfup8ta6zfampnyhjnusxdgns6"  # Key 1
-        address2 = "xch1duvy5ur5eyj7lp5geetfg84cj2d7xgpxt7pya3lr2y6ke3696w9qvda66e"  # Key 2
+        address1 = "cac1rdatypul5c642jkeh4yp933zu3hw8vv8tfup8ta6zfampnyhjnusxdgns6"  # Key 1
+        address2 = "cac1duvy5ur5eyj7lp5geetfg84cj2d7xgpxt7pya3lr2y6ke3696w9qvda66e"  # Key 2
 
         ph1 = decode_puzzle_hash(address1)
         ph2 = decode_puzzle_hash(address2)

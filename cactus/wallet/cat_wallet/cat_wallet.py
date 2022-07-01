@@ -519,7 +519,7 @@ class CATWallet:
     async def get_lineage_proof_for_coin(self, coin) -> Optional[LineageProof]:
         return await self.lineage_store.get_lineage_proof(coin.parent_coin_info)
 
-    async def create_tandem_xch_tx(
+    async def create_tandem_cac_tx(
         self,
         fee: uint64,
         amount_to_claim: uint64,
@@ -603,7 +603,7 @@ class CATWallet:
         selected_cat_amount = sum([c.amount for c in cat_coins])
         assert selected_cat_amount >= starting_amount
 
-        # Figure out if we need to absorb/melt some XCH as part of this
+        # Figure out if we need to absorb/melt some CAC as part of this
         regular_cactus_to_claim: int = 0
         if payment_amount > starting_amount:
             fee = uint64(fee + payment_amount - starting_amount)
@@ -639,7 +639,7 @@ class CATWallet:
                 announcement = Announcement(coin.name(), std_hash(b"".join([c.name() for c in cat_coins])), b"\xca")
                 if need_cactus_transaction:
                     if fee > regular_cactus_to_claim:
-                        cactus_tx, _ = await self.create_tandem_xch_tx(
+                        cactus_tx, _ = await self.create_tandem_cac_tx(
                             fee, uint64(regular_cactus_to_claim), announcement_to_assert=announcement
                         )
                         innersol = self.standard_wallet.make_solution(
@@ -649,7 +649,7 @@ class CATWallet:
                             puzzle_announcements_to_assert=puzzle_announcements_bytes,
                         )
                     elif regular_cactus_to_claim > fee:
-                        cactus_tx, _ = await self.create_tandem_xch_tx(fee, uint64(regular_cactus_to_claim))
+                        cactus_tx, _ = await self.create_tandem_cac_tx(fee, uint64(regular_cactus_to_claim))
                         innersol = self.standard_wallet.make_solution(
                             primaries=primaries,
                             coin_announcements={announcement.message},

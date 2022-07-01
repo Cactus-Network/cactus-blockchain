@@ -80,8 +80,8 @@ def check_keys(new_root: Path, keychain: Optional[Keychain] = None) -> None:
     with lock_and_load_config(new_root, "config.yaml") as config:
         pool_child_pubkeys = [master_sk_to_pool_sk(sk).get_g1() for sk, _ in all_sks]
         all_targets = []
-        stop_searching_for_farmer = "xch_target_address" not in config["farmer"]
-        stop_searching_for_pool = "xch_target_address" not in config["pool"]
+        stop_searching_for_farmer = "cac_target_address" not in config["farmer"]
+        stop_searching_for_pool = "cac_target_address" not in config["pool"]
         number_of_ph_to_search = 50
         selected = config["selected_network"]
         prefix = config["network_overrides"]["config"][selected]["address_prefix"]
@@ -108,46 +108,46 @@ def check_keys(new_root: Path, keychain: Optional[Keychain] = None) -> None:
                 all_targets.append(
                     encode_puzzle_hash(create_puzzlehash_for_pk(_derive_path(intermediate_n, [i]).get_g1()), prefix)
                 )
-                if all_targets[-1] == config["farmer"].get("xch_target_address") or all_targets[-2] == config[
+                if all_targets[-1] == config["farmer"].get("cac_target_address") or all_targets[-2] == config[
                     "farmer"
-                ].get("xch_target_address"):
+                ].get("cac_target_address"):
                     stop_searching_for_farmer = True
-                if all_targets[-1] == config["pool"].get("xch_target_address") or all_targets[-2] == config["pool"].get(
-                    "xch_target_address"
+                if all_targets[-1] == config["pool"].get("cac_target_address") or all_targets[-2] == config["pool"].get(
+                    "cac_target_address"
                 ):
                     stop_searching_for_pool = True
 
         # Set the destinations, if necessary
         updated_target: bool = False
-        if "xch_target_address" not in config["farmer"]:
+        if "cac_target_address" not in config["farmer"]:
             print(
-                f"Setting the xch destination for the farmer reward (1/8 plus fees, solo and pooling)"
+                f"Setting the cac destination for the farmer reward (1/8 plus fees, solo and pooling)"
                 f" to {all_targets[0]}"
             )
-            config["farmer"]["xch_target_address"] = all_targets[0]
+            config["farmer"]["cac_target_address"] = all_targets[0]
             updated_target = True
-        elif config["farmer"]["xch_target_address"] not in all_targets:
+        elif config["farmer"]["cac_target_address"] not in all_targets:
             print(
                 f"WARNING: using a farmer address which we might not have the private"
                 f" keys for. We searched the first {number_of_ph_to_search} addresses. Consider overriding "
-                f"{config['farmer']['xch_target_address']} with {all_targets[0]}"
+                f"{config['farmer']['cac_target_address']} with {all_targets[0]}"
             )
 
         if "pool" not in config:
             config["pool"] = {}
-        if "xch_target_address" not in config["pool"]:
-            print(f"Setting the xch destination address for pool reward (7/8 for solo only) to {all_targets[0]}")
-            config["pool"]["xch_target_address"] = all_targets[0]
+        if "cac_target_address" not in config["pool"]:
+            print(f"Setting the cac destination address for pool reward (7/8 for solo only) to {all_targets[0]}")
+            config["pool"]["cac_target_address"] = all_targets[0]
             updated_target = True
-        elif config["pool"]["xch_target_address"] not in all_targets:
+        elif config["pool"]["cac_target_address"] not in all_targets:
             print(
                 f"WARNING: using a pool address which we might not have the private"
                 f" keys for. We searched the first {number_of_ph_to_search} addresses. Consider overriding "
-                f"{config['pool']['xch_target_address']} with {all_targets[0]}"
+                f"{config['pool']['cac_target_address']} with {all_targets[0]}"
             )
         if updated_target:
             print(
-                f"To change the XCH destination addresses, edit the `xch_target_address` entries in"
+                f"To change the CAC destination addresses, edit the `cac_target_address` entries in"
                 f" {(new_root / 'config' / 'config.yaml').absolute()}."
             )
 

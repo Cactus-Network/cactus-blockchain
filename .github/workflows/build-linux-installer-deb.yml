@@ -97,7 +97,7 @@ jobs:
       env:
         SECRET: "${{ secrets.INSTALLER_UPLOAD_SECRET }}"
 
-      # Get the most recent release from cactus-plotter-madmax
+      # Get the most recent release from chia-plotter-madmax
     - uses: actions/github-script@v6
       id: 'latest-madmax'
       with:
@@ -106,15 +106,15 @@ jobs:
         script: |
           const release = await github.rest.repos.getLatestRelease({
             owner: 'Cactus-Network',
-            repo: 'cactus-plotter-madmax',
+            repo: 'chia-plotter-madmax',
           });
           return release.data.tag_name;
 
     - name: Get latest madmax plotter
       run: |
         mkdir "$GITHUB_WORKSPACE/madmax"
-        wget -O "$GITHUB_WORKSPACE/madmax/cactus_plot" https://github.com/Cactus-Network/cactus-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot-${{ steps.latest-madmax.outputs.result }}-x86-64
-        wget -O "$GITHUB_WORKSPACE/madmax/cactus_plot_k34" https://github.com/Cactus-Network/cactus-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot_k34-${{ steps.latest-madmax.outputs.result }}-x86-64
+        wget -O "$GITHUB_WORKSPACE/madmax/cactus_plot" https://github.com/Cactus-Network/chia-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot-${{ steps.latest-madmax.outputs.result }}-x86-64
+        wget -O "$GITHUB_WORKSPACE/madmax/cactus_plot_k34" https://github.com/Cactus-Network/chia-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot_k34-${{ steps.latest-madmax.outputs.result }}-x86-64
         chmod +x "$GITHUB_WORKSPACE/madmax/cactus_plot"
         chmod +x "$GITHUB_WORKSPACE/madmax/cactus_plot_k34"
 
@@ -186,8 +186,8 @@ jobs:
         CACTUS_DEV_BUILD=${CACTUS_INSTALLER_VERSION}-$GIT_SHORT_HASH
         echo "CACTUS_DEV_BUILD=$CACTUS_DEV_BUILD" >>$GITHUB_ENV
         ls ${{ github.workspace }}/build_scripts/final_installer/
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb s3://download.cactus.net/dev/cactus-blockchain_${CACTUS_DEV_BUILD}_amd64.deb
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb s3://download.cactus.net/dev/cactus-blockchain-cli_${CACTUS_DEV_BUILD}-1_amd64.deb
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb s3://download.cactus-network.net/dev/cactus-blockchain_${CACTUS_DEV_BUILD}_amd64.deb
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb s3://download.cactus-network.net/dev/cactus-blockchain-cli_${CACTUS_DEV_BUILD}-1_amd64.deb
 
     - name: Create Checksums
       if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
@@ -204,8 +204,8 @@ jobs:
         CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb -o ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb.torrent --webseed https://download.cactus.net/install/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb
-        py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb -o ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb.torrent --webseed https://download.cactus.net/install/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb
+        py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb -o ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb.torrent --webseed https://download.cactus-network.net/install/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb
+        py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb -o ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb.torrent --webseed https://download.cactus-network.net/install/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb
         ls
 
     - name: Upload Dev Installer
@@ -213,22 +213,22 @@ jobs:
       env:
         CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       run: |
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb s3://download.cactus.net/latest-dev/cactus-blockchain_amd64_latest_dev.deb
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb.sha256 s3://download.cactus.net/latest-dev/cactus-blockchain_amd64_latest_dev.deb.sha256
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb s3://download.cactus.net/latest-dev/cactus-blockchain-cli_amd64_latest_dev.deb
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb.sha256 s3://download.cactus.net/latest-dev/cactus-blockchain-cli_amd64_latest_dev.deb.sha256
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb s3://download.cactus-network.net/latest-dev/cactus-blockchain_amd64_latest_dev.deb
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb.sha256 s3://download.cactus-network.net/latest-dev/cactus-blockchain_amd64_latest_dev.deb.sha256
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb s3://download.cactus-network.net/latest-dev/cactus-blockchain-cli_amd64_latest_dev.deb
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb.sha256 s3://download.cactus-network.net/latest-dev/cactus-blockchain-cli_amd64_latest_dev.deb.sha256
 
     - name: Upload Release Files
       env:
         CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       if: steps.check_secrets.outputs.HAS_SECRET && startsWith(github.ref, 'refs/tags/')
       run: |
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb s3://download.cactus.net/install/
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb.sha256 s3://download.cactus.net/install/
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb.torrent s3://download.cactus.net/torrents/
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb s3://download.cactus.net/install/
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb.sha256 s3://download.cactus.net/install/
-        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb.torrent s3://download.cactus.net/torrents/
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb s3://download.cactus-network.net/install/
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb.sha256 s3://download.cactus-network.net/install/
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_amd64.deb.torrent s3://download.cactus-network.net/torrents/
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb s3://download.cactus-network.net/install/
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb.sha256 s3://download.cactus-network.net/install/
+        aws s3 cp ${{ github.workspace }}/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_amd64.deb.torrent s3://download.cactus-network.net/torrents/
 
     - name: Get tag name
       if: startsWith(github.ref, 'refs/tags/')

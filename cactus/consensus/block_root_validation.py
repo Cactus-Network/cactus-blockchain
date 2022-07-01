@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, Tuple
 
-from cactus_rs import compute_merkle_set_root
+from chia_rs import compute_merkle_set_root
 
 from cactus.types.blockchain_format.coin import Coin, hash_coin_ids
 from cactus.types.blockchain_format.sized_bytes import bytes32

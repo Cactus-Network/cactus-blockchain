@@ -522,7 +522,7 @@ class TestPoolWalletRpc:
             assert len(await wallet_node_0.wallet_state_manager.tx_store.get_unconfirmed_for_wallet(2)) == 0
 
             tr: TransactionRecord = await client.send_transaction(
-                1, 100, encode_puzzle_hash(status.p2_singleton_puzzle_hash, "txch")
+                1, 100, encode_puzzle_hash(status.p2_singleton_puzzle_hash, "tcac")
             )
 
             await time_out_assert(
@@ -655,7 +655,7 @@ class TestPoolWalletRpc:
         await time_out_assert(20, wallet_is_synced, True, wallet_node_0, full_node_api)
         our_ph = await wallet_0.get_new_puzzlehash()
         assert len(await client.get_wallets(WalletType.POOLING_WALLET)) == 0
-        # Balance stars at 6 XCH
+        # Balance stars at 6 CAC
         assert (await wallet_0.get_confirmed_balance()) == 6000000000000
         creation_tx: TransactionRecord = await client.create_new_pool_wallet(
             our_ph, "http://123.45.67.89", 10, f"{self_hostname}:5000", "new", "FARMING_TO_POOL", fee
@@ -732,7 +732,7 @@ class TestPoolWalletRpc:
                 wallet_node_0.wallet_state_manager.blockchain.get_peak_height()
                 == full_node_api.full_node.blockchain.get_peak().height
             )
-            # Balance stars at 6 XCH and 5 more blocks are farmed, total 22 XCH
+            # Balance stars at 6 CAC and 5 more blocks are farmed, total 22 CAC
             assert (await wallet_0.get_confirmed_balance()) == 21999999999999
 
             num_trials = 3

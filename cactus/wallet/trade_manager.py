@@ -34,7 +34,7 @@ class TradeManager:
     """
     This class is a driver for creating and accepting settlement_payments.clvm style offers.
 
-    By default, standard XCH is supported but to support other types of assets you must implement certain functions on
+    By default, standard CAC is supported but to support other types of assets you must implement certain functions on
     the asset's wallet as well as create a driver for its puzzle(s).  Here is a guide to integrating a new types of
     assets with this trade manager:
 
@@ -232,7 +232,7 @@ class TradeManager:
                 new_ph = await wallet.wallet_state_manager.main_wallet.get_new_puzzlehash()
             else:
                 new_ph = await wallet.get_new_puzzlehash()
-            # This should probably not switch on whether or not we're spending a XCH but it has to for now
+            # This should probably not switch on whether or not we're spending a CAC but it has to for now
             if wallet.type() == WalletType.STANDARD_WALLET:
                 if fee_to_pay > coin.amount:
                     selected_coins: Set[Coin] = await wallet.select_coins(
@@ -422,7 +422,7 @@ class TradeManager:
                     wallet = self.wallet_state_manager.wallets[id]
                 else:
                     wallet = await self.wallet_state_manager.get_wallet_for_asset_id(id.hex())
-                # This should probably not switch on whether or not we're spending XCH but it has to for now
+                # This should probably not switch on whether or not we're spending CAC but it has to for now
                 if wallet.type() == WalletType.STANDARD_WALLET:
                     tx = await wallet.generate_signed_transaction(
                         abs(offer_dict[id]),

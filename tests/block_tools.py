@@ -93,7 +93,7 @@ from cactus.wallet.derive_keys import (
     master_sk_to_pool_sk,
     master_sk_to_wallet_sk,
 )
-from cactus_rs import compute_merkle_set_root
+from chia_rs import compute_merkle_set_root
 
 test_constants = DEFAULT_CONSTANTS.replace(
     **{
@@ -316,7 +316,7 @@ class BlockTools:
                 if pool_contract_puzzle_hash is None:
                     pool_pk = self.pool_pk
                 else:
-                    pool_address = encode_puzzle_hash(pool_contract_puzzle_hash, "xch")
+                    pool_address = encode_puzzle_hash(pool_contract_puzzle_hash, "cac")
 
                 plot_keys = PlotKeys(self.farmer_pk, pool_pk, pool_address)
             # No datetime in the filename, to get deterministic filenames and not re-plot
