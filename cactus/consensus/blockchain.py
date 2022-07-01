@@ -8,7 +8,7 @@ from concurrent.futures.process import ProcessPoolExecutor
 from enum import Enum
 from multiprocessing.context import BaseContext
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 from cactus.consensus.block_body_validation import validate_block_body
 from cactus.consensus.block_header_validation import validate_unfinished_header_block
@@ -48,7 +48,6 @@ from cactus.util.generator_tools import get_block_header, tx_removals_and_additi
 from cactus.util.inline_executor import InlineExecutor
 from cactus.util.ints import uint16, uint32, uint64, uint128
 from cactus.util.setproctitle import getproctitle, setproctitle
-from cactus.util.streamable import recurse_jsonify
 from cactus.util.default_root import DEFAULT_ROOT_PATH
 from cactus.util.config import load_config
 
@@ -80,7 +79,6 @@ class StateChangeSummary:
 
 class Blockchain(BlockchainInterface):
     constants: ConsensusConstants
-    constants_json: Dict[str, Any]
 
     # peak of the blockchain
     _peak_height: Optional[uint32]
@@ -149,7 +147,6 @@ class Blockchain(BlockchainInterface):
         self.constants = consensus_constants
         self.coin_store = coin_store
         self.block_store = block_store
-        self.constants_json = recurse_jsonify(self.constants)
         self._shut_down = False
         await self._load_chain_from_store(blockchain_dir)
         self._seen_compact_proofs = set()
@@ -301,8 +298,8 @@ class Blockchain(BlockchainInterface):
                 )
                 raise
 
-            # This is done outside the try-except in case it fails, since we do not want to revert anything if it does
-            await self.__height_map.maybe_flush()
+        # This is done outside the try-except in case it fails, since we do not want to revert anything if it does
+        await self.__height_map.maybe_flush()
 
         if state_change_summary is not None:
             # new coin records added
@@ -613,7 +610,6 @@ class Blockchain(BlockchainInterface):
     ) -> List[PreValidationResult]:
         return await pre_validate_blocks_multiprocessing(
             self.constants,
-            self.constants_json,
             self,
             blocks,
             self.pool,
@@ -629,7 +625,7 @@ class Blockchain(BlockchainInterface):
         task = asyncio.get_running_loop().run_in_executor(
             self.pool,
             _run_generator,
-            self.constants_json,
+            self.constants,
             unfinished_block,
             bytes(generator),
             height,
@@ -680,10 +676,8 @@ class Blockchain(BlockchainInterface):
         """
         Loads blocks into the cache. The blocks loaded include all blocks from
         fork point - BLOCKS_CACHE_SIZE up to and including the fork_point.
-
         Args:
             fork_point: the last block height to load in the cache
-
         """
         if self._peak_height is None:
             return None
