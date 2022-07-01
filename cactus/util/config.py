@@ -26,7 +26,7 @@ def initial_config_file(filename: Union[str, Path]) -> str:
     return pkg_resources.resource_string(__name__, f"initial-{filename}").decode()
 
 
-def create_default_chia_config(root_path: Path, filenames=["config.yaml"]) -> None:
+def create_default_cactus_config(root_path: Path, filenames=["config.yaml"]) -> None:
     for filename in filenames:
         default_config_file_data: str = initial_config_file(filename)
         path: Path = config_path_for_filename(root_path, filename)
@@ -108,7 +108,7 @@ def _load_config_maybe_locked(
         if not exit_on_error:
             raise ValueError("Config not found")
         print(f"can't find {path}")
-        print("** please run `chia init` to migrate or create new config files **")
+        print("** please run `cactus init` to migrate or create new config files **")
         # TODO: fix this hack
         sys.exit(-1)
     # This loop should not be necessary due to the config lock, but it's kept here just in case

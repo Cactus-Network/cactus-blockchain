@@ -6,8 +6,8 @@ import sys
 
 from pathlib import Path
 from typing import Any, Dict, Optional
-from chia.plotting.create_plots import resolve_plot_keys
-from chia.plotters.plotters_util import run_plotter, run_command
+from cactus.plotting.create_plots import resolve_plot_keys
+from cactus.plotters.plotters_util import run_plotter, run_command
 
 log = logging.getLogger(__name__)
 
@@ -29,9 +29,9 @@ def get_madmax_package_path() -> Path:
 
 def get_madmax_executable_path_for_ksize(plotters_root_path: Path, ksize: int = 32) -> Path:
     madmax_dir: Path = get_madmax_package_path()
-    madmax_exec: str = "chia_plot"
+    madmax_exec: str = "cactus_plot"
     if ksize > 32:
-        madmax_exec += "_k34"  # Use the chia_plot_k34 executable for k-sizes > 32
+        madmax_exec += "_k34"  # Use the cactus_plot_k34 executable for k-sizes > 32
     if sys.platform in ["win32", "cygwin"]:
         madmax_exec += ".exe"
     if not madmax_dir.exists():
@@ -120,7 +120,7 @@ def install_madmax(plotters_root_path: Path):
             [
                 "git",
                 "clone",
-                "https://github.com/Chia-Network/chia-plotter-madmax.git",
+                "https://github.com/Cactus-Network/cactus-plotter-madmax.git",
                 MADMAX_PLOTTER_DIR,
             ],
             "Could not clone madmax git repository",
@@ -174,7 +174,7 @@ def dir_with_trailing_slash(dir: str) -> str:
     return dir if dir[-1] == os.path.sep else dir + os.path.sep
 
 
-def plot_madmax(args, chia_root_path: Path, plotters_root_path: Path):
+def plot_madmax(args, cactus_root_path: Path, plotters_root_path: Path):
     if sys.platform not in ["win32", "cygwin"]:
         import resource
 
@@ -195,7 +195,7 @@ def plot_madmax(args, chia_root_path: Path, plotters_root_path: Path):
             None,
             None if args.pool_key == b"" else args.pool_key.hex(),
             None if args.contract == "" else args.contract,
-            chia_root_path,
+            cactus_root_path,
             log,
             args.connect_to_daemon,
         )

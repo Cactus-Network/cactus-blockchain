@@ -15,7 +15,7 @@ This roughly corresponds to bitcoin's taproot.
 
 Note:
 
-p2_delegated_puzzle_or_hidden_puzzle is essentially the "standard coin" in chia.
+p2_delegated_puzzle_or_hidden_puzzle is essentially the "standard coin" in cactus.
 DEFAULT_HIDDEN_PUZZLE_HASH from this puzzle is used with
 calculate_synthetic_secret_key in the wallet's standard pk_to_sk finder.
 
@@ -28,7 +28,7 @@ following mechanism:
   level a set of auxiliary sk/pk pairs which are used for specific coins. These
   can be used for signing in AGG_SIG_ME, but the standard coin uses a key further
   derived from one of these via calculate_synthetic_secret_key as described in
-  https://chialisp.com/docs/standard_transaction. Therefore, when a wallet needs
+  https://cactuslisp.com/docs/standard_transaction. Therefore, when a wallet needs
   to find a secret key for signing based on a public key, it needs to try repeating
   this derivation as well and see if the G1Element (pk) associated with any of the
   derived secret keys matches the pk requested by the coin.
@@ -38,7 +38,7 @@ following mechanism:
     delegated_puzzle_solution = Program.to((1, condition_args))
     solutions = Program.to([[], delgated_puzzle_solution, []])
 
-  In context, delegated_puzzle_solution here is any *chialisp program*, here one
+  In context, delegated_puzzle_solution here is any *cactuslisp program*, here one
   simply quoting a list of conditions, and the following argument is the arguments
   to this program, which here are unused. Secondly, the actual arguments to the
   p2_delegated_puzzle_or_hidden_puzzle are given. The first argument determines
@@ -48,7 +48,7 @@ following mechanism:
   In most cases, the puzzle will be revealed, and this argument will be the nil object,
   () (represented here by an empty python list).
 
-  The second and third arguments are a chialisp program and its corresponding
+  The second and third arguments are a cactuslisp program and its corresponding
   arguments, which will be run inside the standard coin puzzle. This interacts with
   sign_coin_spend in that the AGG_SIG_ME condition added by the inner puzzle asks the
   surrounding system to provide a signature over the provided program with a synthetic
@@ -61,8 +61,8 @@ from typing import Union
 from blspy import G1Element, PrivateKey
 from clvm.casts import int_from_bytes
 
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
 
 from .load_clvm import load_clvm
 from .p2_conditions import puzzle_for_conditions

@@ -1,22 +1,22 @@
 """
-NOTE: This contains duplicate code from `chia.cmds.plots`.
-After `chia plots create` becomes obsolete, consider removing it from there.
+NOTE: This contains duplicate code from `cactus.cmds.plots`.
+After `cactus plots create` becomes obsolete, consider removing it from there.
 """
 import asyncio
 import logging
 import pkg_resources
-from chia.plotting.create_plots import create_plots, resolve_plot_keys
+from cactus.plotting.create_plots import create_plots, resolve_plot_keys
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from chia.plotting.util import add_plot_directory, validate_plot_size
+from cactus.plotting.util import add_plot_directory, validate_plot_size
 
 log = logging.getLogger(__name__)
 
 
 def get_chiapos_install_info() -> Optional[Dict[str, Any]]:
     chiapos_version: str = pkg_resources.get_distribution("chiapos").version
-    return {"display_name": "Chia Proof of Space", "version": chiapos_version, "installed": True}
+    return {"display_name": "Cactus Proof of Space", "version": chiapos_version, "installed": True}
 
 
 class Params:
@@ -35,7 +35,7 @@ class Params:
         self.nobitfield = args.nobitfield
 
 
-def plot_chia(args, root_path):
+def plot_cactus(args, root_path):
     try:
         validate_plot_size(root_path, args.size, args.override)
     except ValueError as e:

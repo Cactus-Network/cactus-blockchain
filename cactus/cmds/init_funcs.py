@@ -6,28 +6,28 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
 
-from chia import __version__
-from chia.consensus.coinbase import create_puzzlehash_for_pk
-from chia.ssl.create_ssl import (
+from cactus import __version__
+from cactus.consensus.coinbase import create_puzzlehash_for_pk
+from cactus.ssl.create_ssl import (
     ensure_ssl_dirs,
     generate_ca_signed_cert,
-    get_chia_ca_crt_key,
+    get_cactus_ca_crt_key,
     make_ca_cert,
     write_ssl_cert_and_key,
 )
-from chia.util.bech32m import encode_puzzle_hash
-from chia.util.config import (
-    create_default_chia_config,
+from cactus.util.bech32m import encode_puzzle_hash
+from cactus.util.config import (
+    create_default_cactus_config,
     initial_config_file,
     load_config,
     lock_and_load_config,
     save_config,
     unflatten_properties,
 )
-from chia.util.db_version import set_db_version
-from chia.util.keychain import Keychain
-from chia.util.path import path_from_root
-from chia.util.ssl_check import (
+from cactus.util.db_version import set_db_version
+from cactus.util.keychain import Keychain
+from cactus.util.path import path_from_root
+from cactus.util.ssl_check import (
     DEFAULT_PERMISSIONS_CERT_FILE,
     DEFAULT_PERMISSIONS_KEY_FILE,
     RESTRICT_MASK_CERT_FILE,
@@ -35,14 +35,14 @@ from chia.util.ssl_check import (
     check_and_fix_permissions_for_ssl_file,
     fix_ssl,
 )
-from chia.wallet.derive_keys import (
+from cactus.wallet.derive_keys import (
     master_sk_to_pool_sk,
     master_sk_to_wallet_sk_intermediate,
     master_sk_to_wallet_sk_unhardened_intermediate,
     _derive_path,
     _derive_path_unhardened,
 )
-from chia.cmds.configure import configure
+from cactus.cmds.configure import configure
 
 private_node_names: List[str] = ["full_node", "wallet", "farmer", "harvester", "timelord", "crawler", "daemon"]
 public_node_names: List[str] = ["full_node", "wallet", "farmer", "introducer", "timelord"]
@@ -74,7 +74,7 @@ def check_keys(new_root: Path, keychain: Optional[Keychain] = None) -> None:
         keychain = Keychain()
     all_sks = keychain.get_all_private_keys()
     if len(all_sks) == 0:
-        print("No keys are present in the keychain. Generate them with 'chia keys generate'")
+        print("No keys are present in the keychain. Generate them with 'cactus keys generate'")
         return None
 
     with lock_and_load_config(new_root, "config.yaml") as config:
@@ -234,10 +234,10 @@ def create_all_ssl(
 
     private_ca_key_path = ca_dir / "private_ca.key"
     private_ca_crt_path = ca_dir / "private_ca.crt"
-    chia_ca_crt, chia_ca_key = get_chia_ca_crt_key()
-    chia_ca_crt_path = ca_dir / "chia_ca.crt"
-    chia_ca_key_path = ca_dir / "chia_ca.key"
-    write_ssl_cert_and_key(chia_ca_crt_path, chia_ca_crt, chia_ca_key_path, chia_ca_key)
+    cactus_ca_crt, cactus_ca_key = get_cactus_ca_crt_key()
+    cactus_ca_crt_path = ca_dir / "cactus_ca.crt"
+    cactus_ca_key_path = ca_dir / "cactus_ca.key"
+    write_ssl_cert_and_key(cactus_ca_crt_path, cactus_ca_crt, cactus_ca_key_path, cactus_ca_key)
 
     # If Private CA crt/key are passed-in, write them out
     if private_ca_crt_and_key is not None:
@@ -263,11 +263,11 @@ def create_all_ssl(
             ssl_dir, ca_crt, ca_key, prefix="private", nodes=private_node_names, node_certs_and_keys=node_certs_and_keys
         )
 
-    chia_ca_crt, chia_ca_key = get_chia_ca_crt_key()
+    cactus_ca_crt, cactus_ca_key = get_cactus_ca_crt_key()
     generate_ssl_for_nodes(
         ssl_dir,
-        chia_ca_crt,
-        chia_ca_key,
+        cactus_ca_crt,
+        cactus_ca_key,
         prefix="public",
         nodes=public_node_names,
         overwrite=False,
@@ -338,7 +338,7 @@ def init(
             print(f"** {root_path} does not exist. Executing core init **")
             # sanity check here to prevent infinite recursion
             if (
-                chia_init(
+                cactus_init(
                     root_path,
                     fix_ssl_permissions=fix_ssl_permissions,
                     testnet=testnet,
@@ -352,10 +352,10 @@ def init(
             print(f"** {root_path} was not created. Exiting **")
             return -1
     else:
-        return chia_init(root_path, fix_ssl_permissions=fix_ssl_permissions, testnet=testnet, v1_db=v1_db)
+        return cactus_init(root_path, fix_ssl_permissions=fix_ssl_permissions, testnet=testnet, v1_db=v1_db)
 
 
-def chia_version_number() -> Tuple[str, str, str, str]:
+def cactus_version_number() -> Tuple[str, str, str, str]:
     scm_full_version = __version__
     left_full_version = scm_full_version.split("+")
 
@@ -403,18 +403,18 @@ def chia_version_number() -> Tuple[str, str, str, str]:
     return major_release_number, minor_release_number, patch_release_number, dev_release_number
 
 
-def chia_minor_release_number():
-    res = int(chia_version_number()[2])
+def cactus_minor_release_number():
+    res = int(cactus_version_number()[2])
     print(f"Install release number: {res}")
     return res
 
 
-def chia_full_version_str() -> str:
-    major, minor, patch, dev = chia_version_number()
+def cactus_full_version_str() -> str:
+    major, minor, patch, dev = cactus_version_number()
     return f"{major}.{minor}.{patch}{dev}"
 
 
-def chia_init(
+def cactus_init(
     root_path: Path,
     *,
     should_check_keys: bool = True,
@@ -430,13 +430,13 @@ def chia_init(
     protected Keychain. When launching the daemon from the GUI, we want the GUI to
     handle unlocking the keychain.
     """
-    chia_root = os.environ.get("CHIA_ROOT", None)
-    if chia_root is not None:
-        print(f"CHIA_ROOT is set to {chia_root}")
+    cactus_root = os.environ.get("CACTUS_ROOT", None)
+    if cactus_root is not None:
+        print(f"CACTUS_ROOT is set to {cactus_root}")
 
-    print(f"Chia directory {root_path}")
+    print(f"Cactus directory {root_path}")
     if root_path.is_dir() and Path(root_path / "config" / "config.yaml").exists():
-        # This is reached if CHIA_ROOT is set, or if user has run chia init twice
+        # This is reached if CACTUS_ROOT is set, or if user has run cactus init twice
         # before a new update.
         if testnet:
             configure(
@@ -463,7 +463,7 @@ def chia_init(
         print(f"{root_path} already exists, no migration action taken")
         return -1
 
-    create_default_chia_config(root_path)
+    create_default_cactus_config(root_path)
     if testnet:
         configure(
             root_path,
@@ -519,6 +519,6 @@ def chia_init(
             pass
 
     print("")
-    print("To see your keys, run 'chia keys show --show-mnemonic-seed'")
+    print("To see your keys, run 'cactus keys show --show-mnemonic-seed'")
 
     return 0

@@ -11,7 +11,7 @@ def keys_cmd(ctx: click.Context):
 
     root_path: Path = ctx.obj["root_path"]
     if not root_path.is_dir():
-        raise RuntimeError("Please initialize (or migrate) your config directory with chia init")
+        raise RuntimeError("Please initialize (or migrate) your config directory with cactus init")
 
 
 @keys_cmd.command("generate", short_help="Generates and adds a key to keychain")
@@ -32,7 +32,7 @@ def generate_cmd(ctx: click.Context):
     "--non-observer-derivation",
     "-d",
     help=(
-        "Show the first wallet address using non-observer derivation. Older Chia versions use "
+        "Show the first wallet address using non-observer derivation. Older Cactus versions use "
         "non-observer derivation when generating wallet addresses."
     ),
     default=False,
@@ -91,7 +91,7 @@ def delete_cmd(ctx: click.Context, fingerprint: int):
 
 @keys_cmd.command("delete_all", short_help="Delete all private keys in keychain")
 def delete_all_cmd():
-    from chia.util.keychain import Keychain
+    from cactus.util.keychain import Keychain
 
     Keychain().delete_all_keys()
 
@@ -147,7 +147,7 @@ def verify_cmd(message: str, public_key: str, signature: str):
     verify(message, public_key, signature)
 
 
-@keys_cmd.command("migrate", short_help="Attempt to migrate keys to the Chia keyring")
+@keys_cmd.command("migrate", short_help="Attempt to migrate keys to the Cactus keyring")
 @click.pass_context
 def migrate_cmd(ctx: click.Context):
     from .keys_funcs import migrate_keys

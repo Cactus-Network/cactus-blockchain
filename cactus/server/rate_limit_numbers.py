@@ -4,8 +4,8 @@ import dataclasses
 import functools
 from typing import Any, Dict, List, Optional
 
-from chia.protocols.protocol_message_types import ProtocolMessageTypes
-from chia.protocols.shared_protocol import Capability
+from cactus.protocols.protocol_message_types import ProtocolMessageTypes
+from cactus.protocols.shared_protocol import Capability
 
 compose_rate_limits_cache: Dict[int, Dict[str, Any]] = {}
 
@@ -52,7 +52,7 @@ def compose_rate_limits(old_rate_limits: Dict[str, Any], new_rate_limits: Dict[s
 
 
 # Each number in this dict corresponds to a specific version of rate limits (1, 2,  etc).
-# Version 1 includes the original limits for chia software from versions 1.0 to 1.4.
+# Version 1 includes the original limits for cactus software from versions 1.0 to 1.4.
 rate_limits = {
     1: {
         "default_settings": RLSettings(100, 1024 * 1024, 100 * 1024 * 1024),

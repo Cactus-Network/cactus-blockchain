@@ -6,11 +6,11 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-import chia.server.ws_connection as ws  # lgtm [py/import-and-import-from]
-from chia.consensus.constants import ConsensusConstants
-from chia.plot_sync.sender import Sender
-from chia.plotting.manager import PlotManager
-from chia.plotting.util import (
+import cactus.server.ws_connection as ws  # lgtm [py/import-and-import-from]
+from cactus.consensus.constants import ConsensusConstants
+from cactus.plot_sync.sender import Sender
+from cactus.plotting.manager import PlotManager
+from cactus.plotting.util import (
     PlotRefreshEvents,
     PlotRefreshResult,
     PlotsRefreshParameter,
@@ -19,7 +19,7 @@ from chia.plotting.util import (
     remove_plot,
     remove_plot_directory,
 )
-from chia.server.server import ChiaServer
+from cactus.server.server import CactusServer
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class Harvester:
     constants: ConsensusConstants
     _refresh_lock: asyncio.Lock
     event_loop: asyncio.events.AbstractEventLoop
-    server: Optional[ChiaServer]
+    server: Optional[CactusServer]
 
     def __init__(self, root_path: Path, config: Dict, constants: ConsensusConstants):
         self.log = log
@@ -102,7 +102,7 @@ class Harvester:
         if event == PlotRefreshEvents.done:
             self.plot_sync_sender.sync_done(update_result.removed, update_result.duration)
 
-    def on_disconnect(self, connection: ws.WSChiaConnection):
+    def on_disconnect(self, connection: ws.WSCactusConnection):
         self.log.info(f"peer disconnected {connection.get_peer_logging()}")
         self.state_changed("close_connection")
         self.plot_sync_sender.stop()

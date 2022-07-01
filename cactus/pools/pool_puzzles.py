@@ -3,20 +3,20 @@ from typing import Tuple, List, Optional
 from blspy import G1Element
 from clvm.casts import int_from_bytes, int_to_bytes
 
-from chia.clvm.singleton import SINGLETON_LAUNCHER
-from chia.consensus.block_rewards import calculate_pool_reward
-from chia.consensus.coinbase import pool_parent_id
-from chia.pools.pool_wallet_info import PoolState, LEAVING_POOL, SELF_POOLING
+from cactus.clvm.singleton import SINGLETON_LAUNCHER
+from cactus.consensus.block_rewards import calculate_pool_reward
+from cactus.consensus.coinbase import pool_parent_id
+from cactus.pools.pool_wallet_info import PoolState, LEAVING_POOL, SELF_POOLING
 
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import Program, SerializedProgram
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import Program, SerializedProgram
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.wallet.puzzles.load_clvm import load_clvm
-from chia.wallet.puzzles.singleton_top_layer import puzzle_for_singleton
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.wallet.puzzles.load_clvm import load_clvm
+from cactus.wallet.puzzles.singleton_top_layer import puzzle_for_singleton
 
-from chia.util.ints import uint32, uint64
+from cactus.util.ints import uint32, uint64
 
 log = logging.getLogger(__name__)
 # "Full" is the outer singleton, with the inner puzzle filled in
@@ -388,7 +388,7 @@ def solution_to_pool_state(full_spend: CoinSpend) -> Optional[PoolState]:
         if inner_solution.rest().first().as_int() != 0:
             return None
 
-        # This is referred to as p1 in the chialisp code
+        # This is referred to as p1 in the cactuslisp code
         # spend_type is absorbing money if p1 is a cons box, spend_type is escape if p1 is an atom
         # TODO: The comment above, and in the CLVM, seems wrong
         extra_data = inner_solution.first()

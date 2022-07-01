@@ -3,5 +3,5 @@
 
 set -e
 
-ln -s /usr/lib/chia-blockchain/resources/app.asar.unpacked/daemon/chia /usr/bin/chia || true
-ln -s /usr/lib/chia-blockchain/resources/app.asar.unpacked/daemon /opt/chia || true
+ln -s /usr/lib/cactus-blockchain/resources/app.asar.unpacked/daemon/cactus /usr/bin/cactus || true
+ln -s /usr/lib/cactus-blockchain/resources/app.asar.unpacked/daemon /opt/cactus || true

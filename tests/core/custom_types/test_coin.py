@@ -1,8 +1,8 @@
 from typing import List
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.ints import uint64
-from chia.util.hash import std_hash
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.ints import uint64
+from cactus.util.hash import std_hash
 import pytest
 
 

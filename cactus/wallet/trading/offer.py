@@ -4,15 +4,15 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from blspy import G2Element
 from clvm_tools.binutils import disassemble
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.blockchain_format.coin import Coin, coin_as_list
-from chia.types.blockchain_format.program import Program
-from chia.types.announcement import Announcement
-from chia.types.coin_spend import CoinSpend
-from chia.types.spend_bundle import SpendBundle
-from chia.util.bech32m import bech32_decode, bech32_encode, convertbits
-from chia.util.ints import uint64
-from chia.wallet.outer_puzzles import (
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.blockchain_format.coin import Coin, coin_as_list
+from cactus.types.blockchain_format.program import Program
+from cactus.types.announcement import Announcement
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.bech32m import bech32_decode, bech32_encode, convertbits
+from cactus.util.ints import uint64
+from cactus.wallet.outer_puzzles import (
     construct_puzzle,
     create_asset_id,
     match_puzzle,
@@ -20,10 +20,10 @@ from chia.wallet.outer_puzzles import (
     get_inner_puzzle,
     get_inner_solution,
 )
-from chia.wallet.payment import Payment
-from chia.wallet.puzzle_drivers import PuzzleInfo, Solver
-from chia.wallet.puzzles.load_clvm import load_clvm
-from chia.wallet.util.puzzle_compression import (
+from cactus.wallet.payment import Payment
+from cactus.wallet.puzzle_drivers import PuzzleInfo, Solver
+from cactus.wallet.puzzles.load_clvm import load_clvm
+from cactus.wallet.util.puzzle_compression import (
     compress_object_with_puzzles,
     decompress_object_with_puzzles,
     lowest_best_version,

@@ -1,7 +1,7 @@
 from typing import Dict
 
-from chia.consensus.constants import ConsensusConstants
-from chia.consensus.default_constants import DEFAULT_CONSTANTS
+from cactus.consensus.constants import ConsensusConstants
+from cactus.consensus.default_constants import DEFAULT_CONSTANTS
 
 
 def make_test_constants(test_constants_overrides: Dict) -> ConsensusConstants:

@@ -1,23 +1,23 @@
 from typing import Any, Dict, List, Optional
 
-from chia.consensus.block_record import BlockRecord
-from chia.consensus.pos_quality import UI_ACTUAL_SPACE_CONSTANT_FACTOR
-from chia.full_node.full_node import FullNode
-from chia.full_node.mempool_check_conditions import get_puzzle_and_solution_for_coin
-from chia.rpc.rpc_server import Endpoint
-from chia.types.blockchain_format.program import Program, SerializedProgram
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_record import CoinRecord
-from chia.types.coin_spend import CoinSpend
-from chia.types.full_block import FullBlock
-from chia.types.generator_types import BlockGenerator
-from chia.types.mempool_inclusion_status import MempoolInclusionStatus
-from chia.types.spend_bundle import SpendBundle
-from chia.types.unfinished_header_block import UnfinishedHeaderBlock
-from chia.util.byte_types import hexstr_to_bytes
-from chia.util.ints import uint32, uint64, uint128
-from chia.util.log_exceptions import log_exceptions
-from chia.util.ws_message import WsRpcMessage, create_payload_dict
+from cactus.consensus.block_record import BlockRecord
+from cactus.consensus.pos_quality import UI_ACTUAL_SPACE_CONSTANT_FACTOR
+from cactus.full_node.full_node import FullNode
+from cactus.full_node.mempool_check_conditions import get_puzzle_and_solution_for_coin
+from cactus.rpc.rpc_server import Endpoint
+from cactus.types.blockchain_format.program import Program, SerializedProgram
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_record import CoinRecord
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.full_block import FullBlock
+from cactus.types.generator_types import BlockGenerator
+from cactus.types.mempool_inclusion_status import MempoolInclusionStatus
+from cactus.types.spend_bundle import SpendBundle
+from cactus.types.unfinished_header_block import UnfinishedHeaderBlock
+from cactus.util.byte_types import hexstr_to_bytes
+from cactus.util.ints import uint32, uint64, uint128
+from cactus.util.log_exceptions import log_exceptions
+from cactus.util.ws_message import WsRpcMessage, create_payload_dict
 
 
 def coin_record_dict_backwards_compat(coin_record: Dict[str, Any]):
@@ -28,7 +28,7 @@ def coin_record_dict_backwards_compat(coin_record: Dict[str, Any]):
 class FullNodeRpcApi:
     def __init__(self, service: FullNode):
         self.service = service
-        self.service_name = "chia_full_node"
+        self.service_name = "cactus_full_node"
         self.cached_blockchain_state: Optional[Dict] = None
 
     def get_routes(self) -> Dict[str, Endpoint]:

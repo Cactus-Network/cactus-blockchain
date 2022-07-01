@@ -3,5 +3,5 @@
 
 set -e
 
-unlink /usr/bin/chia || true
-unlink /opt/chia || true
+unlink /usr/bin/cactus || true
+unlink /opt/cactus || true

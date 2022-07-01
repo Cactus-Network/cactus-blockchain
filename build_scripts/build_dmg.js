@@ -44,8 +44,8 @@ async function main(opts) {
     console.log('Finished');
 }
 
-const appName = 'Chia';
-const dmgIcon = '../chia-blockchain-gui/packages/gui/src/assets/img/Chia.icns';
+const appName = 'Cactus';
+const dmgIcon = '../cactus-blockchain-gui/packages/gui/src/assets/img/Cactus.icns';
 const dmgBackground = './assets/dmg/background.tiff';
 const outputDir = './final_installer';
 const appPath = process.argv[2]; // required

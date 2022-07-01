@@ -4,10 +4,10 @@ import time
 from collections import Counter
 from typing import Dict, List
 
-from chia.protocols.protocol_message_types import ProtocolMessageTypes
-from chia.protocols.shared_protocol import Capability
-from chia.server.outbound_message import Message
-from chia.server.rate_limit_numbers import RLSettings, get_rate_limits_to_use
+from cactus.protocols.protocol_message_types import ProtocolMessageTypes
+from cactus.protocols.shared_protocol import Capability
+from cactus.server.outbound_message import Message
+from cactus.server.rate_limit_numbers import RLSettings, get_rate_limits_to_use
 
 log = logging.getLogger(__name__)
 

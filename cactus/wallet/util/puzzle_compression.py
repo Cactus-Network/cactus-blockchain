@@ -2,10 +2,10 @@ import zlib
 
 from typing import List
 
-from chia.wallet.puzzles.load_clvm import load_clvm
-from chia.wallet.puzzles import p2_delegated_puzzle_or_hidden_puzzle as standard_puzzle
-from chia.wallet.puzzles.cat_loader import CAT_MOD
-from chia.wallet.nft_wallet.nft_puzzles import (
+from cactus.wallet.puzzles.load_clvm import load_clvm
+from cactus.wallet.puzzles import p2_delegated_puzzle_or_hidden_puzzle as standard_puzzle
+from cactus.wallet.puzzles.cat_loader import CAT_MOD
+from cactus.wallet.nft_wallet.nft_puzzles import (
     SINGLETON_TOP_LAYER_MOD,
     NFT_STATE_LAYER_MOD,
     NFT_OWNERSHIP_LAYER,

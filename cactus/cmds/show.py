@@ -6,8 +6,8 @@ import click
 async def print_connections(node_client, trusted_peers: Dict):
     import time
 
-    from chia.server.outbound_message import NodeType
-    from chia.util.network import is_trusted_inner
+    from cactus.server.outbound_message import NodeType
+    from cactus.util.network import is_trusted_inner
 
     connections = await node_client.get_connections()
     print("Connections:")
@@ -63,9 +63,9 @@ async def print_blockchain_state(node_client, config: Dict):
     # node_client is FullNodeRpcClient
     import time
 
-    from chia.consensus.block_record import BlockRecord
-    from chia.util.ints import uint64
-    from chia.util.misc import format_bytes
+    from cactus.consensus.block_record import BlockRecord
+    from cactus.util.ints import uint64
+    from cactus.util.misc import format_bytes
 
     blockchain_state = await node_client.get_blockchain_state()
     if blockchain_state is None:
@@ -103,7 +103,7 @@ async def print_blockchain_state(node_client, config: Dict):
         print(f"Current Blockchain Status: Not Synced. Peak height: {peak.height}")
     else:
         print("\nSearching for an initial chain\n")
-        print("You may be able to expedite with 'chia show -a host:port' using a known node.\n")
+        print("You may be able to expedite with 'cactus show -a host:port' using a known node.\n")
 
     if peak is not None:
         if peak.is_transaction_block:
@@ -147,11 +147,11 @@ async def print_blockchain_state(node_client, config: Dict):
 async def print_block_from_hash(node_client, config: Dict, block_by_header_hash: str):
     import time
 
-    from chia.consensus.block_record import BlockRecord
-    from chia.types.blockchain_format.sized_bytes import bytes32
-    from chia.types.full_block import FullBlock
-    from chia.util.bech32m import encode_puzzle_hash
-    from chia.util.byte_types import hexstr_to_bytes
+    from cactus.consensus.block_record import BlockRecord
+    from cactus.types.blockchain_format.sized_bytes import bytes32
+    from cactus.types.full_block import FullBlock
+    from cactus.util.bech32m import encode_puzzle_hash
+    from cactus.util.byte_types import hexstr_to_bytes
 
     block: Optional[BlockRecord] = await node_client.get_block_record(hexstr_to_bytes(block_by_header_hash))
     full_block: Optional[FullBlock] = await node_client.get_block(hexstr_to_bytes(block_by_header_hash))
@@ -229,7 +229,7 @@ async def add_node_connection(node_client, add_connection: str):
 
 
 async def remove_node_connection(node_client, remove_connection: str):
-    from chia.server.outbound_message import NodeType
+    from cactus.server.outbound_message import NodeType
 
     result_txt = ""
     if len(remove_connection) != 8:
@@ -256,10 +256,10 @@ async def execute_with_node(rpc_port: Optional[int], function: Callable, *args):
 
     from aiohttp import ClientConnectorError
 
-    from chia.rpc.full_node_rpc_client import FullNodeRpcClient
-    from chia.util.config import load_config
-    from chia.util.default_root import DEFAULT_ROOT_PATH
-    from chia.util.ints import uint16
+    from cactus.rpc.full_node_rpc_client import FullNodeRpcClient
+    from cactus.util.config import load_config
+    from cactus.util.default_root import DEFAULT_ROOT_PATH
+    from cactus.util.ints import uint16
 
     config = load_config(DEFAULT_ROOT_PATH, "config.yaml")
     self_hostname = config["self_hostname"]

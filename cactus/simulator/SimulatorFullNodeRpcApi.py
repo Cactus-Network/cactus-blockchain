@@ -1,9 +1,9 @@
 from typing import Dict
 
-from chia.rpc.full_node_rpc_api import FullNodeRpcApi
-from chia.rpc.rpc_server import Endpoint
-from chia.simulator.simulator_protocol import FarmNewBlockProtocol
-from chia.util.bech32m import decode_puzzle_hash
+from cactus.rpc.full_node_rpc_api import FullNodeRpcApi
+from cactus.rpc.rpc_server import Endpoint
+from cactus.simulator.simulator_protocol import FarmNewBlockProtocol
+from cactus.util.bech32m import decode_puzzle_hash
 
 
 class SimulatorFullNodeRpcApi(FullNodeRpcApi):

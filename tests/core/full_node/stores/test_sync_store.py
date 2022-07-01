@@ -1,7 +1,7 @@
 import pytest
 
-from chia.full_node.sync_store import SyncStore
-from chia.util.hash import std_hash
+from cactus.full_node.sync_store import SyncStore
+from cactus.util.hash import std_hash
 
 
 class TestStore:

@@ -1,12 +1,12 @@
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.blockchain_format.program import Program
 from typing import List, Optional, Tuple, Iterator, Dict
 from blspy import G1Element
-from chia.types.blockchain_format.coin import Coin
-from chia.types.coin_spend import CoinSpend
-from chia.util.ints import uint64
-from chia.wallet.puzzles.load_clvm import load_clvm
-from chia.types.condition_opcodes import ConditionOpcode
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.coin_spend import CoinSpend
+from cactus.util.ints import uint64
+from cactus.wallet.puzzles.load_clvm import load_clvm
+from cactus.types.condition_opcodes import ConditionOpcode
 
 
 SINGLETON_TOP_LAYER_MOD = load_clvm("singleton_top_layer_v1_1.clvm")
@@ -198,9 +198,9 @@ def check_is_did_puzzle(puzzle: Program) -> bool:
 
 def metadata_to_program(metadata: Dict) -> Program:
     """
-    Convert the metadata dict to a Chialisp program
+    Convert the metadata dict to a Cactuslisp program
     :param metadata: User defined metadata
-    :return: Chialisp program
+    :return: Cactuslisp program
     """
     kv_list = []
     for key, value in metadata.items():
@@ -211,7 +211,7 @@ def metadata_to_program(metadata: Dict) -> Program:
 def program_to_metadata(program: Program) -> Dict:
     """
     Convert a program to a metadata dict
-    :param program: Chialisp program contains the metadata
+    :param program: Cactuslisp program contains the metadata
     :return: Metadata dict
     """
     metadata = {}

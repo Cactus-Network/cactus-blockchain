@@ -6,7 +6,7 @@ import sys
 import threading
 import yaml
 
-from chia.util.default_root import DEFAULT_KEYS_ROOT_PATH
+from cactus.util.default_root import DEFAULT_KEYS_ROOT_PATH
 from contextlib import contextmanager
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305  # pyright: reportMissingModuleSource=false
 from functools import wraps
@@ -321,7 +321,7 @@ class FileKeyring(FileSystemEventHandler):
 
     @staticmethod
     def get_symmetric_key(salt: bytes) -> bytes:
-        from chia.util.keychain import obtain_current_passphrase
+        from cactus.util.keychain import obtain_current_passphrase
 
         try:
             passphrase = obtain_current_passphrase(use_passphrase_cache=True)
@@ -393,7 +393,7 @@ class FileKeyring(FileSystemEventHandler):
         return self.outer_payload_cache == FileKeyring.default_outer_payload()
 
     def write_keyring(self, fresh_salt: bool = False):
-        from chia.util.keyring_wrapper import KeyringWrapper
+        from cactus.util.keyring_wrapper import KeyringWrapper
 
         inner_payload = self.payload_cache
         inner_payload_yaml = yaml.safe_dump(inner_payload)

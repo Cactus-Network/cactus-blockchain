@@ -1,15 +1,15 @@
 import ipaddress
 from typing import Any, Dict, List, Optional
 
-from chia.rpc.rpc_server import Endpoint
-from chia.seeder.crawler import Crawler
-from chia.util.ws_message import WsRpcMessage, create_payload_dict
+from cactus.rpc.rpc_server import Endpoint
+from cactus.seeder.crawler import Crawler
+from cactus.util.ws_message import WsRpcMessage, create_payload_dict
 
 
 class CrawlerRpcApi:
     def __init__(self, crawler: Crawler):
         self.service = crawler
-        self.service_name = "chia_crawler"
+        self.service_name = "cactus_crawler"
 
     def get_routes(self) -> Dict[str, Endpoint]:
         return {

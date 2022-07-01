@@ -3,7 +3,7 @@ from typing import Optional
 
 import click
 
-from chia.util.config import lock_and_load_config, save_config, str2bool
+from cactus.util.config import lock_and_load_config, save_config, str2bool
 
 
 def configure(
@@ -96,9 +96,9 @@ def configure(
             if testnet == "true" or testnet == "t":
                 print("Setting Testnet")
                 testnet_port = "58444"
-                testnet_introducer = "introducer-testnet10.chia.net"
-                testnet_dns_introducer = "dns-introducer-testnet10.chia.net"
-                bootstrap_peers = ["testnet10-node.chia.net"]
+                testnet_introducer = "introducer-testnet10.cactus.net"
+                testnet_dns_introducer = "dns-introducer-testnet10.cactus.net"
+                bootstrap_peers = ["testnet10-node.cactus.net"]
                 testnet = "testnet10"
                 config["full_node"]["port"] = int(testnet_port)
                 config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
@@ -133,9 +133,9 @@ def configure(
             elif testnet == "false" or testnet == "f":
                 print("Setting Mainnet")
                 mainnet_port = "8444"
-                mainnet_introducer = "introducer.chia.net"
-                mainnet_dns_introducer = "dns-introducer.chia.net"
-                bootstrap_peers = ["node.chia.net"]
+                mainnet_introducer = "introducer.cactus.net"
+                mainnet_dns_introducer = "dns-introducer.cactus.net"
+                bootstrap_peers = ["node.cactus.net"]
                 net = "mainnet"
                 config["full_node"]["port"] = int(mainnet_port)
                 config["full_node"]["introducer_peer"]["port"] = int(mainnet_port)
@@ -190,7 +190,7 @@ def configure(
             change_made = True
 
         if change_made:
-            print("Restart any running chia services for changes to take effect")
+            print("Restart any running cactus services for changes to take effect")
             save_config(root_path, "config.yaml", config)
 
 

@@ -7,29 +7,29 @@ import re
 from typing import Dict, Optional, List, Any, Set, Tuple
 from blspy import AugSchemeMPL, G1Element, G2Element
 from secrets import token_bytes
-from chia.protocols import wallet_protocol
-from chia.protocols.wallet_protocol import CoinState
-from chia.types.announcement import Announcement
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.types.spend_bundle import SpendBundle
-from chia.util.ints import uint64, uint32, uint8, uint128
-from chia.wallet.util.transaction_type import TransactionType
-from chia.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
-from chia.wallet.did_wallet.did_info import DIDInfo
-from chia.wallet.lineage_proof import LineageProof
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.util.wallet_types import WalletType
-from chia.wallet.util.compute_memos import compute_memos
-from chia.wallet.wallet import Wallet
-from chia.wallet.wallet_coin_record import WalletCoinRecord
-from chia.wallet.wallet_info import WalletInfo
-from chia.wallet.derivation_record import DerivationRecord
-from chia.wallet.did_wallet import did_wallet_puzzles
-from chia.wallet.derive_keys import master_sk_to_wallet_sk_unhardened
-from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
+from cactus.protocols import wallet_protocol
+from cactus.protocols.wallet_protocol import CoinState
+from cactus.types.announcement import Announcement
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.ints import uint64, uint32, uint8, uint128
+from cactus.wallet.util.transaction_type import TransactionType
+from cactus.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
+from cactus.wallet.did_wallet.did_info import DIDInfo
+from cactus.wallet.lineage_proof import LineageProof
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.util.wallet_types import WalletType
+from cactus.wallet.util.compute_memos import compute_memos
+from cactus.wallet.wallet import Wallet
+from cactus.wallet.wallet_coin_record import WalletCoinRecord
+from cactus.wallet.wallet_info import WalletInfo
+from cactus.wallet.derivation_record import DerivationRecord
+from cactus.wallet.did_wallet import did_wallet_puzzles
+from cactus.wallet.derive_keys import master_sk_to_wallet_sk_unhardened
+from cactus.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
     puzzle_for_pk,
     DEFAULT_HIDDEN_PUZZLE_HASH,
     calculate_synthetic_secret_key,
@@ -488,16 +488,16 @@ class DIDWallet:
     async def create_tandem_xch_tx(
         self, fee: uint64, announcement_to_assert: Optional[Announcement] = None
     ) -> TransactionRecord:
-        chia_coins = await self.standard_wallet.select_coins(fee)
-        chia_tx = await self.standard_wallet.generate_signed_transaction(
+        cactus_coins = await self.standard_wallet.select_coins(fee)
+        cactus_tx = await self.standard_wallet.generate_signed_transaction(
             uint64(0),
             (await self.standard_wallet.get_new_puzzlehash()),
             fee=fee,
-            coins=chia_coins,
+            coins=cactus_coins,
             coin_announcements_to_consume={announcement_to_assert} if announcement_to_assert is not None else None,
         )
-        assert chia_tx.spend_bundle is not None
-        return chia_tx
+        assert cactus_tx.spend_bundle is not None
+        return cactus_tx
 
     def puzzle_for_pk(self, pubkey: G1Element) -> Program:
         if self.did_info.origin_coin is not None:
@@ -572,14 +572,14 @@ class DIDWallet:
         spend_bundle = await self.sign(unsigned_spend_bundle)
         if fee > 0:
             announcement_to_make = coin.name()
-            chia_tx = await self.create_tandem_xch_tx(fee, Announcement(coin.name(), announcement_to_make))
+            cactus_tx = await self.create_tandem_xch_tx(fee, Announcement(coin.name(), announcement_to_make))
         else:
             announcement_to_make = None
-            chia_tx = None
-        if chia_tx is not None and chia_tx.spend_bundle is not None:
-            spend_bundle = SpendBundle.aggregate([spend_bundle, chia_tx.spend_bundle])
-            chia_tx = dataclasses.replace(chia_tx, spend_bundle=None)
-            await self.wallet_state_manager.add_pending_transaction(chia_tx)
+            cactus_tx = None
+        if cactus_tx is not None and cactus_tx.spend_bundle is not None:
+            spend_bundle = SpendBundle.aggregate([spend_bundle, cactus_tx.spend_bundle])
+            cactus_tx = dataclasses.replace(cactus_tx, spend_bundle=None)
+            await self.wallet_state_manager.add_pending_transaction(cactus_tx)
         did_record = TransactionRecord(
             confirmed_at_height=uint32(0),
             created_at_time=uint64(int(time.time())),
@@ -667,13 +667,13 @@ class DIDWallet:
         spend_bundle = await self.sign(unsigned_spend_bundle)
         if fee > 0:
             announcement_to_make = coin.name()
-            chia_tx = await self.create_tandem_xch_tx(fee, Announcement(coin.name(), announcement_to_make))
+            cactus_tx = await self.create_tandem_xch_tx(fee, Announcement(coin.name(), announcement_to_make))
         else:
-            chia_tx = None
-        if chia_tx is not None and chia_tx.spend_bundle is not None:
-            spend_bundle = SpendBundle.aggregate([spend_bundle, chia_tx.spend_bundle])
-            chia_tx = dataclasses.replace(chia_tx, spend_bundle=None)
-            await self.wallet_state_manager.add_pending_transaction(chia_tx)
+            cactus_tx = None
+        if cactus_tx is not None and cactus_tx.spend_bundle is not None:
+            spend_bundle = SpendBundle.aggregate([spend_bundle, cactus_tx.spend_bundle])
+            cactus_tx = dataclasses.replace(cactus_tx, spend_bundle=None)
+            await self.wallet_state_manager.add_pending_transaction(cactus_tx)
         did_record = TransactionRecord(
             confirmed_at_height=uint32(0),
             created_at_time=uint64(int(time.time())),

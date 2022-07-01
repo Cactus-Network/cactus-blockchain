@@ -4,7 +4,7 @@ from typing import Callable
 
 import aiohttp
 
-from chia.util.json_util import obj_to_response
+from cactus.util.json_util import obj_to_response
 
 log = logging.getLogger(__name__)
 

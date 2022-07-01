@@ -4,13 +4,13 @@ import pathlib
 import pytest
 from clvm_tools import binutils
 
-from chia.consensus.condition_costs import ConditionCost
-from chia.consensus.cost_calculator import NPCResult
-from chia.full_node.bundle_tools import simple_solution_generator
-from chia.full_node.mempool_check_conditions import get_name_puzzle_conditions, get_puzzle_and_solution_for_coin
-from chia.types.blockchain_format.program import Program, SerializedProgram
-from chia.types.generator_types import BlockGenerator
-from chia.wallet.puzzles import p2_delegated_puzzle_or_hidden_puzzle
+from cactus.consensus.condition_costs import ConditionCost
+from cactus.consensus.cost_calculator import NPCResult
+from cactus.full_node.bundle_tools import simple_solution_generator
+from cactus.full_node.mempool_check_conditions import get_name_puzzle_conditions, get_puzzle_and_solution_for_coin
+from cactus.types.blockchain_format.program import Program, SerializedProgram
+from cactus.types.generator_types import BlockGenerator
+from cactus.wallet.puzzles import p2_delegated_puzzle_or_hidden_puzzle
 from tests.setup_nodes import test_constants
 from tests.util.misc import assert_runtime
 
@@ -39,7 +39,7 @@ def large_block_generator(size):
     except FileNotFoundError:
         generator = make_block_generator(size)
         blob = bytes(generator.program)
-        #  TODO: Re-enable large-block*.hex but cache in ~/.chia/subdir
+        #  TODO: Re-enable large-block*.hex but cache in ~/.cactus/subdir
         #  with open(hex_path, "w") as f:
         #      f.write(blob.hex())
         return blob

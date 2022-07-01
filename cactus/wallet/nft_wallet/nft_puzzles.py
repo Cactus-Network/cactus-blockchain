@@ -4,13 +4,13 @@ from typing import Any, Dict, List, Optional, Tuple
 from clvm.casts import int_from_bytes
 from clvm_tools.binutils import disassemble
 
-from chia.types.blockchain_format.program import Program, SerializedProgram
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.ints import uint16, uint64
-from chia.wallet.nft_wallet.nft_info import NFTCoinInfo, NFTInfo
-from chia.wallet.nft_wallet.uncurry_nft import UncurriedNFT
-from chia.wallet.puzzles.load_clvm import load_clvm
-from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import solution_for_conditions
+from cactus.types.blockchain_format.program import Program, SerializedProgram
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.ints import uint16, uint64
+from cactus.wallet.nft_wallet.nft_info import NFTCoinInfo, NFTInfo
+from cactus.wallet.nft_wallet.uncurry_nft import UncurriedNFT
+from cactus.wallet.puzzles.load_clvm import load_clvm
+from cactus.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import solution_for_conditions
 
 log = logging.getLogger(__name__)
 SINGLETON_TOP_LAYER_MOD = load_clvm("singleton_top_layer_v1_1.clvm")
@@ -125,9 +125,9 @@ def get_nft_info_from_puzzle(nft_coin_info: NFTCoinInfo) -> NFTInfo:
 
 def metadata_to_program(metadata: Dict[bytes, Any]) -> Program:
     """
-    Convert the metadata dict to a Chialisp program
+    Convert the metadata dict to a Cactuslisp program
     :param metadata: User defined metadata
-    :return: Chialisp program
+    :return: Cactuslisp program
     """
     kv_list = []
     for key, value in metadata.items():
@@ -139,7 +139,7 @@ def metadata_to_program(metadata: Dict[bytes, Any]) -> Program:
 def program_to_metadata(program: Program) -> Dict[bytes, Any]:
     """
     Convert a program to a metadata dict
-    :param program: Chialisp program contains the metadata
+    :param program: Cactuslisp program contains the metadata
     :return: Metadata dict
     """
     metadata = {}

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
-from chia.consensus.constants import ConsensusConstants
-from chia.types.blockchain_format.sized_bytes import bytes100
-from chia.util.streamable import Streamable, streamable
+from cactus.consensus.constants import ConsensusConstants
+from cactus.types.blockchain_format.sized_bytes import bytes100
+from cactus.util.streamable import Streamable, streamable
 
 
 @streamable

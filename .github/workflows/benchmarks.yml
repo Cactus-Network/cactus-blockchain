@@ -28,11 +28,11 @@ jobs:
       matrix:
         python-version: [ 3.9 ]
     env:
-      CHIA_ROOT: ${{ github.workspace }}/.chia/mainnet
+      CACTUS_ROOT: ${{ github.workspace }}/.cactus/mainnet
 
     steps:
       - name: Clean workspace
-        uses: Chia-Network/actions/clean-workspace@main
+        uses: Cactus-Network/actions/clean-workspace@main
 
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -60,8 +60,8 @@ jobs:
       - name: Checkout test blocks and plots
         uses: actions/checkout@v3
         with:
-          repository: 'Chia-Network/test-cache'
-          path: '.chia'
+          repository: 'Cactus-Network/test-cache'
+          path: '.cactus'
           ref: '0.29.0'
           fetch-depth: 1
 

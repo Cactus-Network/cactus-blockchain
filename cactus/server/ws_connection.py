@@ -7,25 +7,25 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from aiohttp import WSCloseCode, WSMessage, WSMsgType
 
-from chia.cmds.init_funcs import chia_full_version_str
-from chia.protocols.protocol_message_types import ProtocolMessageTypes
-from chia.protocols.protocol_state_machine import message_response_ok
-from chia.protocols.protocol_timing import INTERNAL_PROTOCOL_ERROR_BAN_SECONDS
-from chia.protocols.shared_protocol import Capability, Handshake
-from chia.server.outbound_message import Message, NodeType, make_msg
-from chia.server.rate_limits import RateLimiter
-from chia.types.peer_info import PeerInfo
-from chia.util.errors import Err, ProtocolError
-from chia.util.ints import uint8, uint16
+from cactus.cmds.init_funcs import cactus_full_version_str
+from cactus.protocols.protocol_message_types import ProtocolMessageTypes
+from cactus.protocols.protocol_state_machine import message_response_ok
+from cactus.protocols.protocol_timing import INTERNAL_PROTOCOL_ERROR_BAN_SECONDS
+from cactus.protocols.shared_protocol import Capability, Handshake
+from cactus.server.outbound_message import Message, NodeType, make_msg
+from cactus.server.rate_limits import RateLimiter
+from cactus.types.peer_info import PeerInfo
+from cactus.util.errors import Err, ProtocolError
+from cactus.util.ints import uint8, uint16
 
 # Each message is prepended with LENGTH_BYTES bytes specifying the length
-from chia.util.network import class_for_type, is_localhost
+from cactus.util.network import class_for_type, is_localhost
 
 # Max size 2^(8*4) which is around 4GiB
 LENGTH_BYTES: int = 4
 
 
-class WSChiaConnection:
+class WSCactusConnection:
     """
     Represents a connection to another node. Local host and port are ours, while peer host and
     port are the host and port of the peer that we are connected to. Node_id and connection_type are
@@ -77,7 +77,7 @@ class WSChiaConnection:
         self.is_outbound = is_outbound
         self.is_feeler = is_feeler
 
-        # ChiaConnection metrics
+        # CactusConnection metrics
         self.creation_time = time.time()
         self.bytes_read = 0
         self.bytes_written = 0
@@ -110,7 +110,7 @@ class WSChiaConnection:
         self.outbound_rate_limiter = RateLimiter(incoming=False, percentage_of_limit=outbound_rate_limit_percent)
         self.inbound_rate_limiter = RateLimiter(incoming=True, percentage_of_limit=inbound_rate_limit_percent)
         self.peer_capabilities: List[Capability] = []
-        # Used by the Chia Seeder.
+        # Used by the Cactus Seeder.
         self.version = None
         self.protocol_version = ""
 
@@ -127,7 +127,7 @@ class WSChiaConnection:
                 Handshake(
                     network_id,
                     protocol_version,
-                    chia_full_version_str(),
+                    cactus_full_version_str(),
                     uint16(server_port),
                     uint8(local_type.value),
                     self.local_capabilities_for_handshake,
@@ -184,7 +184,7 @@ class WSChiaConnection:
                 Handshake(
                     network_id,
                     protocol_version,
-                    chia_full_version_str(),
+                    cactus_full_version_str(),
                     uint16(server_port),
                     uint8(local_type.value),
                     self.local_capabilities_for_handshake,
@@ -495,7 +495,7 @@ class WSChiaConnection:
             await asyncio.sleep(3)
         return None
 
-    # Used by the Chia Seeder.
+    # Used by the Cactus Seeder.
     def get_version(self):
         return self.version
 

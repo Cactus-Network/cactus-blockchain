@@ -13,69 +13,69 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple
 import aiosqlite
 from blspy import G1Element, PrivateKey
 
-from chia.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
-from chia.consensus.coinbase import farmer_parent_id, pool_parent_id
-from chia.consensus.constants import ConsensusConstants
-from chia.pools.pool_puzzles import SINGLETON_LAUNCHER_HASH, solution_to_pool_state
-from chia.pools.pool_wallet import PoolWallet
-from chia.protocols import wallet_protocol
-from chia.protocols.wallet_protocol import CoinState, PuzzleSolutionResponse, RespondPuzzleSolution
-from chia.server.server import ChiaServer
-from chia.server.ws_connection import WSChiaConnection
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.types.full_block import FullBlock
-from chia.types.mempool_inclusion_status import MempoolInclusionStatus
-from chia.util.bech32m import encode_puzzle_hash
-from chia.util.byte_types import hexstr_to_bytes
-from chia.util.config import process_config_start_method
-from chia.util.db_synchronous import db_synchronous_on
-from chia.util.db_wrapper import DBWrapper
-from chia.util.errors import Err
-from chia.util.path import path_from_root
-from chia.util.ints import uint8, uint32, uint64, uint128
-from chia.util.lru_cache import LRUCache
-from chia.wallet.cat_wallet.cat_constants import DEFAULT_CATS
-from chia.wallet.cat_wallet.cat_utils import construct_cat_puzzle, match_cat_puzzle
-from chia.wallet.cat_wallet.cat_wallet import CATWallet
-from chia.wallet.derivation_record import DerivationRecord
-from chia.wallet.derive_keys import master_sk_to_wallet_sk, master_sk_to_wallet_sk_unhardened
-from chia.wallet.did_wallet.did_info import DID_HRP
-from chia.wallet.did_wallet.did_wallet import DIDWallet
-from chia.wallet.did_wallet.did_wallet_puzzles import DID_INNERPUZ_MOD, create_fullpuz, match_did_puzzle
-from chia.wallet.key_val_store import KeyValStore
-from chia.wallet.nft_wallet.nft_info import NFTWalletInfo
-from chia.wallet.nft_wallet.nft_puzzles import get_metadata_and_phs, get_new_owner_did
-from chia.wallet.nft_wallet.nft_wallet import NFTWallet
-from chia.wallet.nft_wallet.uncurry_nft import UncurriedNFT
-from chia.wallet.outer_puzzles import AssetType
-from chia.wallet.puzzle_drivers import PuzzleInfo
-from chia.wallet.puzzles.cat_loader import CAT_MOD, CAT_MOD_HASH
-from chia.wallet.rl_wallet.rl_wallet import RLWallet
-from chia.wallet.settings.user_settings import UserSettings
-from chia.wallet.trade_manager import TradeManager
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.util.compute_hints import compute_coin_hints
-from chia.wallet.util.transaction_type import TransactionType
-from chia.wallet.util.wallet_sync_utils import last_change_height_cs
-from chia.wallet.util.wallet_types import WalletType
-from chia.wallet.wallet import Wallet
-from chia.wallet.wallet_action import WalletAction
-from chia.wallet.wallet_action_store import WalletActionStore
-from chia.wallet.wallet_blockchain import WalletBlockchain
-from chia.wallet.wallet_coin_record import WalletCoinRecord
-from chia.wallet.wallet_coin_store import WalletCoinStore
-from chia.wallet.wallet_info import WalletInfo
-from chia.wallet.wallet_interested_store import WalletInterestedStore
-from chia.wallet.wallet_nft_store import WalletNftStore
-from chia.wallet.wallet_pool_store import WalletPoolStore
-from chia.wallet.wallet_puzzle_store import WalletPuzzleStore
-from chia.wallet.wallet_sync_store import WalletSyncStore
-from chia.wallet.wallet_transaction_store import WalletTransactionStore
-from chia.wallet.wallet_user_store import WalletUserStore
-from chia.wallet.wallet_weight_proof_handler import WalletWeightProofHandler
+from cactus.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
+from cactus.consensus.coinbase import farmer_parent_id, pool_parent_id
+from cactus.consensus.constants import ConsensusConstants
+from cactus.pools.pool_puzzles import SINGLETON_LAUNCHER_HASH, solution_to_pool_state
+from cactus.pools.pool_wallet import PoolWallet
+from cactus.protocols import wallet_protocol
+from cactus.protocols.wallet_protocol import CoinState, PuzzleSolutionResponse, RespondPuzzleSolution
+from cactus.server.server import CactusServer
+from cactus.server.ws_connection import WSCactusConnection
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.full_block import FullBlock
+from cactus.types.mempool_inclusion_status import MempoolInclusionStatus
+from cactus.util.bech32m import encode_puzzle_hash
+from cactus.util.byte_types import hexstr_to_bytes
+from cactus.util.config import process_config_start_method
+from cactus.util.db_synchronous import db_synchronous_on
+from cactus.util.db_wrapper import DBWrapper
+from cactus.util.errors import Err
+from cactus.util.path import path_from_root
+from cactus.util.ints import uint8, uint32, uint64, uint128
+from cactus.util.lru_cache import LRUCache
+from cactus.wallet.cat_wallet.cat_constants import DEFAULT_CATS
+from cactus.wallet.cat_wallet.cat_utils import construct_cat_puzzle, match_cat_puzzle
+from cactus.wallet.cat_wallet.cat_wallet import CATWallet
+from cactus.wallet.derivation_record import DerivationRecord
+from cactus.wallet.derive_keys import master_sk_to_wallet_sk, master_sk_to_wallet_sk_unhardened
+from cactus.wallet.did_wallet.did_info import DID_HRP
+from cactus.wallet.did_wallet.did_wallet import DIDWallet
+from cactus.wallet.did_wallet.did_wallet_puzzles import DID_INNERPUZ_MOD, create_fullpuz, match_did_puzzle
+from cactus.wallet.key_val_store import KeyValStore
+from cactus.wallet.nft_wallet.nft_info import NFTWalletInfo
+from cactus.wallet.nft_wallet.nft_puzzles import get_metadata_and_phs, get_new_owner_did
+from cactus.wallet.nft_wallet.nft_wallet import NFTWallet
+from cactus.wallet.nft_wallet.uncurry_nft import UncurriedNFT
+from cactus.wallet.outer_puzzles import AssetType
+from cactus.wallet.puzzle_drivers import PuzzleInfo
+from cactus.wallet.puzzles.cat_loader import CAT_MOD, CAT_MOD_HASH
+from cactus.wallet.rl_wallet.rl_wallet import RLWallet
+from cactus.wallet.settings.user_settings import UserSettings
+from cactus.wallet.trade_manager import TradeManager
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.util.compute_hints import compute_coin_hints
+from cactus.wallet.util.transaction_type import TransactionType
+from cactus.wallet.util.wallet_sync_utils import last_change_height_cs
+from cactus.wallet.util.wallet_types import WalletType
+from cactus.wallet.wallet import Wallet
+from cactus.wallet.wallet_action import WalletAction
+from cactus.wallet.wallet_action_store import WalletActionStore
+from cactus.wallet.wallet_blockchain import WalletBlockchain
+from cactus.wallet.wallet_coin_record import WalletCoinRecord
+from cactus.wallet.wallet_coin_store import WalletCoinStore
+from cactus.wallet.wallet_info import WalletInfo
+from cactus.wallet.wallet_interested_store import WalletInterestedStore
+from cactus.wallet.wallet_nft_store import WalletNftStore
+from cactus.wallet.wallet_pool_store import WalletPoolStore
+from cactus.wallet.wallet_puzzle_store import WalletPuzzleStore
+from cactus.wallet.wallet_sync_store import WalletSyncStore
+from cactus.wallet.wallet_transaction_store import WalletTransactionStore
+from cactus.wallet.wallet_user_store import WalletUserStore
+from cactus.wallet.wallet_weight_proof_handler import WalletWeightProofHandler
 
 
 class WalletStateManager:
@@ -121,7 +121,7 @@ class WalletStateManager:
     interested_store: WalletInterestedStore
     multiprocessing_context: multiprocessing.context.BaseContext
     weight_proof_handler: WalletWeightProofHandler
-    server: ChiaServer
+    server: CactusServer
     root_path: Path
     wallet_node: Any
     pool_store: WalletPoolStore
@@ -134,7 +134,7 @@ class WalletStateManager:
         config: Dict,
         db_path: Path,
         constants: ConsensusConstants,
-        server: ChiaServer,
+        server: CactusServer,
         root_path: Path,
         wallet_node,
         name: str = None,
@@ -575,7 +575,7 @@ class WalletStateManager:
         return removals
 
     async def determine_coin_type(
-        self, peer: WSChiaConnection, coin_state: CoinState, fork_height: Optional[uint32]
+        self, peer: WSCactusConnection, coin_state: CoinState, fork_height: Optional[uint32]
     ) -> Tuple[Optional[uint32], Optional[WalletType]]:
         if coin_state.created_height is not None and (
             self.is_pool_reward(coin_state.created_height, coin_state.coin)
@@ -834,7 +834,7 @@ class WalletStateManager:
         return wallet_id, wallet_type
 
     async def new_coin_state(
-        self, coin_states: List[CoinState], peer: WSChiaConnection, fork_height: Optional[uint32]
+        self, coin_states: List[CoinState], peer: WSCactusConnection, fork_height: Optional[uint32]
     ) -> None:
         # TODO: add comment about what this method does
         # Input states should already be sorted by cs_height, with reorgs at the beginning

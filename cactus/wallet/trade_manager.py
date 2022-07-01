@@ -4,28 +4,28 @@ import time
 import traceback
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from chia.protocols.wallet_protocol import CoinState
-from chia.types.blockchain_format.coin import Coin, coin_as_list
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.spend_bundle import SpendBundle
-from chia.util.db_wrapper import DBWrapper
-from chia.util.hash import std_hash
-from chia.util.ints import uint32, uint64
-from chia.wallet.nft_wallet.nft_wallet import NFTWallet
-from chia.wallet.outer_puzzles import AssetType
-from chia.wallet.payment import Payment
-from chia.wallet.puzzle_drivers import PuzzleInfo
-from chia.wallet.trade_record import TradeRecord
-from chia.wallet.trading.offer import NotarizedPayment, Offer
-from chia.wallet.trading.trade_status import TradeStatus
-from chia.wallet.trading.trade_store import TradeStore
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.util.transaction_type import TransactionType
-from chia.wallet.util.wallet_types import WalletType
-from chia.wallet.wallet import Wallet
-from chia.wallet.wallet_coin_record import WalletCoinRecord
-from chia.wallet.puzzles.load_clvm import load_clvm
+from cactus.protocols.wallet_protocol import CoinState
+from cactus.types.blockchain_format.coin import Coin, coin_as_list
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.db_wrapper import DBWrapper
+from cactus.util.hash import std_hash
+from cactus.util.ints import uint32, uint64
+from cactus.wallet.nft_wallet.nft_wallet import NFTWallet
+from cactus.wallet.outer_puzzles import AssetType
+from cactus.wallet.payment import Payment
+from cactus.wallet.puzzle_drivers import PuzzleInfo
+from cactus.wallet.trade_record import TradeRecord
+from cactus.wallet.trading.offer import NotarizedPayment, Offer
+from cactus.wallet.trading.trade_status import TradeStatus
+from cactus.wallet.trading.trade_store import TradeStore
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.util.transaction_type import TransactionType
+from cactus.wallet.util.wallet_types import WalletType
+from cactus.wallet.wallet import Wallet
+from cactus.wallet.wallet_coin_record import WalletCoinRecord
+from cactus.wallet.puzzles.load_clvm import load_clvm
 
 OFFER_MOD = load_clvm("settlement_payments.clvm")
 
@@ -39,7 +39,7 @@ class TradeManager:
     assets with this trade manager:
 
     Puzzle Drivers:
-      - See chia/wallet/outer_puzzles.py for a full description of how to build these
+      - See cactus/wallet/outer_puzzles.py for a full description of how to build these
       - The `solve` method must be able to be solved by a Solver that looks like this:
             Solver(
                 {

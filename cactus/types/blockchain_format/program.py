@@ -5,13 +5,13 @@ from clvm import SExp
 from clvm.casts import int_from_bytes
 from clvm.EvalError import EvalError
 from clvm.serialize import sexp_from_stream, sexp_to_stream
-from chia_rs import MEMPOOL_MODE, run_chia_program, serialized_length, run_generator
+from cactus_rs import MEMPOOL_MODE, run_cactus_program, serialized_length, run_generator
 from clvm_tools.curry import uncurry
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.hash import std_hash
-from chia.util.byte_types import hexstr_to_bytes
-from chia.types.spend_bundle_conditions import SpendBundleConditions
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.hash import std_hash
+from cactus.util.byte_types import hexstr_to_bytes
+from cactus.types.spend_bundle_conditions import SpendBundleConditions
 
 from .tree_hash import sha256_treehash
 
@@ -81,7 +81,7 @@ class Program(SExp):
 
     def run_with_cost(self, max_cost: int, args) -> Tuple[int, "Program"]:
         prog_args = Program.to(args)
-        cost, r = run_chia_program(self.as_bin(), prog_args.as_bin(), max_cost, 0)
+        cost, r = run_cactus_program(self.as_bin(), prog_args.as_bin(), max_cost, 0)
         return cost, Program.to(r)
 
     def run(self, args) -> "Program":
@@ -240,7 +240,7 @@ class SerializedProgram:
     def run_with_cost(self, max_cost: int, *args) -> Tuple[int, Program]:
         return self._run(max_cost, 0, *args)
 
-    # returns an optional error code and an optional SpendBundleConditions (from chia_rs)
+    # returns an optional error code and an optional SpendBundleConditions (from cactus_rs)
     # exactly one of those will hold a value
     def run_as_generator(
         self, max_cost: int, flags: int, *args
@@ -284,7 +284,7 @@ class SerializedProgram:
         else:
             serialized_args += _serialize(args[0])
 
-        cost, ret = run_chia_program(
+        cost, ret = run_cactus_program(
             self._buf,
             serialized_args,
             max_cost,

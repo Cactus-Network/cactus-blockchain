@@ -6,39 +6,39 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Type, TypeVar
 
 from blspy import AugSchemeMPL, G2Element
 
-from chia.protocols.wallet_protocol import CoinState
-from chia.server.outbound_message import NodeType
-from chia.server.ws_connection import WSChiaConnection
-from chia.types.announcement import Announcement
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.types.spend_bundle import SpendBundle
-from chia.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
-from chia.util.ints import uint8, uint16, uint32, uint64, uint128
-from chia.wallet.derivation_record import DerivationRecord
-from chia.wallet.lineage_proof import LineageProof
-from chia.wallet.nft_wallet import nft_puzzles
-from chia.wallet.nft_wallet.nft_info import NFTCoinInfo, NFTWalletInfo
-from chia.wallet.nft_wallet.nft_puzzles import NFT_METADATA_UPDATER, create_ownership_layer_puzzle, get_metadata_and_phs
-from chia.wallet.nft_wallet.uncurry_nft import UncurriedNFT
-from chia.wallet.outer_puzzles import AssetType, construct_puzzle, match_puzzle, solve_puzzle
-from chia.wallet.payment import Payment
-from chia.wallet.puzzle_drivers import PuzzleInfo, Solver
-from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
+from cactus.protocols.wallet_protocol import CoinState
+from cactus.server.outbound_message import NodeType
+from cactus.server.ws_connection import WSCactusConnection
+from cactus.types.announcement import Announcement
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
+from cactus.util.ints import uint8, uint16, uint32, uint64, uint128
+from cactus.wallet.derivation_record import DerivationRecord
+from cactus.wallet.lineage_proof import LineageProof
+from cactus.wallet.nft_wallet import nft_puzzles
+from cactus.wallet.nft_wallet.nft_info import NFTCoinInfo, NFTWalletInfo
+from cactus.wallet.nft_wallet.nft_puzzles import NFT_METADATA_UPDATER, create_ownership_layer_puzzle, get_metadata_and_phs
+from cactus.wallet.nft_wallet.uncurry_nft import UncurriedNFT
+from cactus.wallet.outer_puzzles import AssetType, construct_puzzle, match_puzzle, solve_puzzle
+from cactus.wallet.payment import Payment
+from cactus.wallet.puzzle_drivers import PuzzleInfo, Solver
+from cactus.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
     DEFAULT_HIDDEN_PUZZLE_HASH,
     calculate_synthetic_secret_key,
     puzzle_for_pk,
 )
-from chia.wallet.trading.offer import OFFER_MOD, NotarizedPayment, Offer
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.util.compute_memos import compute_memos
-from chia.wallet.util.debug_spend_bundle import disassemble
-from chia.wallet.util.transaction_type import TransactionType
-from chia.wallet.util.wallet_types import AmountWithPuzzlehash, WalletType
-from chia.wallet.wallet import Wallet
-from chia.wallet.wallet_info import WalletInfo
+from cactus.wallet.trading.offer import OFFER_MOD, NotarizedPayment, Offer
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.util.compute_memos import compute_memos
+from cactus.wallet.util.debug_spend_bundle import disassemble
+from cactus.wallet.util.transaction_type import TransactionType
+from cactus.wallet.util.wallet_types import AmountWithPuzzlehash, WalletType
+from cactus.wallet.wallet import Wallet
+from cactus.wallet.wallet_info import WalletInfo
 
 _T_NFTWallet = TypeVar("_T_NFTWallet", bound="NFTWallet")
 
@@ -159,7 +159,7 @@ class NFTWallet:
                 return
         wallet_node = self.wallet_state_manager.wallet_node
         server = wallet_node.server
-        full_nodes: Dict[bytes32, WSChiaConnection] = server.connection_by_type.get(NodeType.FULL_NODE, {})
+        full_nodes: Dict[bytes32, WSCactusConnection] = server.connection_by_type.get(NodeType.FULL_NODE, {})
         cs: Optional[CoinSpend] = None
         coin_states: Optional[List[CoinState]] = await self.wallet_state_manager.wallet_node.get_coin_state(
             [coin.parent_coin_info]
@@ -587,16 +587,16 @@ class NFTWallet:
     async def create_tandem_xch_tx(
         self, fee: uint64, announcement_to_assert: Optional[Announcement] = None
     ) -> TransactionRecord:
-        chia_coins = await self.standard_wallet.select_coins(fee)
-        chia_tx = await self.standard_wallet.generate_signed_transaction(
+        cactus_coins = await self.standard_wallet.select_coins(fee)
+        cactus_tx = await self.standard_wallet.generate_signed_transaction(
             uint64(0),
             (await self.standard_wallet.get_new_puzzlehash()),
             fee=fee,
-            coins=chia_coins,
+            coins=cactus_coins,
             coin_announcements_to_consume={announcement_to_assert} if announcement_to_assert is not None else None,
         )
-        assert chia_tx.spend_bundle is not None
-        return chia_tx
+        assert cactus_tx.spend_bundle is not None
+        return cactus_tx
 
     async def generate_signed_transaction(
         self,
@@ -629,7 +629,7 @@ class NFTWallet:
 
         payment_sum = sum([p.amount for p in payments])
 
-        unsigned_spend_bundle, chia_tx = await self.generate_unsigned_spendbundle(
+        unsigned_spend_bundle, cactus_tx = await self.generate_unsigned_spendbundle(
             payments,
             fee,
             coins=coins,
@@ -643,9 +643,9 @@ class NFTWallet:
         )
         spend_bundle = await self.sign(unsigned_spend_bundle)
         spend_bundle = SpendBundle.aggregate([spend_bundle] + additional_bundles)
-        if chia_tx is not None and chia_tx.spend_bundle is not None:
-            spend_bundle = SpendBundle.aggregate([spend_bundle, chia_tx.spend_bundle])
-            chia_tx = dataclasses.replace(chia_tx, spend_bundle=None)
+        if cactus_tx is not None and cactus_tx.spend_bundle is not None:
+            spend_bundle = SpendBundle.aggregate([spend_bundle, cactus_tx.spend_bundle])
+            cactus_tx = dataclasses.replace(cactus_tx, spend_bundle=None)
 
         tx_list = [
             TransactionRecord(
@@ -668,8 +668,8 @@ class NFTWallet:
             ),
         ]
 
-        if chia_tx is not None:
-            tx_list.append(chia_tx)
+        if cactus_tx is not None:
+            tx_list.append(cactus_tx)
 
         return tx_list
 
@@ -711,10 +711,10 @@ class NFTWallet:
 
         if fee > 0:
             announcement_to_make = nft_coin.coin.name()
-            chia_tx = await self.create_tandem_xch_tx(fee, Announcement(nft_coin.coin.name(), announcement_to_make))
+            cactus_tx = await self.create_tandem_xch_tx(fee, Announcement(nft_coin.coin.name(), announcement_to_make))
         else:
             announcement_to_make = None
-            chia_tx = None
+            cactus_tx = None
 
         innersol: Program = self.standard_wallet.make_solution(
             primaries=primaries,
@@ -752,7 +752,7 @@ class NFTWallet:
 
         nft_spend_bundle = SpendBundle([coin_spend], G2Element())
 
-        return nft_spend_bundle, chia_tx
+        return nft_spend_bundle, cactus_tx
 
     @staticmethod
     async def make_nft1_offer(

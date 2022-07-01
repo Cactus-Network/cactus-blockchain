@@ -1,9 +1,9 @@
 from typing import Any, List
 
-from chia_rs import Coin
+from cactus_rs import Coin
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.hash import std_hash
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.hash import std_hash
 
 __all__ = ["Coin", "coin_as_list", "hash_coin_ids"]
 

@@ -1,4 +1,4 @@
-from chia.util.byte_types import SizedBytes
+from cactus.util.byte_types import SizedBytes
 
 
 class bytes4(SizedBytes):

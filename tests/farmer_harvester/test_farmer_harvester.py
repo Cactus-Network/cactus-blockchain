@@ -2,8 +2,8 @@ import asyncio
 
 import pytest
 
-from chia.farmer.farmer import Farmer
-from chia.util.keychain import generate_mnemonic
+from cactus.farmer.farmer import Farmer
+from cactus.util.keychain import generate_mnemonic
 from tests.time_out_assert import time_out_assert
 
 

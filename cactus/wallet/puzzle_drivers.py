@@ -6,7 +6,7 @@ from clvm.SExp import SExp
 from clvm_tools.binutils import assemble, type_for_atom
 from ir.Type import Type
 
-from chia.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.program import Program
 
 """
 The following two classes act as wrapper classes around dictionaries of strings.
