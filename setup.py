@@ -20,7 +20,7 @@ dependencies = [
     "fasteners==0.16.3",  # For interprocess file locking, expected to be replaced by filelock
     "filelock==3.4.2",  # For reading and writing config multiprocess and multithread safely  (non-reentrant locks)
     "keyring==23.0.1",  # Store keys in MacOS Keychain, Windows Credential Locker
-    "keyrings.cryptfile==1.3.4",  # Secure storage for keys on Linux (Will be replaced)
+    "keyrings.cryptfile==1.3.8",  # Secure storage for keys on Linux (Will be replaced)
     #  "keyrings.cryptfile==1.3.8",  # Secure storage for keys on Linux (Will be replaced)
     #  See https://github.com/frispete/keyrings.cryptfile/issues/15
     "PyYAML==6.0",  # Used for config file format
