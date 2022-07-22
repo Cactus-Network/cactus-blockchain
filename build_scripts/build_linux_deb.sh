@@ -17,16 +17,14 @@ export PLATFORM
 # If the env variable NOTARIZE and the username and password variables are
 # set, this will attempt to Notarize the signed DMG
 
-if [ ! "$CACTUS_INSTALLER_VERSION" ]; then
-	echo "WARNING: No environment variable CACTUS_INSTALLER_VERSION set. Using 0.0.0."
-	CACTUS_INSTALLER_VERSION="0.0.0"
-fi
+CACTUS_INSTALLER_VERSION="1.4.0"
+
 echo "Cactus Installer Version is: $CACTUS_INSTALLER_VERSION"
 export CACTUS_INSTALLER_VERSION
 
 echo "Installing npm and electron packagers"
 cd npm_linux_deb || exit
-npm ci
+npm install
 PATH=$(npm bin):$PATH
 cd .. || exit
 
@@ -35,7 +33,7 @@ rm -rf dist
 mkdir dist
 
 echo "Create executables with pyinstaller"
-SPEC_FILE=$(python -c 'import cactus; print(cactus.PYINSTALLER_SPEC_PATH)')
+SPEC_FILE=$(python3 -c 'import cactus; print(cactus.PYINSTALLER_SPEC_PATH)')
 pyinstaller --log-level=INFO "$SPEC_FILE"
 LAST_EXIT_CODE=$?
 if [ "$LAST_EXIT_CODE" -ne 0 ]; then
@@ -62,7 +60,7 @@ cd cactus-blockchain-gui || exit
 
 echo "npm build"
 lerna clean -y
-npm ci
+npm install
 # Audit fix does not currently work with Lerna. See https://github.com/lerna/lerna/issues/1663
 # npm audit fix
 npm run build
