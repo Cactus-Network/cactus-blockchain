@@ -3,10 +3,10 @@ from secrets import token_bytes
 import pytest
 from blspy import AugSchemeMPL
 
-from chia.util.ints import uint32
-from chia.wallet.derivation_record import DerivationRecord
-from chia.wallet.util.wallet_types import WalletType
-from chia.wallet.wallet_puzzle_store import WalletPuzzleStore
+from cactus.util.ints import uint32
+from cactus.wallet.derivation_record import DerivationRecord
+from cactus.wallet.util.wallet_types import WalletType
+from cactus.wallet.wallet_puzzle_store import WalletPuzzleStore
 from tests.util.db_connection import DBConnection
 
 

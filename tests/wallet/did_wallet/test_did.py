@@ -4,17 +4,17 @@ from typing import Optional
 import pytest
 from blspy import AugSchemeMPL
 
-from chia.consensus.block_rewards import calculate_pool_reward, calculate_base_farmer_reward
-from chia.simulator.simulator_protocol import FarmNewBlockProtocol
-from chia.types.blockchain_format.program import Program
-from chia.types.peer_info import PeerInfo
-from chia.types.spend_bundle import SpendBundle
-from chia.util.hash import std_hash
-from chia.util.ints import uint16, uint32, uint64
+from cactus.consensus.block_rewards import calculate_pool_reward, calculate_base_farmer_reward
+from cactus.simulator.simulator_protocol import FarmNewBlockProtocol
+from cactus.types.blockchain_format.program import Program
+from cactus.types.peer_info import PeerInfo
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.hash import std_hash
+from cactus.util.ints import uint16, uint32, uint64
 
-from chia.wallet.util.wallet_types import WalletType
-from chia.wallet.did_wallet.did_wallet import DIDWallet
-from chia.simulator.time_out_assert import time_out_assert, time_out_assert_not_none
+from cactus.wallet.util.wallet_types import WalletType
+from cactus.wallet.did_wallet.did_wallet import DIDWallet
+from cactus.simulator.time_out_assert import time_out_assert, time_out_assert_not_none
 
 # pytestmark = pytest.mark.skip("TODO: Fix tests")
 
@@ -899,6 +899,6 @@ class TestDIDWallet:
         hex_message = "abcd"
         pubkey, signature = await did_wallet_1.sign_message(bytes.fromhex(hex_message))
         message = std_hash(
-            f"\x18Chia Signed Message:\n{len(bytes.fromhex(hex_message))}".encode("utf-8") + bytes.fromhex(hex_message)
+            f"\x18Cactus Signed Message:\n{len(bytes.fromhex(hex_message))}".encode("utf-8") + bytes.fromhex(hex_message)
         )
         assert AugSchemeMPL.verify(pubkey, message, signature)

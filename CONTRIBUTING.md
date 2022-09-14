@@ -1,13 +1,13 @@
 # Introduction
 
-Welcome to the chia-blockchain project!
-We are happy that you are taking a look at the code for Chia, a proof of space and time cryptocurrency.
+Welcome to the cactus-blockchain project!
+We are happy that you are taking a look at the code for Cactus, a proof of space and time cryptocurrency.
 
 A lot of fascinating new cryptography and blockchain concepts are used and implemented here.
-This repo includes the code for the Chia full node, farmer, and timelord (in chia folder), which are all written in python.
-It also includes a verifiable delay function implementation that it imports from the [chiavdf repo](https://github.com/Chia-Network/chiavdf) (in c/c++), and a proof of space implementation that it imports from the [chiapos repo](https://github.com/Chia-Network/chiapos). BLS signatures are imported from the [bls-signatures repo](https://github.com/Chia-Network/bls-signatures) as blspy. There is an additional dependency on the [chiabip158 repo](https://github.com/Chia-Network/chiabip158). For major platforms, binary and source wheels are shipped to PyPI from each dependent repo. Then chia-blockchain can pip install those from PyPI or they can be prepackaged as is done for the Windows installer. On unsupported platforms, pip will fall back to the source distributions, to be compiled locally.
+This repo includes the code for the Cactus full node, farmer, and timelord (in cactus folder), which are all written in python.
+It also includes a verifiable delay function implementation that it imports from the [chiavdf repo](https://github.com/Cactus-Network/chiavdf) (in c/c++), and a proof of space implementation that it imports from the [chiapos repo](https://github.com/Cactus-Network/chiapos). BLS signatures are imported from the [bls-signatures repo](https://github.com/Cactus-Network/bls-signatures) as blspy. There is an additional dependency on the [chiabip158 repo](https://github.com/Cactus-Network/chiabip158). For major platforms, binary and source wheels are shipped to PyPI from each dependent repo. Then cactus-blockchain can pip install those from PyPI or they can be prepackaged as is done for the Windows installer. On unsupported platforms, pip will fall back to the source distributions, to be compiled locally.
 
-If you want to learn more about this project, read the [wiki](https://github.com/Chia-Network/chia-blockchain/wiki), or check out the [green paper](https://www.chia.net/assets/ChiaGreenPaper.pdf).
+If you want to learn more about this project, read the [wiki](https://github.com/Cactus-Network/cactus-blockchain/wiki), or check out the [green paper](https://www.cactus-network.net/assets/CactusGreenPaper.pdf).
 
 ## Contributions
 
@@ -19,13 +19,13 @@ You can visit our [Trello project board](https://trello.com/b/ZuNx7sET) to get a
 Generally, things to the left are in progress or done. Some things go through "Coming up soon", but some will come directly out of other columns.
 Usually, the things closer to the top of each column are the ones that will be worked on soonest.
 If you are interested in cryptography, math, or just like hacking in python, there are many interesting problems to work on.
-Contact any of the team members on [Keybase](https://keybase.io/team/chia_network.public), which we use as the main communication method. You can also comment on any Trello card.
+Contact any of the team members on [Keybase](https://keybase.io/team/cactus_network.public), which we use as the main communication method. You can also comment on any Trello card.
 
 We ask that external contributors create a fork of the `main` branch for any feature work they wish to take on.
 
-Members of the Chia organization may create feature branches from the `main` branch.
+Members of the Cactus organization may create feature branches from the `main` branch.
 
-In the event an emergency fix is required for the release version of Chia, members of the Chia organization will create a feature branch from the current release branch `latest`.
+In the event an emergency fix is required for the release version of Cactus, members of the Cactus organization will create a feature branch from the current release branch `latest`.
 
 ## Branching Strategy
 
@@ -34,7 +34,7 @@ In the event an emergency fix is required for the release version of Chia, membe
 1. All changes go into the main branch.
 2. Main is stable at all times, all tests pass.
 3. Features (with tests) are developed and fully tested on feature branches, and reviewed before landing in main.
-4. Chia Network's nodes on the public testnet are running the latest version `x.y.z`.
+4. Cactus Network's nodes on the public testnet are running the latest version `x.y.z`.
 5. The `main` branch will have a long running `beta testnet` to allow previewing of changes.
 6. Pull Request events may require a `beta testnet` review environment. At the moment this is at the discretion of the reviewer.
 7. Hotfixes land in the release branch they fix, and all later versions. (This will be achieved by regularly merging from `1.3.x` to main).
@@ -53,7 +53,7 @@ to configure how the tests are run. For example, for more logging: change the lo
 ```bash
 sh install.sh -d
 . ./activate
-black . && isort benchmarks build_scripts chia tests tools *.py && mypy && flake8 benchmarks build_scripts chia tests tools *.py && pylint benchmarks build_scripts chia tests tools *.py
+black . && isort benchmarks build_scripts cactus tests tools *.py && mypy && flake8 benchmarks build_scripts cactus tests tools *.py && pylint benchmarks build_scripts cactus tests tools *.py
 py.test tests -v --durations 0
 ```
 
@@ -67,7 +67,7 @@ If you want verbose logging for tests, edit the `tests/pytest.ini` file.
 
 ## Pre-Commit
 
-We provide a [pre-commit configuration](https://github.com/Chia-Network/chia-blockchain/blob/main/.pre-commit-config.yaml) which triggers several useful
+We provide a [pre-commit configuration](https://github.com/Cactus-Network/cactus-blockchain/blob/main/.pre-commit-config.yaml) which triggers several useful
 hooks (including linters/formatter) before each commit you make if you installed and set up [pre-commit](https://pre-commit.com/). This will help
 to reduce the time you spend on failed CI jobs.
 
@@ -83,7 +83,7 @@ provided configuration with `pre-commit install`.
 4. Preferences > Settings > Python > Linting > flake8 enabled
 5. Preferences > Settings > Python > Linting > mypy enabled
 6. Preferences > Settings > Formatting > Python > Provider > black
-7. Preferences > Settings > mypy > Targets: set to `./chia` and `./tests`
+7. Preferences > Settings > mypy > Targets: set to `./cactus` and `./tests`
 
 ## Configure Pycharm
 
@@ -99,19 +99,19 @@ workflow. It's also especially efficient for git branching, cherry-picking, comm
 
 ## Testnets and review environments
 
-The current official testnet is testnet10. Look at `chia/util/initial_config.yaml` to see the configuration parameters
+The current official testnet is testnet10. Look at `cactus/util/initial_config.yaml` to see the configuration parameters
 for each testnet. Information on how to use the testnet can be found in the wiki.
 
 Prior to proposing changes to `main`, proposers should consider if running a `beta testnet` review environment will make the reviewer more effective when evaluating a change.
 Changes that impact the blockchain could require a review environment before acceptance into `main`. This is at the discretion of the reviewer.
-Chia organization members have been granted CI access to deploy `beta testnets`.
-If you are not a Chia organization member, you can enquire about deploying a `beta testnet` in the public dev Keybase channel.
+Cactus organization members have been granted CI access to deploy `beta testnets`.
+If you are not a Cactus organization member, you can enquire about deploying a `beta testnet` in the public dev Keybase channel.
 
 ## Submit changes
 
 To propose changes, please make a pull request to the `main` branch. See Branching Strategy above.
 
-To propose changes for the production releases of Chia, please make a pull request to the latest release branch.
+To propose changes for the production releases of Cactus, please make a pull request to the latest release branch.
 
 ## Copyright
 

@@ -11,16 +11,16 @@ import tempfile
 from tests.setup_nodes import setup_node_and_wallet, setup_n_nodes, setup_two_nodes
 from pathlib import Path
 from typing import Any, AsyncIterator, Dict, List, Tuple
-from chia.server.start_service import Service
+from cactus.server.start_service import Service
 
 # Set spawn after stdlib imports, but before other imports
-from chia.clvm.spend_sim import SimClient, SpendSim
-from chia.protocols import full_node_protocol
-from chia.simulator.simulator_protocol import FarmNewBlockProtocol
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.peer_info import PeerInfo
-from chia.util.config import create_default_chia_config, lock_and_load_config
-from chia.util.ints import uint16
+from cactus.clvm.spend_sim import SimClient, SpendSim
+from cactus.protocols import full_node_protocol
+from cactus.simulator.simulator_protocol import FarmNewBlockProtocol
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.peer_info import PeerInfo
+from cactus.util.config import create_default_cactus_config, lock_and_load_config
+from cactus.util.ints import uint16
 from tests.core.node_height import node_height_at_least
 from tests.setup_nodes import (
     setup_simulators_and_wallets,
@@ -33,15 +33,15 @@ from tests.setup_nodes import (
     setup_two_nodes,
 )
 from tests.simulation.test_simulation import test_constants_modified
-from chia.simulator.time_out_assert import time_out_assert
-from chia.simulator.wallet_tools import WalletTool
+from cactus.simulator.time_out_assert import time_out_assert
+from cactus.simulator.wallet_tools import WalletTool
 from tests.util.wallet_is_synced import wallet_is_synced
 
 multiprocessing.set_start_method("spawn")
 
 from pathlib import Path
-from chia.util.keyring_wrapper import KeyringWrapper
-from chia.simulator.block_tools import BlockTools, test_constants, create_block_tools, create_block_tools_async
+from cactus.util.keyring_wrapper import KeyringWrapper
+from cactus.simulator.block_tools import BlockTools, test_constants, create_block_tools, create_block_tools_async
 from tests.util.keyring import TempKeyring
 from tests.setup_nodes import setup_farmer_multi_harvester
 
@@ -68,7 +68,7 @@ def self_hostname():
 
 
 # NOTE:
-#       Instantiating the bt fixture results in an attempt to create the chia root directory
+#       Instantiating the bt fixture results in an attempt to create the cactus root directory
 #       which the build scripts symlink to a sometimes-not-there directory.
 #       When not there, Python complains since, well, the symlink is not a directory nor points to a directory.
 #
@@ -322,8 +322,8 @@ async def two_wallet_nodes_services():
 
 
 @pytest_asyncio.fixture(scope="function")
-async def two_wallet_nodes_custom_spam_filtering(spam_filter_after_n_txs, xch_spam_amount):
-    async for _ in setup_simulators_and_wallets(1, 2, {}, spam_filter_after_n_txs, xch_spam_amount):
+async def two_wallet_nodes_custom_spam_filtering(spam_filter_after_n_txs, cac_spam_amount):
+    async for _ in setup_simulators_and_wallets(1, 2, {}, spam_filter_after_n_txs, cac_spam_amount):
         yield _
 
 
@@ -632,23 +632,23 @@ async def setup_sim():
 
 
 @pytest.fixture(scope="function")
-def tmp_chia_root(tmp_path):
+def tmp_cactus_root(tmp_path):
     """
-    Create a temp directory and populate it with an empty chia_root directory.
+    Create a temp directory and populate it with an empty cactus_root directory.
     """
-    path: Path = tmp_path / "chia_root"
+    path: Path = tmp_path / "cactus_root"
     path.mkdir(parents=True, exist_ok=True)
     return path
 
 
 @pytest.fixture(scope="function")
-def root_path_populated_with_config(tmp_chia_root) -> Path:
+def root_path_populated_with_config(tmp_cactus_root) -> Path:
     """
-    Create a temp chia_root directory and populate it with a default config.yaml.
-    Returns the chia_root path.
+    Create a temp cactus_root directory and populate it with a default config.yaml.
+    Returns the cactus_root path.
     """
-    root_path: Path = tmp_chia_root
-    create_default_chia_config(root_path)
+    root_path: Path = tmp_cactus_root
+    create_default_cactus_config(root_path)
     return root_path
 
 

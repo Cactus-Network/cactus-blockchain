@@ -5,10 +5,10 @@ from typing import Callable, Optional
 import pytest
 from click.testing import CliRunner, Result
 
-from chia.cmds.beta_funcs import default_beta_root_path
-from chia.cmds.chia import cli
-from chia.util.beta_metrics import metrics_log_interval_default, metrics_log_interval_max, metrics_log_interval_min
-from chia.util.config import lock_and_load_config, save_config
+from cactus.cmds.beta_funcs import default_beta_root_path
+from cactus.cmds.cactus import cli
+from cactus.util.beta_metrics import metrics_log_interval_default, metrics_log_interval_max, metrics_log_interval_min
+from cactus.util.config import lock_and_load_config, save_config
 
 
 def configure(root_path: Path, *args: str) -> Result:
@@ -81,14 +81,14 @@ def generate_example_submission_data(beta_root_path: Path, versions: int, logs: 
     for version in range(versions):
         version_path = beta_root_path / str(version)
         version_path.mkdir()
-        chia_blockchain_logs = version_path / "chia-blockchain"
+        cactus_blockchain_logs = version_path / "cactus-blockchain"
         plotting_logs = version_path / "plotting"
-        chia_blockchain_logs.mkdir()
+        cactus_blockchain_logs.mkdir()
         plotting_logs.mkdir()
         for i in range(logs):
-            with open(chia_blockchain_logs / f"beta_{i}.log", "w"):
+            with open(cactus_blockchain_logs / f"beta_{i}.log", "w"):
                 pass
-            with open(chia_blockchain_logs / f"beta_{i + 10}.gz", "w"):
+            with open(cactus_blockchain_logs / f"beta_{i + 10}.gz", "w"):
                 pass
             with open(plotting_logs / f"plot_{i}.log", "w"):
                 pass
@@ -134,7 +134,7 @@ def test_configure_no_beta_config(root_path_populated_with_config: Path) -> None
 
     result = configure(root_path, "--path", str(beta_path))
     assert result.exit_code == 1
-    assert "beta test mode is not enabled, enable it first with `chia beta enable`" in result.output
+    assert "beta test mode is not enabled, enable it first with `cactus beta enable`" in result.output
 
 
 @pytest.mark.parametrize("accept_existing_interval", [True, False])
@@ -345,11 +345,11 @@ def test_prepare_submission(
         with zipfile.ZipFile(submission_file) as zip_file:
             all_files = [Path(info.filename) for info in zip_file.filelist]
             for version in range(versions):
-                chia_blockchain_logs = Path("chia-blockchain")
+                cactus_blockchain_logs = Path("cactus-blockchain")
                 plotting_logs = Path("plotting")
                 for i in range(logs):
-                    assert chia_blockchain_logs / f"beta_{i}.log" in all_files
-                    assert chia_blockchain_logs / f"beta_{i + 10}.gz" in all_files
+                    assert cactus_blockchain_logs / f"beta_{i}.log" in all_files
+                    assert cactus_blockchain_logs / f"beta_{i + 10}.gz" in all_files
                     assert plotting_logs / f"plot_{i}.log" in all_files
 
 

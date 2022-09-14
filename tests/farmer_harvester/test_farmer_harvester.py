@@ -2,10 +2,10 @@ import asyncio
 
 import pytest
 
-from chia.farmer.farmer import Farmer
-from chia.simulator.time_out_assert import time_out_assert
-from chia.types.peer_info import PeerInfo
-from chia.util.keychain import generate_mnemonic
+from cactus.farmer.farmer import Farmer
+from cactus.simulator.time_out_assert import time_out_assert
+from cactus.types.peer_info import PeerInfo
+from cactus.util.keychain import generate_mnemonic
 
 
 def farmer_is_started(farmer):

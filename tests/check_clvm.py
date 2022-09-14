@@ -22,7 +22,7 @@ sys.path = [path for path in sys.path if path != os.fspath(here)]
 
 from clvm_tools_rs import compile_clvm  # noqa: E402
 
-from chia.types.blockchain_format.program import SerializedProgram  # noqa: E402
+from cactus.types.blockchain_format.program import SerializedProgram  # noqa: E402
 
 clvm_suffix = ".clvm"
 hex_suffix = ".clvm.hex"
@@ -82,7 +82,7 @@ def main() -> int:
     overall_fail = False
 
     suffixes = {"clvm": clvm_suffix, "hex": hex_suffix, "hash": hash_suffix}
-    top_levels = {"chia"}
+    top_levels = {"cactus"}
     found_stems = {
         name: {
             path.with_name(path.name[: -len(suffix)])

@@ -104,12 +104,12 @@ jobs:
         python -m venv ..\venv
         . ..\venv\Scripts\Activate.ps1
         pip3 install setuptools_scm
-        $env:CHIA_INSTALLER_VERSION = python .\build_scripts\installer-version.py -win
-        echo "$env:CHIA_INSTALLER_VERSION"
-        echo "::set-output name=CHIA_INSTALLER_VERSION::$env:CHIA_INSTALLER_VERSION"
+        $env:CACTUS_INSTALLER_VERSION = python .\build_scripts\installer-version.py -win
+        echo "$env:CACTUS_INSTALLER_VERSION"
+        echo "::set-output name=CACTUS_INSTALLER_VERSION::$env:CACTUS_INSTALLER_VERSION"
         deactivate
 
-      # Get the most recent release from chia-plotter-madmax
+      # Get the most recent release from cactus-plotter-madmax
     - uses: actions/github-script@v6
       id: 'latest-madmax'
       with:
@@ -117,16 +117,16 @@ jobs:
         result-encoding: string
         script: |
           const release = await github.rest.repos.getLatestRelease({
-            owner: 'Chia-Network',
-            repo: 'chia-plotter-madmax',
+            owner: 'Cactus-Network',
+            repo: 'cactus-plotter-madmax',
           });
           return release.data.tag_name;
 
     - name: Get latest madmax plotter
       run: |
         mkdir "$env:GITHUB_WORKSPACE\madmax"
-        Invoke-WebRequest https://github.com/Chia-Network/chia-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/chia_plot-${{ steps.latest-madmax.outputs.result }}.exe -OutFile "$env:GITHUB_WORKSPACE\madmax\chia_plot.exe"
-        Invoke-WebRequest https://github.com/Chia-Network/chia-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/chia_plot_k34-${{ steps.latest-madmax.outputs.result }}.exe -OutFile "$env:GITHUB_WORKSPACE\madmax\chia_plot_k34.exe"
+        Invoke-WebRequest https://github.com/Cactus-Network/cactus-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot-${{ steps.latest-madmax.outputs.result }}.exe -OutFile "$env:GITHUB_WORKSPACE\madmax\cactus_plot.exe"
+        Invoke-WebRequest https://github.com/Cactus-Network/cactus-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot_k34-${{ steps.latest-madmax.outputs.result }}.exe -OutFile "$env:GITHUB_WORKSPACE\madmax\cactus_plot_k34.exe"
 
       # Get the most recent release from bladebit
     - uses: actions/github-script@v6
@@ -136,7 +136,7 @@ jobs:
         result-encoding: string
         script: |
           const release = await github.rest.repos.getLatestRelease({
-            owner: 'Chia-Network',
+            owner: 'Cactus-Network',
             repo: 'bladebit',
           });
           return release.data.tag_name;
@@ -144,7 +144,7 @@ jobs:
     - name: Get latest bladebit plotter
       run: |
         mkdir "$env:GITHUB_WORKSPACE\bladebit"
-        Invoke-WebRequest https://github.com/Chia-Network/bladebit/releases/download/${{ steps.latest-bladebit.outputs.result }}/bladebit-${{ steps.latest-bladebit.outputs.result }}-windows-x86-64.zip -OutFile "$env:GITHUB_WORKSPACE\bladebit\bladebit.zip"
+        Invoke-WebRequest https://github.com/Cactus-Network/bladebit/releases/download/${{ steps.latest-bladebit.outputs.result }}/bladebit-${{ steps.latest-bladebit.outputs.result }}-windows-x86-64.zip -OutFile "$env:GITHUB_WORKSPACE\bladebit\bladebit.zip"
         Expand-Archive -Path "$env:GITHUB_WORKSPACE\bladebit\bladebit.zip" -DestinationPath "$env:GITHUB_WORKSPACE\bladebit\"
         rm "$env:GITHUB_WORKSPACE\bladebit\bladebit.zip"
 
@@ -157,19 +157,19 @@ jobs:
     - name: Prepare GUI cache
       id: gui-ref
       run: |
-        $gui_ref = git submodule status chia-blockchain-gui
-        $gui_ref = $gui_ref -replace "^ | chia-blockchain-gui.*$",""
+        $gui_ref = git submodule status cactus-blockchain-gui
+        $gui_ref = $gui_ref -replace "^ | cactus-blockchain-gui.*$",""
         echo $gui_ref
         echo "::set-output name=GUI_REF::$gui_ref"
-        echo "Remove-Item -Recurse -Force .\chia-blockchain-gui"
-        Remove-Item -Recurse -Force .\chia-blockchain-gui
+        echo "Remove-Item -Recurse -Force .\cactus-blockchain-gui"
+        Remove-Item -Recurse -Force .\cactus-blockchain-gui
 
     - name: Cache GUI
       uses: actions/cache@v3
       id: cache-gui
       with:
-        path: .\chia-blockchain-gui
-        key: ${{ runner.os }}-chia-blockchain-gui-${{ steps.gui-ref.outputs.GUI_REF }}
+        path: .\cactus-blockchain-gui
+        key: ${{ runner.os }}-cactus-blockchain-gui-${{ steps.gui-ref.outputs.GUI_REF }}
 
     - if: steps.cache-gui.outputs.cache-hit != 'true'
       name: Build GUI
@@ -180,7 +180,7 @@ jobs:
 
     - name: Build Windows installer
       env:
-        CHIA_INSTALLER_VERSION: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
         HAS_SECRET: ${{ steps.check_secrets.outputs.HAS_SIGNING_SECRET }}
         CSC_KEY_PASSWORD: ${{ secrets.WIN_CODE_SIGN_PASS }}
       run: |
@@ -194,13 +194,13 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Windows-Exe
-        path: ${{ github.workspace }}\chia-blockchain-gui\Chia-win32-x64\
+        path: ${{ github.workspace }}\cactus-blockchain-gui\Cactus-win32-x64\
 
     - name: Upload Installer to artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: chia-installers-windows-exe-intel
-        path: ${{ github.workspace }}\chia-blockchain-gui\release-builds\
+        name: cactus-installers-windows-exe-intel
+        path: ${{ github.workspace }}\cactus-blockchain-gui\release-builds\
 
     - name: Install AWS CLI
       if: steps.check_secrets.outputs.HAS_AWS_SECRET
@@ -218,22 +218,22 @@ jobs:
     - name: Upload to s3
       if: steps.check_secrets.outputs.HAS_AWS_SECRET
       env:
-        CHIA_INSTALLER_VERSION: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       shell: bash
       run: |
         GIT_SHORT_HASH=$(echo "${GITHUB_SHA}" | cut -c1-8)
-        CHIA_DEV_BUILD=${CHIA_INSTALLER_VERSION}-$GIT_SHORT_HASH
-        echo ::set-output name=CHIA_DEV_BUILD::${CHIA_DEV_BUILD}
-        echo ${CHIA_DEV_BUILD}
+        CACTUS_DEV_BUILD=${CACTUS_INSTALLER_VERSION}-$GIT_SHORT_HASH
+        echo ::set-output name=CACTUS_DEV_BUILD::${CACTUS_DEV_BUILD}
+        echo ${CACTUS_DEV_BUILD}
         pwd
-        aws s3 cp chia-blockchain-gui/release-builds/windows-installer/ChiaSetup-${CHIA_INSTALLER_VERSION}.exe s3://download.chia.net/dev/ChiaSetup-${CHIA_DEV_BUILD}.exe
+        aws s3 cp cactus-blockchain-gui/release-builds/windows-installer/CactusSetup-${CACTUS_INSTALLER_VERSION}.exe s3://download.cactus-network.net/dev/CactusSetup-${CACTUS_DEV_BUILD}.exe
 
     - name: Create Checksums
       env:
-        CHIA_INSTALLER_VERSION: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       run: |
-         certutil.exe -hashfile ${{ github.workspace }}\chia-blockchain-gui\release-builds\windows-installer\ChiaSetup-${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}.exe SHA256 > ${{ github.workspace }}\chia-blockchain-gui\release-builds\windows-installer\ChiaSetup-${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}.exe.sha256
-         ls ${{ github.workspace }}\chia-blockchain-gui\release-builds\windows-installer\
+         certutil.exe -hashfile ${{ github.workspace }}\cactus-blockchain-gui\release-builds\windows-installer\CactusSetup-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}.exe SHA256 > ${{ github.workspace }}\cactus-blockchain-gui\release-builds\windows-installer\CactusSetup-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}.exe.sha256
+         ls ${{ github.workspace }}\cactus-blockchain-gui\release-builds\windows-installer\
 
     - name: Install py3createtorrent
       if: startsWith(github.ref, 'refs/tags/')
@@ -243,16 +243,16 @@ jobs:
     - name: Create torrent
       if: startsWith(github.ref, 'refs/tags/')
       run: |
-        py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce ${{ github.workspace }}\chia-blockchain-gui\release-builds\windows-installer\ChiaSetup-${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}.exe -o ${{ github.workspace }}\chia-blockchain-gui\release-builds\windows-installer\ChiaSetup-${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}.exe.torrent --webseed https://download.chia.net/install/ChiaSetup-${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}.exe
+        py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce ${{ github.workspace }}\cactus-blockchain-gui\release-builds\windows-installer\CactusSetup-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}.exe -o ${{ github.workspace }}\cactus-blockchain-gui\release-builds\windows-installer\CactusSetup-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}.exe.torrent --webseed https://download.cactus-network.net/install/CactusSetup-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}.exe
         ls
 
     - name: Upload Dev Installer
       if: steps.check_secrets.outputs.HAS_AWS_SECRET && github.ref == 'refs/heads/main'
       env:
-        CHIA_INSTALLER_VERSION: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       run: |
-        aws s3 cp ${{ github.workspace }}\chia-blockchain-gui\release-builds\windows-installer\ChiaSetup-${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}.exe s3://download.chia.net/latest-dev/ChiaSetup-latest-dev.exe
-        aws s3 cp ${{ github.workspace }}\chia-blockchain-gui\release-builds\windows-installer\ChiaSetup-${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}.exe.sha256 s3://download.chia.net/latest-dev/ChiaSetup-latest-dev.exe.sha256
+        aws s3 cp ${{ github.workspace }}\cactus-blockchain-gui\release-builds\windows-installer\CactusSetup-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}.exe s3://download.cactus-network.net/latest-dev/CactusSetup-latest-dev.exe
+        aws s3 cp ${{ github.workspace }}\cactus-blockchain-gui\release-builds\windows-installer\CactusSetup-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}.exe.sha256 s3://download.cactus-network.net/latest-dev/CactusSetup-latest-dev.exe.sha256
 
     - name: Upload Release Files
       if: steps.check_secrets.outputs.HAS_AWS_SECRET && startsWith(github.ref, 'refs/tags/')
@@ -260,9 +260,9 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.INSTALLER_UPLOAD_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.INSTALLER_UPLOAD_SECRET }}
       run: |
-        aws s3 cp ${{ github.workspace }}\chia-blockchain-gui\release-builds\windows-installer\ChiaSetup-${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}.exe s3://download.chia.net/install/
-        aws s3 cp ${{ github.workspace }}\chia-blockchain-gui\release-builds\windows-installer\ChiaSetup-${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}.exe.sha256 s3://download.chia.net/install/
-        aws s3 cp ${{ github.workspace }}\chia-blockchain-gui\release-builds\windows-installer\ChiaSetup-${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}.exe.torrent s3://download.chia.net/torrents/
+        aws s3 cp ${{ github.workspace }}\cactus-blockchain-gui\release-builds\windows-installer\CactusSetup-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}.exe s3://download.cactus-network.net/install/
+        aws s3 cp ${{ github.workspace }}\cactus-blockchain-gui\release-builds\windows-installer\CactusSetup-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}.exe.sha256 s3://download.cactus-network.net/install/
+        aws s3 cp ${{ github.workspace }}\cactus-blockchain-gui\release-builds\windows-installer\CactusSetup-${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}.exe.torrent s3://download.cactus-network.net/torrents/
 
     - name: Get tag name
       if: startsWith(github.ref, 'refs/tags/')
@@ -278,14 +278,14 @@ jobs:
             Authorization="Bearer ${{ secrets.GLUE_ACCESS_TOKEN }}"
         }
         $data = @{
-            chia_ref='${{ steps.tag-name.outputs.TAG_NAME }}'
+            cactus_ref='${{ steps.tag-name.outputs.TAG_NAME }}'
         }
         $json = $data | ConvertTo-Json
         $response = Invoke-RestMethod '${{ secrets.GLUE_API_URL }}/api/v1/${{ steps.tag-name.outputs.REPO_NAME }}/${{ steps.tag-name.outputs.TAG_NAME }}/success/build-windows' -Method Post -Body $json -ContentType 'application/json' -Headers $headers
 
     - name: Remove Windows exe and installer to exclude from cache
       run: |
-        Remove-Item .\chia-blockchain-gui\packages\gui\dist -Recurse -Force
-        Remove-Item .\chia-blockchain-gui\packages\gui\daemon -Recurse -Force
-        Remove-Item .\chia-blockchain-gui\Chia-win32-x64 -Recurse -Force
-        Remove-Item .\chia-blockchain-gui\release-builds -Recurse -Force
+        Remove-Item .\cactus-blockchain-gui\packages\gui\dist -Recurse -Force
+        Remove-Item .\cactus-blockchain-gui\packages\gui\daemon -Recurse -Force
+        Remove-Item .\cactus-blockchain-gui\Cactus-win32-x64 -Recurse -Force
+        Remove-Item .\cactus-blockchain-gui\release-builds -Recurse -Force

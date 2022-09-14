@@ -9,10 +9,10 @@ from typing import Any, Callable, Dict, List, Optional, TextIO, Tuple, Type, Uni
 import click
 from utils import EnumType, get_commit_hash, rand_bytes, rand_full_block, rand_hash
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.full_block import FullBlock
-from chia.util.ints import uint8, uint64
-from chia.util.streamable import Streamable, streamable
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.full_block import FullBlock
+from cactus.util.ints import uint8, uint64
+from cactus.util.streamable import Streamable, streamable
 
 _version = 1
 

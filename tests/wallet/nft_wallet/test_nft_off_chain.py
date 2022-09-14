@@ -2,23 +2,23 @@ from typing import Tuple
 
 import pytest
 
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import Program
-from chia.util.ints import uint32
-from chia.wallet.nft_wallet.nft_info import NFTCoinInfo
-from chia.wallet.nft_wallet.nft_off_chain import (
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import Program
+from cactus.util.ints import uint32
+from cactus.wallet.nft_wallet.nft_info import NFTCoinInfo
+from cactus.wallet.nft_wallet.nft_off_chain import (
     delete_off_chain_metadata,
     get_off_chain_metadata,
     read_off_chain_metadata,
 )
-from chia.wallet.nft_wallet.nft_puzzles import (
+from cactus.wallet.nft_wallet.nft_puzzles import (
     LAUNCHER_PUZZLE_HASH,
     NFT_TRANSFER_PROGRAM_DEFAULT,
     SINGLETON_MOD_HASH,
     construct_ownership_layer,
     create_full_puzzle,
 )
-from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import puzzle_for_pk, solution_for_conditions
+from cactus.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import puzzle_for_pk, solution_for_conditions
 from tests.core.make_block_generator import int_to_public_key
 from tests.wallet.nft_wallet.test_nft_puzzles import NFT_METADATA_UPDATER_DEFAULT, OFFER_MOD
 
@@ -70,7 +70,7 @@ def make_a_new_ownership_layer_puzzle() -> Tuple[Program, Program]:
 
 def create_test_full_puzzle() -> Program:
     metadata = [
-        ("u", ["https://www.chia.net/img/branding/chia-logo.svg"]),
+        ("u", ["https://www.cactus-network.net/img/branding/cactus-logo.svg"]),
         ("h", 0xD4584AD463139FA8C0D9F68F4B59F185),
         ("mu", ["https://bafybeigzcazxeu7epmm4vtkuadrvysv74lbzzbl2evphtae6k57yhgynp4.ipfs.nftstorage.link/6590.json"]),
         ("mh", 0x6A9CB99B7B9A987309E8DD4FD14A7CA2423858585DA68CC9EC689669DD6DD6AB),

@@ -1216,7 +1216,7 @@ respond_compact_vdf_json: Dict[str, Any] = {
 
 request_peers_json: Dict[str, Any] = {}
 
-respond_peers_json: Dict[str, Any] = {"peer_list": [{"host": "127.0.0.1", "port": 8444, "timestamp": 10796}]}
+respond_peers_json: Dict[str, Any] = {"peer_list": [{"host": "127.0.0.1", "port": 11444, "timestamp": 10796}]}
 
 request_puzzle_solution_json: Dict[str, Any] = {
     "coin_name": "0x6edddb46bd154f50566b49c95812e0f1131a0a7162630349fc8d1d696e463e47",
