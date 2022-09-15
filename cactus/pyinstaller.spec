@@ -73,22 +73,12 @@ hiddenimports.extend(entry_points)
 hiddenimports.extend(keyring_imports)
 
 binaries = [
-    (
-        f"{ROOT}/madmax/chia_plot",
-        "madmax"
-    ),
-    (
-        f"{ROOT}/madmax/chia_plot_k34",
-        "madmax"
-    )
+
 ]
 
 if not THIS_IS_MAC:
     binaries.extend([
-        (
-            f"{ROOT}/bladebit/bladebit",
-            "bladebit"
-        )
+
     ])
 
 if THIS_IS_WINDOWS:
