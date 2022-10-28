@@ -1,13 +1,13 @@
 import dataclasses
 import pytest
 
-from chia.consensus.blockchain import ReceiveBlockResult
-from chia.protocols import full_node_protocol
-from chia.types.blockchain_format.vdf import VDFProof
-from chia.types.weight_proof import WeightProof
-from chia.util.generator_tools import get_block_header
-from chia.wallet.key_val_store import KeyValStore
-from chia.wallet.wallet_blockchain import WalletBlockchain
+from cactus.consensus.blockchain import ReceiveBlockResult
+from cactus.protocols import full_node_protocol
+from cactus.types.blockchain_format.vdf import VDFProof
+from cactus.types.weight_proof import WeightProof
+from cactus.util.generator_tools import get_block_header
+from cactus.wallet.key_val_store import KeyValStore
+from cactus.wallet.wallet_blockchain import WalletBlockchain
 from tests.setup_nodes import test_constants
 from tests.util.db_connection import DBConnection
 

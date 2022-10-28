@@ -1,8 +1,8 @@
 import logging
 import pytest
 
-from chia.util.errors import KeychainLabelError, KeychainLabelExists, KeychainFingerprintNotFound, KeychainLabelInvalid
-from chia.util.keyring_wrapper import KeyringWrapper, DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE
+from cactus.util.errors import KeychainLabelError, KeychainLabelExists, KeychainFingerprintNotFound, KeychainLabelInvalid
+from cactus.util.keyring_wrapper import KeyringWrapper, DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE
 from pathlib import Path
 from typing import Type
 from sys import platform

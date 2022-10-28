@@ -5,17 +5,17 @@ from typing import List, Tuple
 import pytest
 import pytest_asyncio
 
-from chia.full_node.full_node import FullNode
-from chia.rpc.full_node_rpc_api import FullNodeRpcApi
-from chia.rpc.full_node_rpc_client import FullNodeRpcClient
-from chia.server.start_service import Service
-from chia.simulator.block_tools import BlockTools
-from chia.simulator.simulator_protocol import FarmNewBlockProtocol
-from chia.simulator.wallet_tools import WalletTool
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.ints import uint64
-from chia.wallet.wallet_node import WalletNode
+from cactus.full_node.full_node import FullNode
+from cactus.rpc.full_node_rpc_api import FullNodeRpcApi
+from cactus.rpc.full_node_rpc_client import FullNodeRpcClient
+from cactus.server.start_service import Service
+from cactus.simulator.block_tools import BlockTools
+from cactus.simulator.simulator_protocol import FarmNewBlockProtocol
+from cactus.simulator.wallet_tools import WalletTool
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.ints import uint64
+from cactus.wallet.wallet_node import WalletNode
 
 
 @pytest_asyncio.fixture(scope="function")

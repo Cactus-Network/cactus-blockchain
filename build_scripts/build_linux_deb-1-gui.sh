@@ -8,9 +8,9 @@ npm ci
 PATH=$(npm bin):$PATH
 
 cd ../../ || exit 1
-git submodule update --init chia-blockchain-gui
+git submodule update --init cactus-blockchain-gui
 
-cd ./chia-blockchain-gui || exit 1
+cd ./cactus-blockchain-gui || exit 1
 
 echo "npm build"
 lerna clean -y
@@ -27,9 +27,9 @@ fi
 # Remove unused packages
 rm -rf node_modules
 
-# Other than `chia-blockchain-gui/package/gui`, all other packages are no longer necessary after build.
+# Other than `cactus-blockchain-gui/package/gui`, all other packages are no longer necessary after build.
 # Since these unused packages make cache unnecessarily fat, here unused packages are removed.
-echo "Remove unused @chia packages to make cache slim"
+echo "Remove unused @cactus packages to make cache slim"
 ls -l packages
 rm -rf packages/api
 rm -rf packages/api-react
@@ -44,5 +44,5 @@ rm -rf electron/dist # ~186MB
 rm -rf "@mui" # ~71MB
 rm -rf typescript # ~63MB
 
-# Remove `packages/gui/node_modules/@chia` because it causes an error on later `electron-packager` command
-rm -rf "@chia"
+# Remove `packages/gui/node_modules/@cactus` because it causes an error on later `electron-packager` command
+rm -rf "@cactus"

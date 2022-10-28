@@ -5,17 +5,17 @@ import logging
 import pytest
 from aiohttp import ClientSession, ClientTimeout, ServerDisconnectedError, WSCloseCode, WSMessage, WSMsgType
 
-from chia.full_node.full_node_api import FullNodeAPI
-from chia.protocols import full_node_protocol
-from chia.protocols.protocol_message_types import ProtocolMessageTypes
-from chia.protocols.shared_protocol import Handshake
-from chia.server.outbound_message import make_msg, Message
-from chia.server.rate_limits import RateLimiter
-from chia.server.ws_connection import WSChiaConnection
-from chia.types.peer_info import PeerInfo
-from chia.util.errors import Err
-from chia.util.ints import uint16, uint64
-from chia.simulator.time_out_assert import time_out_assert
+from cactus.full_node.full_node_api import FullNodeAPI
+from cactus.protocols import full_node_protocol
+from cactus.protocols.protocol_message_types import ProtocolMessageTypes
+from cactus.protocols.shared_protocol import Handshake
+from cactus.server.outbound_message import make_msg, Message
+from cactus.server.rate_limits import RateLimiter
+from cactus.server.ws_connection import WSCactusConnection
+from cactus.types.peer_info import PeerInfo
+from cactus.util.errors import Err
+from cactus.util.ints import uint16, uint64
+from cactus.simulator.time_out_assert import time_out_assert
 
 log = logging.getLogger(__name__)
 
@@ -168,8 +168,8 @@ class TestDos:
 
         assert len(server_1.all_connections) == 1
 
-        ws_con: WSChiaConnection = list(server_1.all_connections.values())[0]
-        ws_con_2: WSChiaConnection = list(server_2.all_connections.values())[0]
+        ws_con: WSCactusConnection = list(server_1.all_connections.values())[0]
+        ws_con_2: WSCactusConnection = list(server_2.all_connections.values())[0]
 
         ws_con.peer_host = "1.2.3.4"
         ws_con_2.peer_host = "1.2.3.4"
@@ -223,8 +223,8 @@ class TestDos:
 
         assert len(server_1.all_connections) == 1
 
-        ws_con: WSChiaConnection = list(server_1.all_connections.values())[0]
-        ws_con_2: WSChiaConnection = list(server_2.all_connections.values())[0]
+        ws_con: WSCactusConnection = list(server_1.all_connections.values())[0]
+        ws_con_2: WSCactusConnection = list(server_2.all_connections.values())[0]
 
         ws_con.peer_host = "1.2.3.4"
         ws_con_2.peer_host = "1.2.3.4"
@@ -272,8 +272,8 @@ class TestDos:
 
         assert len(server_1.all_connections) == 1
 
-        ws_con: WSChiaConnection = list(server_1.all_connections.values())[0]
-        ws_con_2: WSChiaConnection = list(server_2.all_connections.values())[0]
+        ws_con: WSCactusConnection = list(server_1.all_connections.values())[0]
+        ws_con_2: WSCactusConnection = list(server_2.all_connections.values())[0]
 
         ws_con.peer_host = "1.2.3.4"
         ws_con_2.peer_host = "1.2.3.4"

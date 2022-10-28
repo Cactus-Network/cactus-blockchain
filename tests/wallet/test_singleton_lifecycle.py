@@ -4,16 +4,16 @@ import pytest
 from blspy import G2Element
 from clvm_tools import binutils
 
-from chia.types.blockchain_format.program import Program, INFINITE_COST
-from chia.types.announcement import Announcement
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.types.condition_opcodes import ConditionOpcode
-from chia.types.spend_bundle import SpendBundle
+from cactus.types.blockchain_format.program import Program, INFINITE_COST
+from cactus.types.announcement import Announcement
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.condition_opcodes import ConditionOpcode
+from cactus.types.spend_bundle import SpendBundle
 
-from chia.util.ints import uint64
-from chia.wallet.puzzles.load_clvm import load_clvm
+from cactus.util.ints import uint64
+from cactus.wallet.puzzles.load_clvm import load_clvm
 
 from tests.core.full_node.test_conditions import check_spend_bundle_validity, initial_blocks
 

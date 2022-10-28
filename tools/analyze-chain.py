@@ -12,10 +12,10 @@ from time import time
 
 from chia_rs import run_generator, MEMPOOL_MODE
 
-from chia.types.blockchain_format.program import Program
-from chia.consensus.default_constants import DEFAULT_CONSTANTS
-from chia.wallet.puzzles.rom_bootstrap_generator import get_generator
-from chia.util.full_block_utils import block_info_from_block, generator_from_block
+from cactus.types.blockchain_format.program import Program
+from cactus.consensus.default_constants import DEFAULT_CONSTANTS
+from cactus.wallet.puzzles.rom_bootstrap_generator import get_generator
+from cactus.util.full_block_utils import block_info_from_block, generator_from_block
 
 GENERATOR_ROM = bytes(get_generator())
 
