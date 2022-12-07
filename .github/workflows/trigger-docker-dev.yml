@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   trigger:
-    name: Trigger building a new dev tag for the chia-docker image
+    name: Trigger building a new dev tag for the cactus-docker image
     runs-on: ubuntu-latest
     steps:
       - name: Test for secrets access

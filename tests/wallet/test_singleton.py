@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from clvm_tools import binutils
 
-from chia.types.announcement import Announcement
-from chia.types.blockchain_format.program import INFINITE_COST, Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.condition_tools import parse_sexp_to_conditions
-from chia.wallet.puzzles.load_clvm import load_clvm
+from cactus.types.announcement import Announcement
+from cactus.types.blockchain_format.program import INFINITE_COST, Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.condition_tools import parse_sexp_to_conditions
+from cactus.wallet.puzzles.load_clvm import load_clvm
 
 SINGLETON_MOD = load_clvm("singleton_top_layer.clvm")
 LAUNCHER_PUZZLE = load_clvm("singleton_launcher.clvm")
