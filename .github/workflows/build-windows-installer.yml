@@ -133,59 +133,6 @@ jobs:
         echo "CACTUS_INSTALLER_VERSION=$CACTUS_INSTALLER_VERSION" >>$GITHUB_OUTPUT
         deactivate
 
-      # Get the most recent release from cactus-plotter-madmax
-    - uses: actions/github-script@v6
-      id: 'latest-madmax'
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        result-encoding: string
-        script: |
-          const release = await github.rest.repos.getLatestRelease({
-            owner: 'Cactus-Network',
-            repo: 'cactus-plotter-madmax',
-          });
-          return release.data.tag_name;
-
-    - name: Get latest madmax plotter
-      run: |
-        mkdir "$env:GITHUB_WORKSPACE\madmax"
-        Invoke-WebRequest https://github.com/Cactus-Network/cactus-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot-${{ steps.latest-madmax.outputs.result }}.exe -OutFile "$env:GITHUB_WORKSPACE\madmax\cactus_plot.exe"
-        Invoke-WebRequest https://github.com/Cactus-Network/cactus-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot_k34-${{ steps.latest-madmax.outputs.result }}.exe -OutFile "$env:GITHUB_WORKSPACE\madmax\cactus_plot_k34.exe"
-
-      # Get the most recent release from bladebit
-    - uses: actions/github-script@v6
-      if: '!github.event.release.prerelease'
-      id: 'latest-bladebit'
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        result-encoding: string
-        script: |
-          const release = await github.rest.repos.getLatestRelease({
-            owner: 'Cactus-Network',
-            repo: 'bladebit',
-          });
-          return release.data.tag_name;
-
-    - name: Get latest bladebit plotter
-      if: '!github.event.release.prerelease'
-      run: |
-        mkdir "$env:GITHUB_WORKSPACE\bladebit"
-        Invoke-WebRequest https://github.com/Cactus-Network/bladebit/releases/download/${{ steps.latest-bladebit.outputs.result }}/bladebit-${{ steps.latest-bladebit.outputs.result }}-windows-x86-64.zip -OutFile "$env:GITHUB_WORKSPACE\bladebit\bladebit.zip"
-        Expand-Archive -Path "$env:GITHUB_WORKSPACE\bladebit\bladebit.zip" -DestinationPath "$env:GITHUB_WORKSPACE\bladebit\"
-        rm "$env:GITHUB_WORKSPACE\bladebit\bladebit.zip"
-
-    - name: Get latest prerelease bladebit plotter
-      if: env.PRE_RELEASE == 'true'
-      shell: bash
-      run: |
-        PRERELEASE_URL=$(curl -Ls -H "Accept: application/vnd.github+json" "https://api.github.com/repos/Cactus-Network/bladebit/releases" | jq -r 'map(select(.prerelease)) | first.assets[] | select(.browser_download_url | endswith("windows-x86-64.zip")).browser_download_url')
-        mkdir $GITHUB_WORKSPACE\\bladebit
-        ls
-        echo $PRERELEASE_URL
-        curl -L "$PRERELEASE_URL" --output $GITHUB_WORKSPACE\\bladebit\\bladebit.zip
-        unzip $GITHUB_WORKSPACE\\bladebit\\bladebit.zip -d $GITHUB_WORKSPACE\\bladebit\\
-        rm $GITHUB_WORKSPACE\\bladebit\\bladebit.zip
-
     - name: Run install script
       env:
         INSTALL_PYTHON_VERSION: ${{ matrix.python-version }}
@@ -234,32 +181,6 @@ jobs:
       with:
         name: cactus-installers-windows-exe-intel
         path: ${{ github.workspace }}\cactus-blockchain-gui\release-builds\
-
-    - name: Install AWS CLI
-      if: steps.check_secrets.outputs.HAS_AWS_SECRET
-      run: |
-          msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi
-
-    - name: Configure AWS Credentials
-      if: steps.check_secrets.outputs.HAS_AWS_SECRET
-      uses: aws-actions/configure-aws-credentials@v1-node16
-      with:
-        aws-access-key-id: ${{ secrets.INSTALLER_UPLOAD_KEY }}
-        aws-secret-access-key: ${{ secrets.INSTALLER_UPLOAD_SECRET }}
-        aws-region: us-west-2
-
-    - name: Upload to s3
-      if: steps.check_secrets.outputs.HAS_AWS_SECRET
-      env:
-        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
-      shell: bash
-      run: |
-        GIT_SHORT_HASH=$(echo "${GITHUB_SHA}" | cut -c1-8)
-        CACTUS_DEV_BUILD=${CACTUS_INSTALLER_VERSION}-$GIT_SHORT_HASH
-        echo CACTUS_DEV_BUILD=${CACTUS_DEV_BUILD} >>$GITHUB_OUTPUT
-        echo ${CACTUS_DEV_BUILD}
-        pwd
-        aws s3 cp cactus-blockchain-gui/release-builds/windows-installer/CactusSetup-${CACTUS_INSTALLER_VERSION}.exe s3://download.cactus-network.net /dev/CactusSetup-${CACTUS_DEV_BUILD}.exe
 
     - name: Create Checksums
       env:

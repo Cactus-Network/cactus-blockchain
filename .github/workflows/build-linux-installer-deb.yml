@@ -87,58 +87,6 @@ jobs:
         AWS_SECRET: "${{ secrets.INSTALLER_UPLOAD_KEY }}"
         GLUE_ACCESS_TOKEN: "${{ secrets.GLUE_ACCESS_TOKEN }}"
 
-      # Get the most recent release from cactus-plotter-madmax
-    - uses: actions/github-script@v6
-      id: 'latest-madmax'
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        result-encoding: string
-        script: |
-          const release = await github.rest.repos.getLatestRelease({
-            owner: 'Cactus-Network',
-            repo: 'cactus-plotter-madmax',
-          });
-          return release.data.tag_name;
-
-    - name: Get latest madmax plotter
-      run: |
-        mkdir "$GITHUB_WORKSPACE/madmax"
-        wget -O "$GITHUB_WORKSPACE/madmax/cactus_plot" https://github.com/Cactus-Network/cactus-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot-${{ steps.latest-madmax.outputs.result }}-x86-64
-        wget -O "$GITHUB_WORKSPACE/madmax/cactus_plot_k34" https://github.com/Cactus-Network/cactus-plotter-madmax/releases/download/${{ steps.latest-madmax.outputs.result }}/cactus_plot_k34-${{ steps.latest-madmax.outputs.result }}-x86-64
-        chmod +x "$GITHUB_WORKSPACE/madmax/cactus_plot"
-        chmod +x "$GITHUB_WORKSPACE/madmax/cactus_plot_k34"
-
-      # Get the most recent release from bladebit
-    - uses: actions/github-script@v6
-      if: '!github.event.release.prerelease'
-      id: 'latest-bladebit'
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        result-encoding: string
-        script: |
-          const release = await github.rest.repos.getLatestRelease({
-            owner: 'Cactus-Network',
-            repo: 'bladebit',
-          });
-          return release.data.tag_name;
-
-    - name: Get latest bladebit plotter
-      if: '!github.event.release.prerelease'
-      run: |
-        mkdir "$GITHUB_WORKSPACE/bladebit"
-        wget -O /tmp/bladebit.tar.gz https://github.com/Cactus-Network/bladebit/releases/download/${{ steps.latest-bladebit.outputs.result }}/bladebit-${{ steps.latest-bladebit.outputs.result }}-ubuntu-x86-64.tar.gz
-        tar -xvzf /tmp/bladebit.tar.gz -C $GITHUB_WORKSPACE/bladebit
-        chmod +x "$GITHUB_WORKSPACE/bladebit/bladebit"
-
-    - name: Get latest prerelease bladebit plotter
-      if: env.PRE_RELEASE == 'true'
-      run: |
-        PRERELEASE_URL=$(curl -Ls -H "Accept: application/vnd.github+json" "https://api.github.com/repos/Cactus-Network/bladebit/releases" | jq -r 'map(select(.prerelease)) | first.assets[] | select(.browser_download_url | endswith("ubuntu-x86-64.tar.gz")).browser_download_url')
-        mkdir "$GITHUB_WORKSPACE/bladebit"
-        wget -O /tmp/bladebit.tar.gz $PRERELEASE_URL
-        tar -xvzf /tmp/bladebit.tar.gz -C $GITHUB_WORKSPACE/bladebit
-        chmod +x "$GITHUB_WORKSPACE/bladebit/bladebit"
-
     - uses: ./.github/actions/install
       with:
         python-version: ${{ matrix.python-version }}
