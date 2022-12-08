@@ -17,6 +17,7 @@ Write-Output "   ---"
 Write-Output "   ---"
 Write-Output "Use pyinstaller to create cactus .exe's"
 Write-Output "   ---"
+pip install pyinstaller
 $SPEC_FILE = (python -c 'import cactus; print(cactus.PYINSTALLER_SPEC_PATH)') -join "`n"
 pyinstaller --log-level INFO $SPEC_FILE
 

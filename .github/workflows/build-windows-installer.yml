@@ -214,10 +214,3 @@ jobs:
         }
         $json = $data | ConvertTo-Json
         $response = Invoke-RestMethod '${{ secrets.GLUE_API_URL }}/api/v1/${{ steps.tag-name.outputs.REPO_NAME }}/${{ steps.tag-name.outputs.TAG_NAME }}/success/build-windows' -Method Post -Body $json -ContentType 'application/json' -Headers $headers
-
-    - name: Remove Windows exe and installer to exclude from cache
-      run: |
-        Remove-Item .\cactus-blockchain-gui\packages\gui\dist -Recurse -Force
-        Remove-Item .\cactus-blockchain-gui\packages\gui\daemon -Recurse -Force
-        Remove-Item .\cactus-blockchain-gui\Cactus-win32-x64 -Recurse -Force
-        Remove-Item .\cactus-blockchain-gui\release-builds -Recurse -Force

@@ -43,7 +43,7 @@ jobs:
             bladebit-suffix: macos-arm64.tar.gz
 
     steps:
-      - uses: Cactus-Network/actions/clean-workspace@main
+      - uses: Cactus-Network/actions/clean-workspace
 
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -51,7 +51,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - uses: Cactus-Network/actions/git-ssh-to-https@main
+      - uses: Cactus-Network/actions/git-ssh-to-https
 
       - name: Cleanup any leftovers that exist from previous runs
         run: bash build_scripts/clean-runner.sh || true
@@ -101,7 +101,7 @@ jobs:
           deactivate
 
       - name: Setup Python environment
-        uses: Cactus-Network/actions/setup-python@main
+        uses: Cactus-Network/actions/setup-python
         with:
           python-version: ${{ matrix.python-version }}
           force-pyenv: 'true'
@@ -124,7 +124,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           development: true
 
-      - uses: cactus-network/actions/activate-venv@main
+      - uses: cactus-network/actions/activate-venv
 
       - name: Setup Node 16.x
         uses: actions/setup-node@v3

@@ -31,10 +31,10 @@ jobs:
         python-version: [3.8]
 
     steps:
-    - uses: Cactus-Network/actions/clean-workspace@main
+    - uses: Cactus-Network/actions/clean-workspace
 
     - name: Add safe git directory
-      uses: Cactus-Network/actions/git-mark-workspace-safe@main
+      uses: Cactus-Network/actions/git-mark-workspace-safe
 
     - name: Checkout Code
       uses: actions/checkout@v3
@@ -42,7 +42,7 @@ jobs:
         fetch-depth: 0
         submodules: recursive
 
-    - uses: Cactus-Network/actions/git-ssh-to-https@main
+    - uses: Cactus-Network/actions/git-ssh-to-https
 
     - name: Cleanup any leftovers that exist from previous runs
       run: bash build_scripts/clean-runner.sh || true
@@ -92,7 +92,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         development: true
 
-    - uses: cactus-network/actions/activate-venv@main
+    - uses: cactus-network/actions/activate-venv
 
     - name: Prepare GUI cache
       id: gui-ref
