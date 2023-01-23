@@ -5,23 +5,23 @@ from typing import AsyncIterator, List, Tuple
 import pytest
 import pytest_asyncio
 
-from chia.cmds.units import units
-from chia.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
-from chia.full_node.full_node import FullNode
-from chia.server.outbound_message import NodeType
-from chia.server.server import ChiaServer
-from chia.server.start_service import Service
-from chia.simulator.block_tools import BlockTools, create_block_tools_async
-from chia.simulator.full_node_simulator import FullNodeSimulator
-from chia.simulator.simulator_protocol import FarmNewBlockProtocol, GetAllCoinsProtocol, ReorgProtocol
-from chia.simulator.time_out_assert import time_out_assert
-from chia.types.peer_info import PeerInfo
-from chia.util.ints import uint16, uint32, uint64
-from chia.simulator.setup_nodes import SimulatorsAndWallets, setup_simulators_and_wallets, setup_full_system
-from chia.simulator.setup_services import setup_full_node
-from chia.wallet.wallet_node import WalletNode
-from chia.simulator.block_tools import test_constants
-from chia.simulator.keyring import TempKeyring
+from cactus.cmds.units import units
+from cactus.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
+from cactus.full_node.full_node import FullNode
+from cactus.server.outbound_message import NodeType
+from cactus.server.server import CactusServer
+from cactus.server.start_service import Service
+from cactus.simulator.block_tools import BlockTools, create_block_tools_async
+from cactus.simulator.full_node_simulator import FullNodeSimulator
+from cactus.simulator.simulator_protocol import FarmNewBlockProtocol, GetAllCoinsProtocol, ReorgProtocol
+from cactus.simulator.time_out_assert import time_out_assert
+from cactus.types.peer_info import PeerInfo
+from cactus.util.ints import uint16, uint32, uint64
+from cactus.simulator.setup_nodes import SimulatorsAndWallets, setup_simulators_and_wallets, setup_full_system
+from cactus.simulator.setup_services import setup_full_node
+from cactus.wallet.wallet_node import WalletNode
+from cactus.simulator.block_tools import test_constants
+from cactus.simulator.keyring import TempKeyring
 
 test_constants_modified = test_constants.replace(
     **{
@@ -73,7 +73,7 @@ class TestSimulation:
     @pytest.mark.asyncio
     async def test_simulation_1(self, simulation, extra_node, self_hostname):
         node1, node2, _, _, _, _, _, _, _, sanitizer_server = simulation
-        server1: ChiaServer = node1.full_node.server
+        server1: CactusServer = node1.full_node.server
 
         node1_port: uint16 = server1.get_port()
         node2_port: uint16 = node2.full_node.server.get_port()
@@ -85,7 +85,7 @@ class TestSimulation:
 
         # Connect node3 to node1 and node2 - checks come later
         node3: Service[FullNode] = extra_node
-        server3: ChiaServer = node3.full_node.server
+        server3: CactusServer = node3.full_node.server
         connected = await server3.start_client(PeerInfo(self_hostname, node1_port))
         assert connected, f"server3 was unable to connect to node1 on port {node1_port}"
         connected = await server3.start_client(PeerInfo(self_hostname, node2_port))
@@ -148,7 +148,7 @@ class TestSimulation:
     @pytest.mark.asyncio
     async def test_simulator_auto_farm_and_get_coins(
         self,
-        two_wallet_nodes: Tuple[List[FullNodeSimulator], List[Tuple[WalletNode, ChiaServer]], BlockTools],
+        two_wallet_nodes: Tuple[List[FullNodeSimulator], List[Tuple[WalletNode, CactusServer]], BlockTools],
         self_hostname: str,
     ) -> None:
         num_blocks = 2
@@ -270,11 +270,11 @@ class TestSimulation:
         argvalues=[
             [0, 0],
             [1, 2],
-            [(2 * units["chia"]) - 1, 2],
-            [2 * units["chia"], 2],
-            [(2 * units["chia"]) + 1, 4],
-            [3 * units["chia"], 4],
-            [10 * units["chia"], 10],
+            [(2 * units["cactus"]) - 1, 2],
+            [2 * units["cactus"], 2],
+            [(2 * units["cactus"]) + 1, 4],
+            [3 * units["cactus"], 4],
+            [10 * units["cactus"], 10],
         ],
     )
     async def test_simulation_farm_rewards(

@@ -55,11 +55,11 @@ def main():
 
     install_release_number = major_release_number + "." + minor_release_number
     if len(patch_release_number) > 0:
-        install_release_number += "." + patch_release_number
+        install_release_number "1.6.2""
     if len(dev_release_number) > 0:
-        install_release_number += dev_release_number
+        install_release_number "1.6.2"
 
-    print(str(install_release_number))
+    print(str("1.6.2"))
 
 
 if __name__ == "__main__":

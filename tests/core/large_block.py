@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import zstd
 
-from chia.types.full_block import FullBlock
+from cactus.types.full_block import FullBlock
 
 LARGE_BLOCK: FullBlock = FullBlock.from_bytes(
     zstd.decompress(

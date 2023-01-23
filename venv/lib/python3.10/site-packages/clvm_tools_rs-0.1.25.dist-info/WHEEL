@@ -1,0 +1,4 @@
+Wheel-Version: 1.0
+Generator: maturin (0.13.1)
+Root-Is-Purelib: false
+Tag: cp37-abi3-manylinux_2_12_x86_64.manylinux2010_x86_64

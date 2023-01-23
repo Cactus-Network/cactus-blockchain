@@ -5,13 +5,13 @@ from typing import Any
 
 import pytest
 
-from chia.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
-from chia.simulator.full_node_simulator import FullNodeSimulator
-from chia.simulator.simulator_protocol import FarmNewBlockProtocol
-from chia.simulator.time_out_assert import time_out_assert, time_out_assert_not_none
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.peer_info import PeerInfo
-from chia.util.ints import uint16, uint32, uint64
+from cactus.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
+from cactus.simulator.full_node_simulator import FullNodeSimulator
+from cactus.simulator.simulator_protocol import FarmNewBlockProtocol
+from cactus.simulator.time_out_assert import time_out_assert, time_out_assert_not_none
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.peer_info import PeerInfo
+from cactus.util.ints import uint16, uint32, uint64
 
 # from clvm_tools.binutils import disassemble
 from tests.util.wallet_is_synced import wallets_are_synced

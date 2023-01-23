@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: chia_rs
+Version: 0.1.16
+Summary: Code useful for implementing chia consensus.
+Home-Page: https://github.com/Chia-Network/chia_rs/
+Author: Richard Kiss <him@richardkiss.com>
+Author-email: Richard Kiss <him@richardkiss.com>
+License: Apache-2.0
+Description-Content-Type: text/markdown; charset=UTF-8; variant=GFM
+Project-URL: Source Code, https://github.com/Chia-Network/chia_rs/
+
+The `chia_rs` wheel contains python bindings for code from the `chia` crate.
+

@@ -1,0 +1,6 @@
+[console_scripts]
+brun = clvm_tools.cmds:brun
+opc = clvm_tools.cmds:opc
+opd = clvm_tools.cmds:opd
+read_ir = clvm_tools.cmds:read_ir
+run = clvm_tools.cmds:run
