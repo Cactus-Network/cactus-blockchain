@@ -51,7 +51,7 @@ keyring_imports = collect_submodules("keyring.backends")
 # keyring uses entrypoints to read keyring.backends from metadata file entry_points.txt.
 keyring_datas = copy_metadata("keyring")[0]
 
-version_data = "1.6.2""
+version_data = copy_metadata(get_distribution("cactus-blockchain"))[0]
 
 block_cipher = None
 
@@ -65,7 +65,7 @@ SERVERS = [
     "timelord",
 ]
 
-# TODO: collapse all these entry points into one `chia_exec` entrypoint that accepts the server as a parameter
+# TODO: collapse all these entry points into one `cactus_exec` entrypoint that accepts the server as a parameter
 
 entry_points = ["cactus.cmds.cactus"] + [f"cactus.server.start_{s}" for s in SERVERS]
 
@@ -75,6 +75,30 @@ hiddenimports.extend(keyring_imports)
 
 binaries = []
 
+if os.path.exists(f"{ROOT}/madmax/chia_plot"):
+    binaries.extend([
+        (
+            f"{ROOT}/madmax/chia_plot",
+            "madmax"
+        )
+    ])
+
+if os.path.exists(f"{ROOT}/madmax/chia_plot_k34",):
+    binaries.extend([
+        (
+            f"{ROOT}/madmax/chia_plot_k34",
+            "madmax"
+        )
+    ])
+
+if os.path.exists(f"{ROOT}/bladebit/bladebit"):
+    binaries.extend([
+        (
+            f"{ROOT}/bladebit/bladebit",
+            "bladebit"
+        )
+    ])
+
 if THIS_IS_WINDOWS:
     hiddenimports.extend(["win32timezone", "win32cred", "pywintypes", "win32ctypes.pywin32"])
 
@@ -83,7 +107,7 @@ if THIS_IS_WINDOWS:
     entry_points.extend(["aiohttp", "cactus.util.bip39"])
 
 if THIS_IS_WINDOWS:
-    chia_mod = importlib.import_module("cactus")
+    cactus_mod = importlib.import_module("cactus")
     dll_paths = pathlib.Path(sysconfig.get_path("platlib")) / "*.dll"
 
     binaries = [
@@ -98,6 +122,18 @@ if THIS_IS_WINDOWS:
         (
             "C:\\Windows\\System32\\vcruntime140_1.dll",
             ".",
+        ),
+        (
+            f"{ROOT}\\madmax\\chia_plot.exe",
+            "madmax"
+        ),
+        (
+            f"{ROOT}\\madmax\\chia_plot_k34.exe",
+            "madmax"
+        ),
+        (
+            f"{ROOT}\\bladebit\\bladebit.exe",
+            "bladebit"
         ),
     ]
 
