@@ -1,10 +1,10 @@
 Metadata-Version: 2.1
 Name: cactus-blockchain
-Version: 1.6.3.dev0
+Version: 1.6.3.dev2
 Summary: Cactus blockchain full node, farmer, timelord, and wallet.
 Home-page: https://cactus-network.net/
-Author: Mariano Sorgente
-Author-email: mariano@cactus-network.net
+Author: Dommer
+Author-email: Dommer@cactus-network.net
 License: Apache License
 Project-URL: Source, https://github.com/Cactus-Network/cactus-blockchain/
 Project-URL: Changelog, https://github.com/Cactus-Network/cactus-blockchain/blob/main/CHANGELOG.md

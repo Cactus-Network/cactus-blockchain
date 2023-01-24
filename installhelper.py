@@ -54,7 +54,7 @@ def get_cactus_version() -> str:
     output = subprocess.run(["cactus", "version"], capture_output=True)
     if output.returncode == 0:
         version = str(output.stdout.strip(), "utf-8").splitlines()[-1]
-    return make_semver(version)
+    return make_semver("1.6.2")
 
 
 def update_version(package_json_path: str):
