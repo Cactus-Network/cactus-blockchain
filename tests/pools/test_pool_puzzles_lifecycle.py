@@ -7,8 +7,8 @@ from unittest import TestCase
 import pytest
 from blspy import AugSchemeMPL, G1Element, G2Element, PrivateKey
 
-from chia.consensus.default_constants import DEFAULT_CONSTANTS
-from chia.pools.pool_puzzles import (
+from cactus.consensus.default_constants import DEFAULT_CONSTANTS
+from cactus.pools.pool_puzzles import (
     SINGLETON_MOD_HASH,
     create_absorb_spend,
     create_p2_singleton_puzzle,
@@ -24,16 +24,16 @@ from chia.pools.pool_puzzles import (
     solution_to_pool_state,
     uncurry_pool_waitingroom_inner_puzzle,
 )
-from chia.pools.pool_wallet_info import PoolState
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.types.spend_bundle import SpendBundle
-from chia.util.ints import uint32, uint64
-from chia.wallet.puzzles import singleton_top_layer
-from chia.wallet.puzzles.p2_conditions import puzzle_for_conditions
-from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
+from cactus.pools.pool_wallet_info import PoolState
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.ints import uint32, uint64
+from cactus.wallet.puzzles import singleton_top_layer
+from cactus.wallet.puzzles.p2_conditions import puzzle_for_conditions
+from cactus.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
     DEFAULT_HIDDEN_PUZZLE_HASH,
     calculate_synthetic_secret_key,
     puzzle_for_pk,
@@ -45,9 +45,9 @@ from tests.util.key_tool import KeyTool
 
 """
 This test suite aims to test:
-    - chia.pools.pool_puzzles.py
-    - chia.wallet.puzzles.pool_member_innerpuz.clvm
-    - chia.wallet.puzzles.pool_waiting_room_innerpuz.clvm
+    - cactus.pools.pool_puzzles.py
+    - cactus.wallet.puzzles.pool_member_innerpuz.clvm
+    - cactus.wallet.puzzles.pool_waiting_room_innerpuz.clvm
 """
 
 

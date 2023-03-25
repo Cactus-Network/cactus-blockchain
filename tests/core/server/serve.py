@@ -8,8 +8,8 @@ import sys
 import threading
 from typing import List, Optional
 
-from chia.server.chia_policy import ChiaPolicy
-from chia.server.start_service import async_run
+from cactus.server.cactus_policy import CactusPolicy
+from cactus.server.start_service import async_run
 
 if sys.platform == "win32":
     import _winapi
@@ -35,7 +35,7 @@ class EchoServer(asyncio.Protocol):
 
 async def async_main(
     ip: str = "127.0.0.1",
-    port: int = 8444,
+    port: int = 11444,
     thread_end_event: Optional[threading.Event] = None,
     port_holder: Optional[List[int]] = None,
 ) -> None:
@@ -64,7 +64,7 @@ async def async_main(
 
 
 def main(connection_limit: int = 25) -> None:
-    asyncio.set_event_loop_policy(ChiaPolicy())
+    asyncio.set_event_loop_policy(CactusPolicy())
     logger = logging.getLogger()
     logger.setLevel(level=logging.DEBUG)
     stream_handler = logging.StreamHandler(stream=sys.stdout)

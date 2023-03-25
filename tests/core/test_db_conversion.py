@@ -6,16 +6,16 @@ from typing import List, Optional, Tuple
 
 import pytest
 
-from chia.cmds.db_upgrade_func import convert_v1_to_v2
-from chia.consensus.blockchain import Blockchain
-from chia.consensus.multiprocess_validation import PreValidationResult
-from chia.full_node.block_store import BlockStore
-from chia.full_node.coin_store import CoinStore
-from chia.full_node.hint_store import HintStore
-from chia.simulator.block_tools import test_constants
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.db_wrapper import DBWrapper2
-from chia.util.ints import uint64
+from cactus.cmds.db_upgrade_func import convert_v1_to_v2
+from cactus.consensus.blockchain import Blockchain
+from cactus.consensus.multiprocess_validation import PreValidationResult
+from cactus.full_node.block_store import BlockStore
+from cactus.full_node.coin_store import CoinStore
+from cactus.full_node.hint_store import HintStore
+from cactus.simulator.block_tools import test_constants
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.db_wrapper import DBWrapper2
+from cactus.util.ints import uint64
 from tests.util.temp_file import TempFile
 
 

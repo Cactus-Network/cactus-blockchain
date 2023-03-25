@@ -25,7 +25,7 @@ permissions:
 
 jobs:
   snyk_python:
-    name: Scan the dependencies of Chia Blockchain
+    name: Scan the dependencies of Cactus Blockchain
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -54,16 +54,16 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Chia Blockchain
+    - name: Install Cactus Blockchain
       if: steps.check_secrets.outputs.HAS_SNYK_SECRET
       uses: ./.github/actions/install
       with:
         python-version: ${{ matrix.python-version }}
         development: true
 
-    - name: Activate Chia venv
+    - name: Activate Cactus venv
       if: steps.check_secrets.outputs.HAS_SNYK_SECRET
-      uses: chia-network/actions/activate-venv@main
+      uses: cactus-network/actions/activate-venv@main
 
     - name: Generate requirements.txt file
       if: steps.check_secrets.outputs.HAS_SNYK_SECRET

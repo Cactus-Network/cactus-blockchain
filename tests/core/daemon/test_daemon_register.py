@@ -3,9 +3,9 @@ from __future__ import annotations
 import aiohttp
 import pytest
 
-from chia.daemon.server import WebSocketServer
-from chia.simulator.block_tools import BlockTools
-from chia.util.ws_message import create_payload
+from cactus.daemon.server import WebSocketServer
+from cactus.simulator.block_tools import BlockTools
+from cactus.util.ws_message import create_payload
 
 
 @pytest.mark.asyncio
