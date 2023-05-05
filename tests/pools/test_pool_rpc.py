@@ -16,26 +16,26 @@ import pytest_asyncio
 from _pytest.fixtures import SubRequest
 from blspy import G1Element
 
-from chia.full_node.full_node import FullNode
-from chia.pools.pool_puzzles import SINGLETON_LAUNCHER_HASH
-from chia.pools.pool_wallet_info import PoolSingletonState, PoolWalletInfo
-from chia.rpc.wallet_rpc_client import WalletRpcClient
-from chia.server.start_service import Service
-from chia.simulator.block_tools import BlockTools, get_plot_dir
-from chia.simulator.full_node_simulator import FullNodeSimulator
-from chia.simulator.setup_nodes import setup_simulators_and_wallets_service
-from chia.simulator.simulator_protocol import ReorgProtocol
-from chia.simulator.time_out_assert import time_out_assert
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.peer_info import PeerInfo
-from chia.util.bech32m import encode_puzzle_hash
-from chia.util.byte_types import hexstr_to_bytes
-from chia.util.config import load_config
-from chia.util.ints import uint16, uint32, uint64
-from chia.wallet.derive_keys import find_authentication_sk, find_owner_sk
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.util.wallet_types import WalletType
-from chia.wallet.wallet_node import WalletNode
+from cactus.full_node.full_node import FullNode
+from cactus.pools.pool_puzzles import SINGLETON_LAUNCHER_HASH
+from cactus.pools.pool_wallet_info import PoolSingletonState, PoolWalletInfo
+from cactus.rpc.wallet_rpc_client import WalletRpcClient
+from cactus.server.start_service import Service
+from cactus.simulator.block_tools import BlockTools, get_plot_dir
+from cactus.simulator.full_node_simulator import FullNodeSimulator
+from cactus.simulator.setup_nodes import setup_simulators_and_wallets_service
+from cactus.simulator.simulator_protocol import ReorgProtocol
+from cactus.simulator.time_out_assert import time_out_assert
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.peer_info import PeerInfo
+from cactus.util.bech32m import encode_puzzle_hash
+from cactus.util.byte_types import hexstr_to_bytes
+from cactus.util.config import load_config
+from cactus.util.ints import uint16, uint32, uint64
+from cactus.wallet.derive_keys import find_authentication_sk, find_owner_sk
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.util.wallet_types import WalletType
+from cactus.wallet.wallet_node import WalletNode
 
 # TODO: Compare deducted fees in all tests against reported total_fee
 
@@ -466,7 +466,7 @@ class TestPoolWalletRpc:
             assert len(await wallet_node.wallet_state_manager.tx_store.get_unconfirmed_for_wallet(2)) == 0
 
             tr: TransactionRecord = await client.send_transaction(
-                1, uint64(100), encode_puzzle_hash(status.p2_singleton_puzzle_hash, "txch")
+                1, uint64(100), encode_puzzle_hash(status.p2_singleton_puzzle_hash, "tcac")
             )
 
             await full_node_api.wait_transaction_records_entered_mempool(records=[tr])

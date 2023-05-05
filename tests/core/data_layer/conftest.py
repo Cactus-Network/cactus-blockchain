@@ -13,35 +13,35 @@ import pytest_asyncio
 # https://github.com/pytest-dev/pytest/issues/7469
 from _pytest.fixtures import SubRequest
 
-from chia.data_layer.data_layer_util import NodeType, Status
-from chia.data_layer.data_store import DataStore
-from chia.types.blockchain_format.sized_bytes import bytes32
+from cactus.data_layer.data_layer_util import NodeType, Status
+from cactus.data_layer.data_store import DataStore
+from cactus.types.blockchain_format.sized_bytes import bytes32
 from tests.core.data_layer.util import (
-    ChiaRoot,
+    CactusRoot,
     Example,
     add_0123_example,
     add_01234567_example,
     create_valid_node_values,
 )
-from tests.util.misc import closing_chia_root_popen
+from tests.util.misc import closing_cactus_root_popen
 
 # TODO: These are more general than the data layer and should either move elsewhere or
 #       be replaced with an existing common approach.  For now they can at least be
 #       shared among the data layer test files.
 
 
-@pytest.fixture(name="chia_daemon", scope="function")
-def chia_daemon_fixture(chia_root: ChiaRoot) -> Iterator[None]:
-    with closing_chia_root_popen(chia_root=chia_root, args=[sys.executable, "-m", "chia.daemon.server"]):
+@pytest.fixture(name="cactus_daemon", scope="function")
+def cactus_daemon_fixture(cactus_root: CactusRoot) -> Iterator[None]:
+    with closing_cactus_root_popen(cactus_root=cactus_root, args=[sys.executable, "-m", "cactus.daemon.server"]):
         # TODO: this is not pretty as a hard coded time
         # let it settle
         time.sleep(5)
         yield
 
 
-@pytest.fixture(name="chia_data", scope="function")
-def chia_data_fixture(chia_root: ChiaRoot, chia_daemon: None, scripts_path: pathlib.Path) -> Iterator[None]:
-    with closing_chia_root_popen(chia_root=chia_root, args=[os.fspath(scripts_path.joinpath("chia_data_layer"))]):
+@pytest.fixture(name="cactus_data", scope="function")
+def cactus_data_fixture(cactus_root: CactusRoot, cactus_daemon: None, scripts_path: pathlib.Path) -> Iterator[None]:
+    with closing_cactus_root_popen(cactus_root=cactus_root, args=[os.fspath(scripts_path.joinpath("cactus_data_layer"))]):
         # TODO: this is not pretty as a hard coded time
         # let it settle
         time.sleep(5)

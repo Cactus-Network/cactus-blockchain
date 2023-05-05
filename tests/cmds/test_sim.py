@@ -4,16 +4,16 @@ from shutil import rmtree
 
 from click.testing import CliRunner, Result
 
-from chia.cmds.chia import cli
-from chia.util.default_root import SIMULATOR_ROOT_PATH
+from cactus.cmds.cactus import cli
+from cactus.util.default_root import SIMULATOR_ROOT_PATH
 
 mnemonic = (  # ignore any secret warnings
     "cup smoke miss park baby say island tomorrow segment lava bitter easily settle gift renew arrive kangaroo dilemma "
     "organ skin design salt history awesome"
 )
 fingerprint = 2640131813
-std_farming_address = "txch1mh4qanzyawn3v4uphgaj2cg6hrjazwyp0sx653fhn9apg6mfajlqtj0ztp"
-burn_address = "txch1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqm6ksh7qddh"  # 0x0...dead
+std_farming_address = "tcac1mh4qanzyawn3v4uphgaj2cg6hrjazwyp0sx653fhn9apg6mfajlqtj0ztp"
+burn_address = "tcac1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqm6ksh7qddh"  # 0x0...dead
 
 
 def test_every_simulator_command() -> None:
@@ -22,7 +22,7 @@ def test_every_simulator_command() -> None:
     start_result: Result = runner.invoke(cli, ["dev", "sim", "-n", "ci_test", "create", "-bm", mnemonic])
     assert start_result.exit_code == 0
     assert f"Farming & Prefarm reward address: {address}" in start_result.output
-    assert "chia_full_node_simulator: started" in start_result.output
+    assert "cactus_full_node_simulator: started" in start_result.output
     assert "Genesis block generated, exiting." in start_result.output
     try:
         # run all tests
@@ -42,7 +42,7 @@ def test_custom_farming_address() -> None:
     )
     assert start_result.exit_code == 0
     assert f"Farming & Prefarm reward address: {address}" in start_result.output
-    assert "chia_full_node_simulator: started" in start_result.output
+    assert "cactus_full_node_simulator: started" in start_result.output
     assert "Genesis block generated, exiting." in start_result.output
 
     try:
@@ -59,7 +59,7 @@ def stop_simulator(runner: CliRunner) -> None:
     """Stop simulator."""
     result: Result = runner.invoke(cli, ["dev", "sim", "-n", "ci_test", "-n", "ci_test", "stop", "-d"])
     assert result.exit_code == 0
-    assert "chia_full_node_simulator: Stopped\nDaemon stopped\n" == result.output
+    assert "cactus_full_node_simulator: Stopped\nDaemon stopped\n" == result.output
     rmtree(SIMULATOR_ROOT_PATH / "ci_test")
 
 
@@ -78,7 +78,7 @@ def _test_sim_status(runner: CliRunner, address: str) -> None:
 
     assert "Network: simulator0" and "Current Blockchain Status: Full Node Synced" in result.output  # default
     assert "Height:          1" in result.output  # default
-    assert f"Current Farming address: {address}, with a balance of: 21000000.0 TXCH." in result.output  # default
+    assert f"Current Farming address: {address}, with a balance of: 21000000.0 TCAC." in result.output  # default
 
     assert (
         f"Address: {address} has a balance of: 21000000000000000000 mojo, with a total of: 2 transactions."

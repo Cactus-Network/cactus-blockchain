@@ -4,8 +4,8 @@ from typing import Any, Dict
 
 import pytest
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.network import is_trusted_peer
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.network import is_trusted_peer
 
 
 @pytest.mark.parametrize(

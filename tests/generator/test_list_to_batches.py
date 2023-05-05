@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from chia.util.generator_tools import list_to_batches
+from cactus.util.generator_tools import list_to_batches
 
 
 def test_empty_lists():

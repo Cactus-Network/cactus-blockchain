@@ -119,7 +119,7 @@ jobs:
                 ${{ inputs.matrix_mode }}: True
 
     env:
-      CHIA_ROOT: ${{ github.workspace }}/.chia/mainnet
+      CACTUS_ROOT: ${{ github.workspace }}/.cactus/mainnet
       JOB_FILE_NAME: tests_${{ matrix.os.file_name }}_python-${{ matrix.python.file_name }}_${{ matrix.configuration.name }}
       BLOCKS_AND_PLOTS_VERSION: 0.29.0
 
@@ -134,22 +134,22 @@ jobs:
           fetch-depth: 0
 
       - name: Set Env
-        uses: Chia-Network/actions/setjobenv@main
+        uses: Cactus-Network/actions/setjobenv@main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python environment
-        uses: Chia-Network/actions/setup-python@main
+        uses: Cactus-Network/actions/setup-python@main
         with:
           python-version: ${{ matrix.python.action }}
 
       - name: Create keychain for CI use (macOS)
         if: matrix.os.matrix == 'macos'
         run: |
-          security create-keychain -p foo chiachain
-          security default-keychain -s chiachain
-          security unlock-keychain -p foo chiachain
-          security set-keychain-settings -t 7200 -u chiachain
+          security create-keychain -p foo cactuschain
+          security default-keychain -s cactuschain
+          security unlock-keychain -p foo cactuschain
+          security set-keychain-settings -t 7200 -u cactuschain
 
       - name: Cache npm (Ubuntu)
         if: matrix.os.matrix == 'ubuntu'
@@ -187,8 +187,8 @@ jobs:
         id: test-blocks-plots
         with:
           path: |
-            ${{ github.workspace }}/.chia/blocks
-            ${{ github.workspace }}/.chia/test-plots
+            ${{ github.workspace }}/.cactus/blocks
+            ${{ github.workspace }}/.cactus/test-plots
           key: ${{ env.BLOCKS_AND_PLOTS_VERSION }}
 
       - name: Checkout test blocks and plots (macOS, Ubuntu)
@@ -196,19 +196,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release download -R Chia-Network/test-cache 0.29.0 --archive=tar.gz -O - | tar xzf -
-          mkdir ${{ github.workspace }}/.chia
-          mv ${{ github.workspace }}/test-cache-${{ env.BLOCKS_AND_PLOTS_VERSION }}/* ${{ github.workspace }}/.chia
+          gh release download -R Cactus-Network/test-cache 0.29.0 --archive=tar.gz -O - | tar xzf -
+          mkdir ${{ github.workspace }}/.cactus
+          mv ${{ github.workspace }}/test-cache-${{ env.BLOCKS_AND_PLOTS_VERSION }}/* ${{ github.workspace }}/.cactus
 
       - name: Checkout test blocks and plots (Windows)
         if: steps.test-blocks-plots.outputs.cache-hit != 'true' && matrix.os.matrix == 'windows'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release download -R Chia-Network/test-cache ${{ env.BLOCKS_AND_PLOTS_VERSION }} --archive=zip -O blocks_and_plots.zip
+          gh release download -R Cactus-Network/test-cache ${{ env.BLOCKS_AND_PLOTS_VERSION }} --archive=zip -O blocks_and_plots.zip
           Expand-Archive blocks_and_plots.zip -DestinationPath .
-          mkdir ${{ github.workspace }}/.chia
-          mv ${{ github.workspace }}/test-cache-${{ env.BLOCKS_AND_PLOTS_VERSION }}/* ${{ github.workspace }}/.chia
+          mkdir ${{ github.workspace }}/.cactus
+          mv ${{ github.workspace }}/test-cache-${{ env.BLOCKS_AND_PLOTS_VERSION }}/* ${{ github.workspace }}/.cactus
 
       - name: Install boost (macOS)
         if: matrix.os.matrix == 'macos'
@@ -221,7 +221,7 @@ jobs:
           development: true
           legacy_keyring: ${{ matrix.configuration.legacy_keyring_required }}
 
-      - uses: chia-network/actions/activate-venv@main
+      - uses: cactus-network/actions/activate-venv@main
 
       - name: Install timelord
         if: matrix.configuration.install_timelord
@@ -233,7 +233,7 @@ jobs:
         env:
           ENABLE_PYTEST_MONITOR: ${{ matrix.os.matrix == 'ubuntu' && matrix.configuration.enable_pytest_monitor || '' }}
         run: |
-          pytest --cov=chia --cov=tests --cov-config=.coveragerc --cov-report= --durations=10 ${{ matrix.configuration.pytest_parallel_args[matrix.os.matrix] }} -m "not benchmark" ${{ env.ENABLE_PYTEST_MONITOR }} ${{ matrix.configuration.test_files }}
+          pytest --cov=cactus --cov=tests --cov-config=.coveragerc --cov-report= --durations=10 ${{ matrix.configuration.pytest_parallel_args[matrix.os.matrix] }} -m "not benchmark" ${{ env.ENABLE_PYTEST_MONITOR }} ${{ matrix.configuration.test_files }}
 
       - name: Process coverage data
         run: |

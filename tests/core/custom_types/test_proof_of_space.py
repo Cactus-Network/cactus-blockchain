@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from secrets import token_bytes
 
-from chia.consensus.default_constants import DEFAULT_CONSTANTS
-from chia.types.blockchain_format.proof_of_space import passes_plot_filter
+from cactus.consensus.default_constants import DEFAULT_CONSTANTS
+from cactus.types.blockchain_format.proof_of_space import passes_plot_filter
 
 
 class TestProofOfSpace:

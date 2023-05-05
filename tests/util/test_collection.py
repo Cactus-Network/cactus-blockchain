@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from chia.util.collection import find_duplicates
+from cactus.util.collection import find_duplicates
 
 
 def test_find_duplicates() -> None:

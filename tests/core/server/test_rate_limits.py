@@ -5,17 +5,17 @@ from typing import List
 
 import pytest
 
-from chia.protocols.protocol_message_types import ProtocolMessageTypes
-from chia.protocols.shared_protocol import Capability
-from chia.server.outbound_message import make_msg
-from chia.server.rate_limit_numbers import compose_rate_limits, get_rate_limits_to_use
-from chia.server.rate_limit_numbers import rate_limits as rl_numbers
-from chia.server.rate_limits import RateLimiter
-from chia.server.server import ChiaServer
-from chia.server.ws_connection import WSChiaConnection
-from chia.simulator.block_tools import test_constants
-from chia.types.peer_info import PeerInfo
-from chia.util.ints import uint16
+from cactus.protocols.protocol_message_types import ProtocolMessageTypes
+from cactus.protocols.shared_protocol import Capability
+from cactus.server.outbound_message import make_msg
+from cactus.server.rate_limit_numbers import compose_rate_limits, get_rate_limits_to_use
+from cactus.server.rate_limit_numbers import rate_limits as rl_numbers
+from cactus.server.rate_limits import RateLimiter
+from cactus.server.server import CactusServer
+from cactus.server.ws_connection import WSCactusConnection
+from cactus.simulator.block_tools import test_constants
+from cactus.types.peer_info import PeerInfo
+from cactus.util.ints import uint16
 from tests.conftest import node_with_params
 
 constants = test_constants
@@ -306,16 +306,16 @@ class TestRateLimits:
         node_a = node_with_params
         node_b = node_with_params_b
 
-        full_node_server_a: ChiaServer = node_a.full_node.server
-        full_node_server_b: ChiaServer = node_b.full_node.server
+        full_node_server_a: CactusServer = node_a.full_node.server
+        full_node_server_b: CactusServer = node_b.full_node.server
 
         await full_node_server_b.start_client(PeerInfo(self_hostname, uint16(full_node_server_a._port)), None)
 
         assert len(full_node_server_b.get_connections()) == 1
         assert len(full_node_server_a.get_connections()) == 1
 
-        a_con: WSChiaConnection = full_node_server_a.get_connections()[0]
-        b_con: WSChiaConnection = full_node_server_b.get_connections()[0]
+        a_con: WSCactusConnection = full_node_server_a.get_connections()[0]
+        b_con: WSCactusConnection = full_node_server_b.get_connections()[0]
 
         print(a_con.local_capabilities, a_con.peer_capabilities)
         print(b_con.local_capabilities, b_con.peer_capabilities)
