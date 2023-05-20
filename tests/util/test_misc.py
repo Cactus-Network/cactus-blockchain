@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from chia.util.errors import InvalidPathError
-from chia.util.misc import format_bytes, format_minutes, validate_directory_writable
+from cactus.util.errors import InvalidPathError
+from cactus.util.misc import format_bytes, format_minutes, validate_directory_writable
 
 
 class TestMisc:

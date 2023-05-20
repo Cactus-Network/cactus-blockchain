@@ -34,7 +34,7 @@ jobs:
         fetch-depth: 0
         submodules: recursive
 
-    - uses: Chia-Network/actions/setup-python@main
+    - uses: Cactus-Network/actions/setup-python@main
       name: Install Python
       with:
         python-version: '3.8'
@@ -54,7 +54,7 @@ jobs:
         python-version: '3.8'
         development: true
 
-    - uses: chia-network/actions/activate-venv@main
+    - uses: cactus-network/actions/activate-venv@main
 
     - name: Lint source with black
       run: |
@@ -62,7 +62,7 @@ jobs:
 
     - name: Lint source with flake8
       run: |
-        flake8 benchmarks build_scripts chia tests tools *.py
+        flake8 benchmarks build_scripts cactus tests tools *.py
 
     - name: Lint source with mypy
       run: |
@@ -71,7 +71,7 @@ jobs:
 
     - name: Lint source with pylint
       run: |
-        pylint benchmarks build_scripts chia tests tools *.py
+        pylint benchmarks build_scripts cactus tests tools *.py
 
     - name: Build source distribution
       run: |

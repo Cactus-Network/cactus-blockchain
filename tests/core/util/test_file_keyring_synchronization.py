@@ -8,9 +8,9 @@ from pathlib import Path
 from sys import platform
 from time import sleep
 
-from chia.simulator.keyring import TempKeyring, using_temp_file_keyring
-from chia.simulator.time_out_assert import adjusted_timeout
-from chia.util.keyring_wrapper import KeyringWrapper
+from cactus.simulator.keyring import TempKeyring, using_temp_file_keyring
+from cactus.simulator.time_out_assert import adjusted_timeout
+from cactus.util.keyring_wrapper import KeyringWrapper
 from tests.core.util.test_lockfile import wait_for_enough_files_in_directory
 
 log = logging.getLogger(__name__)

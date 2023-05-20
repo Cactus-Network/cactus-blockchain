@@ -4,15 +4,15 @@ from typing import List, Tuple
 
 import pytest
 
-from chia.protocols.shared_protocol import Capability
-from chia.server.capabilities import known_active_capabilities
-from chia.util.ints import uint16
+from cactus.protocols.shared_protocol import Capability
+from cactus.server.capabilities import known_active_capabilities
+from cactus.util.ints import uint16
 
 
 @pytest.mark.parametrize(
     argnames=["values", "expected"],
     argvalues=[
-        # nothing, not even Chia mainnet...
+        # nothing, not even Cactus mainnet...
         [[], []],
         # single valid
         [[(uint16(Capability.BASE), "1")], [Capability.BASE]],

@@ -11,4 +11,4 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        gh workflow run test.yml --repo Chia-Network/chia-blockchain --ref main
+        gh workflow run test.yml --repo Cactus-Network/cactus-blockchain --ref main

@@ -26,7 +26,7 @@ jobs:
   build:
     name: Linux arm64 DEB Installer
     runs-on: [Linux, ARM64]
-    container: chianetwork/ubuntu-18.04-builder:latest
+    container: cactusnetwork/ubuntu-18.04-builder:latest
     timeout-minutes: 120
     strategy:
       fail-fast: false
@@ -35,10 +35,10 @@ jobs:
         python-version: [3.8]
 
     steps:
-    - uses: Chia-Network/actions/clean-workspace@main
+    - uses: Cactus-Network/actions/clean-workspace@main
 
     - name: Add safe git directory
-      uses: Chia-Network/actions/git-mark-workspace-safe@main
+      uses: Cactus-Network/actions/git-mark-workspace-safe@main
 
     - name: Checkout Code
       uses: actions/checkout@v3
@@ -46,13 +46,13 @@ jobs:
         fetch-depth: 0
         submodules: recursive
 
-    - uses: Chia-Network/actions/git-ssh-to-https@main
+    - uses: Cactus-Network/actions/git-ssh-to-https@main
 
     - name: Cleanup any leftovers that exist from previous runs
       run: bash build_scripts/clean-runner.sh || true
 
     - name: Set Env
-      uses: Chia-Network/actions/setjobenv@main
+      uses: Cactus-Network/actions/setjobenv@main
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -63,7 +63,7 @@ jobs:
         python3 -m venv ../venv
         . ../venv/bin/activate
         pip3 install setuptools_scm
-        echo "CHIA_INSTALLER_VERSION=$(python3 ./build_scripts/installer-version.py)" >> $GITHUB_OUTPUT
+        echo "CACTUS_INSTALLER_VERSION=$(python3 ./build_scripts/installer-version.py)" >> $GITHUB_OUTPUT
         deactivate
 
     - name: Test for secrets access
@@ -86,21 +86,21 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        LATEST_MADMAX=$(gh api repos/Chia-Network/chia-plotter-madmax/releases/latest --jq 'select(.prerelease == false) | .tag_name')
+        LATEST_MADMAX=$(gh api repos/Cactus-Network/cactus-plotter-madmax/releases/latest --jq 'select(.prerelease == false) | .tag_name')
         mkdir "$GITHUB_WORKSPACE/madmax"
-        gh release download -R Chia-Network/chia-plotter-madmax $LATEST_MADMAX -p 'chia_plot-*-arm64' -O $GITHUB_WORKSPACE/madmax/chia_plot
-        gh release download -R Chia-Network/chia-plotter-madmax $LATEST_MADMAX -p 'chia_plot_k34-*-arm64' -O $GITHUB_WORKSPACE/madmax/chia_plot_k34
-        chmod +x "$GITHUB_WORKSPACE/madmax/chia_plot"
-        chmod +x "$GITHUB_WORKSPACE/madmax/chia_plot_k34"
+        gh release download -R Cactus-Network/cactus-plotter-madmax $LATEST_MADMAX -p 'cactus_plot-*-arm64' -O $GITHUB_WORKSPACE/madmax/cactus_plot
+        gh release download -R Cactus-Network/cactus-plotter-madmax $LATEST_MADMAX -p 'cactus_plot_k34-*-arm64' -O $GITHUB_WORKSPACE/madmax/cactus_plot_k34
+        chmod +x "$GITHUB_WORKSPACE/madmax/cactus_plot"
+        chmod +x "$GITHUB_WORKSPACE/madmax/cactus_plot_k34"
 
     - name: Get latest bladebit plotter
       if: '!github.event.release.prerelease'
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        LATEST_BLADEBIT=$(gh api repos/Chia-Network/bladebit/releases/latest --jq 'select(.prerelease == false) | .tag_name')
+        LATEST_BLADEBIT=$(gh api repos/Cactus-Network/bladebit/releases/latest --jq 'select(.prerelease == false) | .tag_name')
         mkdir "$GITHUB_WORKSPACE/bladebit"
-        gh release download -R Chia-Network/bladebit $LATEST_BLADEBIT -p '*-ubuntu-arm64.tar.gz' -O - | tar -xz -C $GITHUB_WORKSPACE/bladebit
+        gh release download -R Cactus-Network/bladebit $LATEST_BLADEBIT -p '*-ubuntu-arm64.tar.gz' -O - | tar -xz -C $GITHUB_WORKSPACE/bladebit
         chmod +x "$GITHUB_WORKSPACE/bladebit/bladebit"
 
     - name: Get latest prerelease bladebit plotter
@@ -108,9 +108,9 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        LATEST_PRERELEASE=$(gh api repos/Chia-Network/bladebit/releases --jq 'map(select(.prerelease)) | first | .tag_name')
+        LATEST_PRERELEASE=$(gh api repos/Cactus-Network/bladebit/releases --jq 'map(select(.prerelease)) | first | .tag_name')
         mkdir "$GITHUB_WORKSPACE/bladebit"
-        gh release download -R Chia-Network/bladebit $LATEST_PRERELEASE -p '*ubuntu-arm64.tar.gz' -O - | tar -xz -C $GITHUB_WORKSPACE/bladebit
+        gh release download -R Cactus-Network/bladebit $LATEST_PRERELEASE -p '*ubuntu-arm64.tar.gz' -O - | tar -xz -C $GITHUB_WORKSPACE/bladebit
         chmod +x "$GITHUB_WORKSPACE/bladebit/bladebit"
 
     - uses: ./.github/actions/install
@@ -118,23 +118,23 @@ jobs:
         python-version: ${{ matrix.python-version }}
         development: true
 
-    - uses: chia-network/actions/activate-venv@main
+    - uses: cactus-network/actions/activate-venv@main
 
     - name: Prepare GUI cache
       id: gui-ref
       run: |
-        gui_ref=$(git submodule status chia-blockchain-gui | sed -e 's/^ //g' -e 's/ chia-blockchain-gui.*$//g')
+        gui_ref=$(git submodule status cactus-blockchain-gui | sed -e 's/^ //g' -e 's/ cactus-blockchain-gui.*$//g')
         echo "${gui_ref}"
         echo "GUI_REF=${gui_ref}" >> $GITHUB_OUTPUT
-        echo "rm -rf ./chia-blockchain-gui"
-        rm -rf ./chia-blockchain-gui
+        echo "rm -rf ./cactus-blockchain-gui"
+        rm -rf ./cactus-blockchain-gui
 
     - name: Cache GUI
       uses: actions/cache@v3
       id: cache-gui
       with:
-        path: ./chia-blockchain-gui
-        key: ${{ runner.os }}-arm64-chia-blockchain-gui-${{ steps.gui-ref.outputs.GUI_REF }}
+        path: ./cactus-blockchain-gui
+        key: ${{ runner.os }}-arm64-cactus-blockchain-gui-${{ steps.gui-ref.outputs.GUI_REF }}
 
     - if: steps.cache-gui.outputs.cache-hit != 'true'
       name: Build GUI
@@ -145,7 +145,7 @@ jobs:
 
     - name: Build arm64 .deb package
       env:
-        CHIA_INSTALLER_VERSION: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       run: |
         ldd --version
         cd ./build_scripts
@@ -154,7 +154,7 @@ jobs:
     - name: Upload Linux artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: chia-installers-linux-deb-arm64
+        name: cactus-installers-linux-deb-arm64
         path: ${{ github.workspace }}/build_scripts/final_installer/
 
     - name: Configure AWS Credentials
@@ -168,55 +168,55 @@ jobs:
     - name: Upload to s3
       if: steps.check_secrets.outputs.HAS_AWS_SECRET
       env:
-        CHIA_INSTALLER_VERSION: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       run: |
         GIT_SHORT_HASH=$(echo "${GITHUB_SHA}" | cut -c1-8)
-        CHIA_DEV_BUILD=${CHIA_INSTALLER_VERSION}-$GIT_SHORT_HASH
-        echo "CHIA_DEV_BUILD=$CHIA_DEV_BUILD" >>$GITHUB_ENV
-        aws s3 cp "$GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb" "s3://download.chia.net/dev/chia-blockchain_${CHIA_DEV_BUILD}_arm64.deb"
-        aws s3 cp "$GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb" "s3://download.chia.net/dev/chia-blockchain-cli_${CHIA_DEV_BUILD}-1_arm64.deb"
+        CACTUS_DEV_BUILD=${CACTUS_INSTALLER_VERSION}-$GIT_SHORT_HASH
+        echo "CACTUS_DEV_BUILD=$CACTUS_DEV_BUILD" >>$GITHUB_ENV
+        aws s3 cp "$GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb" "s3://download.cactus-network.net/dev/cactus-blockchain_${CACTUS_DEV_BUILD}_arm64.deb"
+        aws s3 cp "$GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb" "s3://download.cactus-network.net/dev/cactus-blockchain-cli_${CACTUS_DEV_BUILD}-1_arm64.deb"
 
     - name: Create Checksums
       if: env.FULL_RELEASE == 'true' || github.ref == 'refs/heads/main'
       env:
-        CHIA_INSTALLER_VERSION: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       run: |
         ls $GITHUB_WORKSPACE/build_scripts/final_installer/
-        sha256sum $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb > $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb.sha256
-        sha256sum $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb > $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb.sha256
+        sha256sum $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb > $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb.sha256
+        sha256sum $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb > $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb.sha256
         ls $GITHUB_WORKSPACE/build_scripts/final_installer/
 
     - name: Create torrent
       if: env.FULL_RELEASE == 'true'
       env:
-        CHIA_INSTALLER_VERSION: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb -o $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb.torrent --webseed https://download.chia.net/install/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb
-        py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb -o $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb.torrent --webseed https://download.chia.net/install/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb
-        gh release upload $RELEASE_TAG $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb.torrent
+        py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb -o $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb.torrent --webseed https://download.cactus-network.net/install/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb
+        py3createtorrent -f -t udp://tracker.opentrackr.org:1337/announce $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb -o $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb.torrent --webseed https://download.cactus-network.net/install/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb
+        gh release upload $RELEASE_TAG $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb.torrent
 
     - name: Upload Dev Installer
       if: steps.check_secrets.outputs.HAS_AWS_SECRET && github.ref == 'refs/heads/main'
       env:
-        CHIA_INSTALLER_VERSION: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       run: |
-        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb s3://download.chia.net/latest-dev/chia-blockchain_arm64_latest_dev.deb
-        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb.sha256 s3://download.chia.net/latest-dev/chia-blockchain_arm64_latest_dev.deb.sha256
-        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb s3://download.chia.net/latest-dev/chia-blockchain-cli_arm64_latest_dev.deb
-        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb.sha256 s3://download.chia.net/latest-dev/chia-blockchain-cli_arm64_latest_dev.deb.sha256
+        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb s3://download.cactus-network.net/latest-dev/cactus-blockchain_arm64_latest_dev.deb
+        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb.sha256 s3://download.cactus-network.net/latest-dev/cactus-blockchain_arm64_latest_dev.deb.sha256
+        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb s3://download.cactus-network.net/latest-dev/cactus-blockchain-cli_arm64_latest_dev.deb
+        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb.sha256 s3://download.cactus-network.net/latest-dev/cactus-blockchain-cli_arm64_latest_dev.deb.sha256
 
     - name: Upload Release Files
       if: steps.check_secrets.outputs.HAS_AWS_SECRET && env.FULL_RELEASE == 'true'
       env:
-        CHIA_INSTALLER_VERSION: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       run: |
-        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb s3://download.chia.net/install/
-        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb.sha256 s3://download.chia.net/install/
-        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb.torrent s3://download.chia.net/torrents/
-        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb s3://download.chia.net/install/
-        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb.sha256 s3://download.chia.net/install/
-        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb.torrent s3://download.chia.net/torrents/
+        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb s3://download.cactus-network.net/install/
+        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb.sha256 s3://download.cactus-network.net/install/
+        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb.torrent s3://download.cactus-network.net/torrents/
+        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb s3://download.cactus-network.net/install/
+        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb.sha256 s3://download.cactus-network.net/install/
+        aws s3 cp $GITHUB_WORKSPACE/build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb.torrent s3://download.cactus-network.net/torrents/
 
     - name: Get tag name
       if: startsWith(github.ref, 'refs/tags/')
@@ -229,17 +229,17 @@ jobs:
       if: env.RELEASE == 'true'
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CHIA_INSTALLER_VERSION: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+        CACTUS_INSTALLER_VERSION: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
       run: |
         gh release upload \
           $RELEASE_TAG \
-          build_scripts/final_installer/chia-blockchain_${CHIA_INSTALLER_VERSION}_arm64.deb \
-          build_scripts/final_installer/chia-blockchain-cli_${CHIA_INSTALLER_VERSION}-1_arm64.deb
+          build_scripts/final_installer/cactus-blockchain_${CACTUS_INSTALLER_VERSION}_arm64.deb \
+          build_scripts/final_installer/cactus-blockchain-cli_${CACTUS_INSTALLER_VERSION}-1_arm64.deb
 
     - name: Mark installer complete
       if: steps.check_secrets.outputs.HAS_GLUE_SECRET && env.FULL_RELEASE == 'true'
       run: |
-        curl -s -XPOST -H "Authorization: Bearer ${{ secrets.GLUE_ACCESS_TOKEN }}" --data '{"chia_ref": "${{ steps.tag-name.outputs.TAG_NAME }}"}' ${{ secrets.GLUE_API_URL }}/api/v1/${{ steps.tag-name.outputs.REPO_NAME }}/${{ steps.tag-name.outputs.TAG_NAME }}/success/build-arm
+        curl -s -XPOST -H "Authorization: Bearer ${{ secrets.GLUE_ACCESS_TOKEN }}" --data '{"cactus_ref": "${{ steps.tag-name.outputs.TAG_NAME }}"}' ${{ secrets.GLUE_API_URL }}/api/v1/${{ steps.tag-name.outputs.REPO_NAME }}/${{ steps.tag-name.outputs.TAG_NAME }}/success/build-arm
 
     - name: Clean up on self hosted runner
       run: |
@@ -247,4 +247,4 @@ jobs:
 
     - name: Remove working files to exclude from cache
       run: |
-        rm -rf ./chia-blockchain-gui/packages/gui/daemon
+        rm -rf ./cactus-blockchain-gui/packages/gui/daemon

@@ -7,7 +7,7 @@ from typing import Type, Union
 
 import pytest
 
-from chia.util.network import IPAddress, resolve
+from cactus.util.network import IPAddress, resolve
 
 
 class TestNetwork:

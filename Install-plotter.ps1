@@ -41,7 +41,7 @@ function get_bladebit_url()
         [string]$arch
     )
 
-    $GITHUB_BASE_URL = "https://github.com/Chia-Network/bladebit/releases/download"
+    $GITHUB_BASE_URL = "https://github.com/Cactus-Network/bladebit/releases/download"
     $filename = get_bladebit_filename -ver $ver -os $os -arch $arch
 
     "${GITHUB_BASE_URL}/${ver}/${filename}"
@@ -56,10 +56,10 @@ function get_madmax_filename()
         [string]$arch
     )
 
-    $chia_plot = "chia_plot"
+    $cactus_plot = "cactus_plot"
     if ("${ksize}" -eq "k34")
     {
-        $chia_plot = "chia_plot_k34"
+        $cactus_plot = "cactus_plot_k34"
     }
     $suffix = ""
     if ("${os}" -eq "macos")
@@ -75,7 +75,7 @@ function get_madmax_filename()
         $suffix = "-${arch}"
     }
 
-    "${chia_plot}-${ver}${suffix}"
+    "${cactus_plot}-${ver}${suffix}"
 }
 
 function get_madmax_url()
@@ -87,7 +87,7 @@ function get_madmax_url()
         [string]$arch
     )
 
-    $GITHUB_BASE_URL = "https://github.com/Chia-Network/chia-plotter-madmax/releases/download"
+    $GITHUB_BASE_URL = "https://github.com/Cactus-Network/cactus-plotter-madmax/releases/download"
     $madmax_filename = get_madmax_filename -ksize $ksize -ver $ver -os $os -arch $arch
 
     "${GITHUB_BASE_URL}/${ver}/${madmax_filename}"
@@ -102,7 +102,7 @@ $ARCH = "x86-64"
 
 if ($null -eq (Get-ChildItem env:VIRTUAL_ENV -ErrorAction SilentlyContinue))
 {
-    Write-Output "This script requires that the Chia Python virtual environment is activated."
+    Write-Output "This script requires that the Cactus Python virtual environment is activated."
     Write-Output "Execute '.\venv\Scripts\Activate.ps1' before running."
     Exit 1
 }
@@ -159,9 +159,9 @@ try {
         $URL = get_madmax_url -ksize k32 -ver "${VERSION}" -os "${OS}" -arch "${ARCH}"
         Write-Output "Fetching binary from: ${URL}"
         try {
-            Invoke-WebRequest -Uri "$URL" -Outfile "chia_plot.exe"
+            Invoke-WebRequest -Uri "$URL" -Outfile "cactus_plot.exe"
             Write-Output "Successfully downloaded: $URL"
-            Write-Output "Successfully installed madmax to $(Get-Location)\chia_plot.exe"
+            Write-Output "Successfully installed madmax to $(Get-Location)\cactus_plot.exe"
         }
         catch {
             Write-Output "ERROR: Download failed. Maybe specified version of the binary does not exist."
@@ -173,9 +173,9 @@ try {
         $URL = get_madmax_url -ksize k34 -ver "${VERSION}" -os "${OS}" -arch "${ARCH}"
         Write-Output "Fetching binary from: ${URL}"
         try {
-            Invoke-WebRequest -Uri "$URL" -Outfile "chia_plot_k34.exe"
+            Invoke-WebRequest -Uri "$URL" -Outfile "cactus_plot_k34.exe"
             Write-Output "Successfully downloaded: $URL"
-            Write-Output "Successfully installed madmax for k34 to $(Get-Location)\chia_plot_k34.exe"
+            Write-Output "Successfully installed madmax for k34 to $(Get-Location)\cactus_plot_k34.exe"
         }
         catch {
             Write-Output "madmax for k34 is not found"

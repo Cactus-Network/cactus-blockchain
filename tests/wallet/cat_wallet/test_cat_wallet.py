@@ -5,20 +5,20 @@ from typing import List
 
 import pytest
 
-from chia.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
-from chia.rpc.wallet_rpc_api import WalletRpcApi
-from chia.simulator.simulator_protocol import FarmNewBlockProtocol, ReorgProtocol
-from chia.simulator.time_out_assert import time_out_assert
-from chia.types.blockchain_format.coin import Coin
-from chia.types.peer_info import PeerInfo
-from chia.util.ints import uint16, uint32, uint64
-from chia.wallet.cat_wallet.cat_constants import DEFAULT_CATS
-from chia.wallet.cat_wallet.cat_info import LegacyCATInfo
-from chia.wallet.cat_wallet.cat_utils import construct_cat_puzzle
-from chia.wallet.cat_wallet.cat_wallet import CATWallet
-from chia.wallet.puzzles.cat_loader import CAT_MOD
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.wallet_info import WalletInfo
+from cactus.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
+from cactus.rpc.wallet_rpc_api import WalletRpcApi
+from cactus.simulator.simulator_protocol import FarmNewBlockProtocol, ReorgProtocol
+from cactus.simulator.time_out_assert import time_out_assert
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.peer_info import PeerInfo
+from cactus.util.ints import uint16, uint32, uint64
+from cactus.wallet.cat_wallet.cat_constants import DEFAULT_CATS
+from cactus.wallet.cat_wallet.cat_info import LegacyCATInfo
+from cactus.wallet.cat_wallet.cat_utils import construct_cat_puzzle
+from cactus.wallet.cat_wallet.cat_wallet import CATWallet
+from cactus.wallet.puzzles.cat_loader import CAT_MOD
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.wallet_info import WalletInfo
 
 
 class TestCATWallet:
