@@ -4,11 +4,11 @@ set -o errexit
 
 echo "Installing global npm packages"
 cd npm_linux || exit 1
-npm ci
+npm i
 PATH=$(npm bin):$PATH
 
 cd ../../ || exit 1
-git submodule update --init cactus-blockchain-gui
+#git submodule update --init cactus-blockchain-gui
 
 cd ./cactus-blockchain-gui || exit 1
 

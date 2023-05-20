@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "electron": "^24.3.1"
+  }
+}
