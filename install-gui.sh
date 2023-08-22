@@ -185,10 +185,10 @@ echo ""
 if [ ! "$CI" ]; then
   echo "Running git submodule update --init --recursive."
   echo ""
-  #git submodule update --init --recursive
+  git submodule update --init --recursive
   echo "Running git submodule update."
   echo ""
-  #git submodule update
+  git submodule update
   cd cactus-blockchain-gui
 
   if [ "$SUBMODULE_BRANCH" ];
