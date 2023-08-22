@@ -7,11 +7,11 @@ from typing import Dict, List
 import pytest
 from blspy import AugSchemeMPL
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.ints import uint32
-from chia.wallet.derivation_record import DerivationRecord
-from chia.wallet.util.wallet_types import WalletIdentifier, WalletType
-from chia.wallet.wallet_puzzle_store import WalletPuzzleStore
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.ints import uint32
+from cactus.wallet.derivation_record import DerivationRecord
+from cactus.wallet.util.wallet_types import WalletIdentifier, WalletType
+from cactus.wallet.wallet_puzzle_store import WalletPuzzleStore
 from tests.util.db_connection import DBConnection
 
 

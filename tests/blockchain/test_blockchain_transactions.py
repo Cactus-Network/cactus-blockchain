@@ -6,18 +6,18 @@ from typing import Tuple
 import pytest
 from clvm.casts import int_to_bytes
 
-from chia.full_node.full_node_api import FullNodeAPI
-from chia.protocols import wallet_protocol
-from chia.server.server import ChiaServer
-from chia.simulator.block_tools import BlockTools, test_constants
-from chia.simulator.wallet_tools import WalletTool
-from chia.types.announcement import Announcement
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.condition_opcodes import ConditionOpcode
-from chia.types.condition_with_args import ConditionWithArgs
-from chia.types.spend_bundle import SpendBundle
-from chia.util.errors import ConsensusError, Err
-from chia.util.ints import uint32, uint64
+from cactus.full_node.full_node_api import FullNodeAPI
+from cactus.protocols import wallet_protocol
+from cactus.server.server import CactusServer
+from cactus.simulator.block_tools import BlockTools, test_constants
+from cactus.simulator.wallet_tools import WalletTool
+from cactus.types.announcement import Announcement
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.condition_opcodes import ConditionOpcode
+from cactus.types.condition_with_args import ConditionWithArgs
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.errors import ConsensusError, Err
+from cactus.util.ints import uint32, uint64
 from tests.blockchain.blockchain_test_utils import _validate_and_add_block
 from tests.util.generator_tools_testing import run_and_get_removals_and_additions
 
@@ -32,7 +32,7 @@ log = logging.getLogger(__name__)
 class TestBlockchainTransactions:
     @pytest.mark.asyncio
     async def test_basic_blockchain_tx(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 10
         wallet_a = WALLET_A
@@ -96,7 +96,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_validate_blockchain_with_double_spend(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 5
         wallet_a = WALLET_A
@@ -136,7 +136,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_validate_blockchain_duplicate_output(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 3
         wallet_a = WALLET_A
@@ -176,7 +176,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_validate_blockchain_with_reorg_double_spend(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 10
         wallet_a = WALLET_A
@@ -285,7 +285,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_validate_blockchain_spend_reorg_coin(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools], softfork_height: uint32
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools], softfork_height: uint32
     ) -> None:
         num_blocks = 10
         wallet_a = WALLET_A
@@ -373,7 +373,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_validate_blockchain_spend_reorg_cb_coin(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 15
         wallet_a = WALLET_A
@@ -418,7 +418,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_validate_blockchain_spend_reorg_since_genesis(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 10
         wallet_a = WALLET_A
@@ -469,7 +469,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_assert_my_coin_id(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 10
         wallet_a = WALLET_A
@@ -541,7 +541,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_assert_coin_announcement_consumed(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 10
         wallet_a = WALLET_A
@@ -625,7 +625,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_assert_puzzle_announcement_consumed(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 10
         wallet_a = WALLET_A
@@ -709,7 +709,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_assert_height_absolute(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 10
         wallet_a = WALLET_A
@@ -775,7 +775,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_assert_height_relative(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 11
         wallet_a = WALLET_A
@@ -843,7 +843,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_assert_seconds_relative(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 10
         wallet_a = WALLET_A
@@ -902,7 +902,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_assert_seconds_absolute(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 10
         wallet_a = WALLET_A
@@ -963,7 +963,7 @@ class TestBlockchainTransactions:
 
     @pytest.mark.asyncio
     async def test_assert_fee_condition(
-        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, ChiaServer, ChiaServer, BlockTools]
+        self, two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools]
     ) -> None:
         num_blocks = 10
         wallet_a = WALLET_A

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from chia.full_node.full_node_api import FullNodeAPI
-from chia.util.ints import uint32
+from cactus.full_node.full_node_api import FullNodeAPI
+from cactus.util.ints import uint32
 
 
 def node_height_at_least(node: FullNodeAPI, h: uint32) -> bool:

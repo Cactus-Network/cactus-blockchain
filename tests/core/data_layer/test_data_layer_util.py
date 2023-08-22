@@ -8,7 +8,7 @@ import pytest
 # TODO: update after resolution in https://github.com/pytest-dev/pytest/issues/7469
 from _pytest.fixtures import SubRequest
 
-from chia.data_layer.data_layer_util import (
+from cactus.data_layer.data_layer_util import (
     ClearPendingRootsRequest,
     ClearPendingRootsResponse,
     ProofOfInclusion,
@@ -17,8 +17,8 @@ from chia.data_layer.data_layer_util import (
     Side,
     Status,
 )
-from chia.rpc.data_layer_rpc_util import MarshallableProtocol
-from chia.types.blockchain_format.sized_bytes import bytes32
+from cactus.rpc.data_layer_rpc_util import MarshallableProtocol
+from cactus.types.blockchain_format.sized_bytes import bytes32
 from tests.util.misc import Marks, datacases
 
 pytestmark = pytest.mark.data_layer

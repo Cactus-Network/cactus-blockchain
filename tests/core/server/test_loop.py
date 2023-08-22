@@ -14,14 +14,14 @@ from typing import AsyncIterator, List, Optional
 import anyio
 import pytest
 
-from chia.server import chia_policy
+from cactus.server import cactus_policy
 from tests.core.server import serve
 
 here = pathlib.Path(__file__).parent
 
 # TODO: CAMPid 0945094189459712842390t591
 IP = "127.0.0.1"
-PORT = 8444
+PORT = 11444
 NUM_CLIENTS = 500
 
 
@@ -96,9 +96,9 @@ class ServeInThread:
     port_holder: List[int] = field(default_factory=list)
 
     def start(self) -> None:
-        self.original_connection_limit = chia_policy.global_max_concurrent_connections
+        self.original_connection_limit = cactus_policy.global_max_concurrent_connections
         # TODO: yuck yuck, messes with a single global
-        chia_policy.global_max_concurrent_connections = self.connection_limit
+        cactus_policy.global_max_concurrent_connections = self.connection_limit
 
         self.thread = threading.Thread(target=self._run)
         self.thread.start()
@@ -110,7 +110,7 @@ class ServeInThread:
     def _run(self) -> None:
         # TODO: yuck yuck, messes with a single global
         original_event_loop_policy = asyncio.get_event_loop_policy()
-        asyncio.set_event_loop_policy(chia_policy.ChiaPolicy())
+        asyncio.set_event_loop_policy(cactus_policy.CactusPolicy())
         try:
             asyncio.run(self.main())
         finally:
@@ -140,7 +140,7 @@ class ServeInThread:
         self.thread.join()
 
         if self.original_connection_limit is not None:
-            chia_policy.global_max_concurrent_connections = self.original_connection_limit
+            cactus_policy.global_max_concurrent_connections = self.original_connection_limit
 
 
 @pytest.mark.asyncio
@@ -205,7 +205,7 @@ async def test_loop() -> None:
             if count > connection_limit + allowed_over_connections:
                 over.append(count)
 
-        # mark = "ChiaProactor._chia_accept_loop() entering count="
+        # mark = "CactusProactor._cactus_accept_loop() entering count="
         # if mark in line:
         #     _, _, rest = line.partition(mark)
         #     count = int(rest)

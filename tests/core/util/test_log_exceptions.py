@@ -8,7 +8,7 @@ from typing import Tuple, Type, Union
 
 import pytest
 
-from chia.util.log_exceptions import log_exceptions
+from cactus.util.log_exceptions import log_exceptions
 
 log_message = "Some message that probably, hopefully, won't accidentally come from somewhere else"
 exception_message = "A message tied to the exception"

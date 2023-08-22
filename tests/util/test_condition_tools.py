@@ -6,15 +6,15 @@ import pytest
 from blspy import G1Element
 from clvm.casts import int_to_bytes
 
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32, bytes48
-from chia.types.condition_opcodes import ConditionOpcode
-from chia.types.condition_with_args import ConditionWithArgs
-from chia.types.spend_bundle_conditions import Spend, SpendBundleConditions
-from chia.util.condition_tools import parse_sexp_to_conditions, pkm_pairs, pkm_pairs_for_conditions_dict
-from chia.util.errors import ConsensusError
-from chia.util.hash import std_hash
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32, bytes48
+from cactus.types.condition_opcodes import ConditionOpcode
+from cactus.types.condition_with_args import ConditionWithArgs
+from cactus.types.spend_bundle_conditions import Spend, SpendBundleConditions
+from cactus.util.condition_tools import parse_sexp_to_conditions, pkm_pairs, pkm_pairs_for_conditions_dict
+from cactus.util.errors import ConsensusError
+from cactus.util.hash import std_hash
 
 H1 = bytes32(b"a" * 32)
 H2 = bytes32(b"b" * 32)

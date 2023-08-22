@@ -6,18 +6,18 @@ from typing import Tuple
 import pytest
 from _pytest.capture import CaptureFixture
 
-from chia.cmds.farm_funcs import summary
-from chia.farmer.farmer import Farmer
-from chia.farmer.farmer_api import FarmerAPI
-from chia.full_node.full_node import FullNode
-from chia.harvester.harvester import Harvester
-from chia.harvester.harvester_api import HarvesterAPI
-from chia.server.start_service import Service
-from chia.simulator.block_tools import BlockTools
-from chia.simulator.full_node_simulator import FullNodeSimulator
-from chia.simulator.time_out_assert import time_out_assert
-from chia.wallet.wallet_node import WalletNode
-from chia.wallet.wallet_node_api import WalletNodeAPI
+from cactus.cmds.farm_funcs import summary
+from cactus.farmer.farmer import Farmer
+from cactus.farmer.farmer_api import FarmerAPI
+from cactus.full_node.full_node import FullNode
+from cactus.harvester.harvester import Harvester
+from cactus.harvester.harvester_api import HarvesterAPI
+from cactus.server.start_service import Service
+from cactus.simulator.block_tools import BlockTools
+from cactus.simulator.full_node_simulator import FullNodeSimulator
+from cactus.simulator.time_out_assert import time_out_assert
+from cactus.wallet.wallet_node import WalletNode
+from cactus.wallet.wallet_node_api import WalletNodeAPI
 
 
 @pytest.mark.asyncio
@@ -60,7 +60,7 @@ async def test_farm_summary_command(
     lines = match.group(1).split("\n")
 
     assert lines[0] == "Farming status: Not synced or not connected to peers"
-    assert "Total chia farmed:" in lines[1]
+    assert "Total cactus farmed:" in lines[1]
     assert "User transaction fees:" in lines[2]
     assert "Block rewards:" in lines[3]
     assert "Last height farmed:" in lines[4]

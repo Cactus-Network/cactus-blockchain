@@ -7,34 +7,34 @@ from typing import List
 
 import pytest
 
-from chia.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
-from chia.protocols.wallet_protocol import CoinState
-from chia.rpc.wallet_rpc_api import WalletRpcApi
-from chia.rpc.wallet_rpc_client import WalletRpcClient
-from chia.simulator.full_node_simulator import FullNodeSimulator
-from chia.simulator.setup_nodes import SimulatorsAndWalletsServices
-from chia.simulator.simulator_protocol import FarmNewBlockProtocol, ReorgProtocol
-from chia.simulator.time_out_assert import time_out_assert, time_out_assert_not_none
-from chia.types.blockchain_format.coin import Coin, coin_as_list
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.types.peer_info import PeerInfo
-from chia.util.bech32m import encode_puzzle_hash
-from chia.util.db_wrapper import DBWrapper2
-from chia.util.ints import uint16, uint32, uint64
-from chia.wallet.cat_wallet.cat_constants import DEFAULT_CATS
-from chia.wallet.cat_wallet.cat_info import LegacyCATInfo
-from chia.wallet.cat_wallet.cat_utils import CAT_MOD, construct_cat_puzzle
-from chia.wallet.cat_wallet.cat_wallet import CATWallet
-from chia.wallet.derivation_record import DerivationRecord
-from chia.wallet.derive_keys import _derive_path_unhardened, master_sk_to_wallet_sk_unhardened_intermediate
-from chia.wallet.lineage_proof import LineageProof
-from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import puzzle_hash_for_pk
-from chia.wallet.transaction_record import TransactionRecord
-from chia.wallet.util.wallet_types import WalletType
-from chia.wallet.wallet_info import WalletInfo
-from chia.wallet.wallet_interested_store import WalletInterestedStore
+from cactus.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
+from cactus.protocols.wallet_protocol import CoinState
+from cactus.rpc.wallet_rpc_api import WalletRpcApi
+from cactus.rpc.wallet_rpc_client import WalletRpcClient
+from cactus.simulator.full_node_simulator import FullNodeSimulator
+from cactus.simulator.setup_nodes import SimulatorsAndWalletsServices
+from cactus.simulator.simulator_protocol import FarmNewBlockProtocol, ReorgProtocol
+from cactus.simulator.time_out_assert import time_out_assert, time_out_assert_not_none
+from cactus.types.blockchain_format.coin import Coin, coin_as_list
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.peer_info import PeerInfo
+from cactus.util.bech32m import encode_puzzle_hash
+from cactus.util.db_wrapper import DBWrapper2
+from cactus.util.ints import uint16, uint32, uint64
+from cactus.wallet.cat_wallet.cat_constants import DEFAULT_CATS
+from cactus.wallet.cat_wallet.cat_info import LegacyCATInfo
+from cactus.wallet.cat_wallet.cat_utils import CAT_MOD, construct_cat_puzzle
+from cactus.wallet.cat_wallet.cat_wallet import CATWallet
+from cactus.wallet.derivation_record import DerivationRecord
+from cactus.wallet.derive_keys import _derive_path_unhardened, master_sk_to_wallet_sk_unhardened_intermediate
+from cactus.wallet.lineage_proof import LineageProof
+from cactus.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import puzzle_hash_for_pk
+from cactus.wallet.transaction_record import TransactionRecord
+from cactus.wallet.util.wallet_types import WalletType
+from cactus.wallet.wallet_info import WalletInfo
+from cactus.wallet.wallet_interested_store import WalletInterestedStore
 
 
 class TestCATWallet:
@@ -909,7 +909,7 @@ class TestCATWallet:
             Program.to(None).get_tree_hash(),
             Program.to(1),
         )
-        addr = encode_puzzle_hash(cat_puzzle.get_tree_hash(), "txch")
+        addr = encode_puzzle_hash(cat_puzzle.get_tree_hash(), "tcac")
         cat_amount_0 = uint64(100)
         cat_amount_1 = uint64(5)
 

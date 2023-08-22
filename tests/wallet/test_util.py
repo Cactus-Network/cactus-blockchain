@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from chia.types.blockchain_format.program import Program
-from chia.types.coin_spend import CoinSpend
-from chia.wallet.util.compute_hints import compute_spend_hints_and_additions
+from cactus.types.blockchain_format.program import Program
+from cactus.types.coin_spend import CoinSpend
+from cactus.wallet.util.compute_hints import compute_spend_hints_and_additions
 from tests.util.misc import CoinGenerator, coin_creation_args
 
 

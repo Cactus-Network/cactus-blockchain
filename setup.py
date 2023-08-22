@@ -27,7 +27,7 @@ dependencies = [
     "filelock==3.12.2",  # For reading and writing config multiprocess and multithread safely  (non-reentrant locks)
     "keyring==23.13.1",  # Store keys in MacOS Keychain, Windows Credential Locker
     "PyYAML==6.0",  # Used for config file format
-    "setproctitle==1.3.2",  # Gives the chia processes readable names
+    "setproctitle==1.3.2",  # Gives the cactus processes readable names
     "sortedcontainers==2.4.0",  # For maintaining sorted mempools
     "click==8.1.3",  # For the CLI
     "dnspython==2.3.0",  # Query DNS seeds
@@ -76,53 +76,53 @@ legacy_keyring_dependencies = [
 ]
 
 kwargs = dict(
-    name="chia-blockchain",
-    author="Mariano Sorgente",
-    author_email="mariano@chia.net",
-    description="Chia blockchain full node, farmer, timelord, and wallet.",
-    url="https://chia.net/",
+    name="cactus-blockchain",
+    author="Dommer",
+    author_email="dommer@cactus-network.net",
+    description="Cactus blockchain full node, farmer, timelord, and wallet.",
+    url="https://cactus-network.net/",
     license="Apache License",
     python_requires=">=3.8.1, <4",
-    keywords="chia blockchain node",
+    keywords="cactus blockchain node",
     install_requires=dependencies,
     extras_require=dict(
         dev=dev_dependencies,
         upnp=upnp_dependencies,
         legacy_keyring=legacy_keyring_dependencies,
     ),
-    packages=find_packages(include=["build_scripts", "chia", "chia.*", "mozilla-ca"]),
+    packages=find_packages(include=["build_scripts", "cactus", "cactus.*", "mozilla-ca"]),
     entry_points={
         "console_scripts": [
-            "chia = chia.cmds.chia:main",
-            "chia_daemon = chia.daemon.server:main",
-            "chia_wallet = chia.server.start_wallet:main",
-            "chia_full_node = chia.server.start_full_node:main",
-            "chia_harvester = chia.server.start_harvester:main",
-            "chia_farmer = chia.server.start_farmer:main",
-            "chia_introducer = chia.server.start_introducer:main",
-            "chia_crawler = chia.seeder.start_crawler:main",
-            "chia_seeder = chia.seeder.dns_server:main",
-            "chia_timelord = chia.server.start_timelord:main",
-            "chia_timelord_launcher = chia.timelord.timelord_launcher:main",
-            "chia_full_node_simulator = chia.simulator.start_simulator:main",
-            "chia_data_layer = chia.server.start_data_layer:main",
-            "chia_data_layer_http = chia.data_layer.data_layer_server:main",
-            "chia_data_layer_s3_plugin = chia.data_layer.s3_plugin_service:run_server",
+            "cactus = cactus.cmds.cactus:main",
+            "cactus_daemon = cactus.daemon.server:main",
+            "cactus_wallet = cactus.server.start_wallet:main",
+            "cactus_full_node = cactus.server.start_full_node:main",
+            "cactus_harvester = cactus.server.start_harvester:main",
+            "cactus_farmer = cactus.server.start_farmer:main",
+            "cactus_introducer = cactus.server.start_introducer:main",
+            "cactus_crawler = cactus.seeder.start_crawler:main",
+            "cactus_seeder = cactus.seeder.dns_server:main",
+            "cactus_timelord = cactus.server.start_timelord:main",
+            "cactus_timelord_launcher = cactus.timelord.timelord_launcher:main",
+            "cactus_full_node_simulator = cactus.simulator.start_simulator:main",
+            "cactus_data_layer = cactus.server.start_data_layer:main",
+            "cactus_data_layer_http = cactus.data_layer.data_layer_server:main",
+            "cactus_data_layer_s3_plugin = cactus.data_layer.s3_plugin_service:run_server",
         ]
     },
     package_data={
-        "chia": ["pyinstaller.spec"],
+        "cactus": ["pyinstaller.spec"],
         "": ["*.clsp", "*.clsp.hex", "*.clvm", "*.clib", "py.typed"],
-        "chia.util": ["initial-*.yaml", "english.txt"],
-        "chia.ssl": ["chia_ca.crt", "chia_ca.key", "dst_root_ca.pem"],
+        "cactus.util": ["initial-*.yaml", "english.txt"],
+        "cactus.ssl": ["cactus_ca.crt", "cactus_ca.key", "dst_root_ca.pem"],
         "mozilla-ca": ["cacert.pem"],
     },
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     zip_safe=False,
     project_urls={
-        "Source": "https://github.com/Chia-Network/chia-blockchain/",
-        "Changelog": "https://github.com/Chia-Network/chia-blockchain/blob/main/CHANGELOG.md",
+        "Source": "https://github.com/Cactus-Network/cactus-blockchain/",
+        "Changelog": "https://github.com/Cactus-Network/cactus-blockchain/blob/main/CHANGELOG.md",
     },
 )
 
@@ -130,5 +130,5 @@ if "setup_file" in sys.modules:
     # include dev deps in regular deps when run in snyk
     dependencies.extend(dev_dependencies)
 
-if len(os.environ.get("CHIA_SKIP_SETUP", "")) < 1:
+if len(os.environ.get("CACTUS_SKIP_SETUP", "")) < 1:
     setup(**kwargs)  # type: ignore

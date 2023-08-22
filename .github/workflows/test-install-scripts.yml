@@ -39,7 +39,7 @@ jobs:
         fetch-depth: 0
 
     - name: Setup Python environment
-      uses: Chia-Network/actions/setup-python@main
+      uses: Cactus-Network/actions/setup-python@main
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -48,7 +48,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         development: true
 
-    - uses: chia-network/actions/activate-venv@main
+    - uses: cactus-network/actions/activate-venv@main
 
     - name: Run install-gui script
       run: |
@@ -188,8 +188,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
         development: true
 
-    - uses: chia-network/actions/activate-venv@main
+    - uses: cactus-network/actions/activate-venv@main
 
-    - name: Run chia --help
+    - name: Run cactus --help
       run: |
-        chia --help
+        cactus --help

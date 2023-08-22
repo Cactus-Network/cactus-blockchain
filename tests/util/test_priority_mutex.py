@@ -13,8 +13,8 @@ from typing import Callable, List, Optional
 import anyio
 import pytest
 
-from chia.simulator.time_out_assert import adjusted_timeout, time_out_assert_custom_interval
-from chia.util.priority_mutex import NestedLockUnsupportedError, PriorityMutex
+from cactus.simulator.time_out_assert import adjusted_timeout, time_out_assert_custom_interval
+from cactus.util.priority_mutex import NestedLockUnsupportedError, PriorityMutex
 from tests.util.misc import Marks, datacases
 
 log = logging.getLogger(__name__)

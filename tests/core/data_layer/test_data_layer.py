@@ -5,8 +5,8 @@ from typing import Any, Dict, cast
 
 import pytest
 
-from chia.data_layer.data_layer import DataLayer
-from chia.rpc.wallet_rpc_client import WalletRpcClient
+from cactus.data_layer.data_layer import DataLayer
+from cactus.rpc.wallet_rpc_client import WalletRpcClient
 
 
 async def create_sufficient_wallet_rpc_client() -> WalletRpcClient:
@@ -23,14 +23,14 @@ class SufficientWalletRpcClient:
 
 @pytest.mark.parametrize(argnames="enable", argvalues=[True, False], ids=["log", "do not log"])
 @pytest.mark.asyncio
-async def test_sql_logs(enable: bool, config: Dict[str, Any], tmp_chia_root: Path) -> None:
+async def test_sql_logs(enable: bool, config: Dict[str, Any], tmp_cactus_root: Path) -> None:
     config["data_layer"]["log_sqlite_cmds"] = enable
 
-    log_path = tmp_chia_root.joinpath("log", "data_sql.log")
+    log_path = tmp_cactus_root.joinpath("log", "data_sql.log")
 
     data_layer = DataLayer(
         config=config["data_layer"],
-        root_path=tmp_chia_root,
+        root_path=tmp_cactus_root,
         wallet_rpc_init=create_sufficient_wallet_rpc_client(),
         downloaders=[],
         uploaders=[],

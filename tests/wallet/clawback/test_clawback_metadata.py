@@ -5,14 +5,14 @@ from typing import List, Tuple
 
 import pytest
 
-from chia.server.server import ChiaServer
-from chia.simulator.block_tools import BlockTools
-from chia.simulator.full_node_simulator import FullNodeSimulator
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.peer_info import PeerInfo
-from chia.util.ints import uint16, uint64
-from chia.wallet.puzzles.clawback.metadata import ClawbackMetadata
-from chia.wallet.wallet_node import WalletNode
+from cactus.server.server import CactusServer
+from cactus.simulator.block_tools import BlockTools
+from cactus.simulator.full_node_simulator import FullNodeSimulator
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.peer_info import PeerInfo
+from cactus.util.ints import uint16, uint64
+from cactus.wallet.puzzles.clawback.metadata import ClawbackMetadata
+from cactus.wallet.wallet_node import WalletNode
 
 
 @pytest.mark.parametrize(
@@ -21,13 +21,13 @@ from chia.wallet.wallet_node import WalletNode
 )
 @pytest.mark.asyncio
 async def test_is_recipient(
-    simulator_and_wallet: Tuple[List[FullNodeSimulator], List[Tuple[WalletNode, ChiaServer]], BlockTools],
+    simulator_and_wallet: Tuple[List[FullNodeSimulator], List[Tuple[WalletNode, CactusServer]], BlockTools],
     trusted: bool,
     self_hostname: str,
 ) -> None:
     full_nodes, wallets, _ = simulator_and_wallet
     full_node_api = full_nodes[0]
-    server_1: ChiaServer = full_node_api.full_node.server
+    server_1: CactusServer = full_node_api.full_node.server
     wallet_node, server_2 = wallets[0]
     wallet = wallet_node.wallet_state_manager.main_wallet
     puzhash_1 = await wallet.get_new_puzzlehash()

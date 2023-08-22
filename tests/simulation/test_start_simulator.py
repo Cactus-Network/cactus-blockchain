@@ -7,14 +7,14 @@ from typing import Any, AsyncGenerator, Dict, Tuple
 import pytest
 import pytest_asyncio
 
-from chia.simulator.full_node_simulator import FullNodeSimulator
-from chia.simulator.simulator_full_node_rpc_client import SimulatorFullNodeRpcClient
-from chia.simulator.simulator_test_tools import get_full_chia_simulator, get_puzzle_hash_from_key
-from chia.simulator.time_out_assert import time_out_assert
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.hash import std_hash
-from chia.util.ints import uint16
-from chia.util.keychain import Keychain
+from cactus.simulator.full_node_simulator import FullNodeSimulator
+from cactus.simulator.simulator_full_node_rpc_client import SimulatorFullNodeRpcClient
+from cactus.simulator.simulator_test_tools import get_full_cactus_simulator, get_puzzle_hash_from_key
+from cactus.simulator.time_out_assert import time_out_assert
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.hash import std_hash
+from cactus.util.ints import uint16
+from cactus.util.keychain import Keychain
 
 
 async def get_num_coins_for_ph(simulator_client: SimulatorFullNodeRpcClient, ph: bytes32) -> int:
@@ -27,17 +27,17 @@ class TestStartSimulator:
     """
 
     @pytest_asyncio.fixture(scope="function")
-    async def get_chia_simulator(
+    async def get_cactus_simulator(
         self, tmp_path: Path, empty_keyring: Keychain
     ) -> AsyncGenerator[Tuple[FullNodeSimulator, Path, Dict[str, Any], str, int, Keychain], None]:
-        async for simulator_args in get_full_chia_simulator(chia_root=tmp_path, keychain=empty_keyring):
+        async for simulator_args in get_full_cactus_simulator(cactus_root=tmp_path, keychain=empty_keyring):
             yield simulator_args
 
     @pytest.mark.asyncio
     async def test_start_simulator(
-        self, get_chia_simulator: Tuple[FullNodeSimulator, Path, Dict[str, Any], str, int, Keychain]
+        self, get_cactus_simulator: Tuple[FullNodeSimulator, Path, Dict[str, Any], str, int, Keychain]
     ) -> None:
-        simulator, root_path, config, mnemonic, fingerprint, keychain = get_chia_simulator
+        simulator, root_path, config, mnemonic, fingerprint, keychain = get_cactus_simulator
         ph_1: bytes32 = get_puzzle_hash_from_key(keychain=keychain, fingerprint=fingerprint, key_id=1)
         ph_2: bytes32 = get_puzzle_hash_from_key(keychain=keychain, fingerprint=fingerprint, key_id=2)
         dummy_hash: bytes32 = std_hash(b"test")

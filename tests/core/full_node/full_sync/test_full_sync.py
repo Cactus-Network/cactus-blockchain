@@ -9,15 +9,15 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from chia.full_node.full_node_api import FullNodeAPI
-from chia.protocols import full_node_protocol
-from chia.protocols.shared_protocol import Capability
-from chia.simulator.time_out_assert import time_out_assert
-from chia.types.blockchain_format.sub_epoch_summary import SubEpochSummary
-from chia.types.full_block import FullBlock
-from chia.types.peer_info import PeerInfo
-from chia.util.hash import std_hash
-from chia.util.ints import uint16
+from cactus.full_node.full_node_api import FullNodeAPI
+from cactus.protocols import full_node_protocol
+from cactus.protocols.shared_protocol import Capability
+from cactus.simulator.time_out_assert import time_out_assert
+from cactus.types.blockchain_format.sub_epoch_summary import SubEpochSummary
+from cactus.types.full_block import FullBlock
+from cactus.types.peer_info import PeerInfo
+from cactus.util.hash import std_hash
+from cactus.util.ints import uint16
 from tests.core.node_height import node_height_between, node_height_exactly
 
 log = logging.getLogger(__name__)
@@ -370,7 +370,7 @@ class TestFullSync:
         assert node_height_between(full_node_2, summary_heights[0], summary_heights[1])
 
     @pytest.mark.asyncio
-    @pytest.mark.skip("skipping until we re-enable the capability in chia.protocols.shared_protocol")
+    @pytest.mark.skip("skipping until we re-enable the capability in cactus.protocols.shared_protocol")
     async def test_sync_none_wp_response_backward_comp(self, three_nodes, default_1000_blocks, self_hostname):
         num_blocks_initial = len(default_1000_blocks) - 50
         blocks_950 = default_1000_blocks[:num_blocks_initial]

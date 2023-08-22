@@ -5,15 +5,15 @@ from typing import Any, Optional
 import pytest
 from typing_extensions import Literal
 
-from chia.rpc.wallet_rpc_client import WalletRpcClient
-from chia.simulator.full_node_simulator import FullNodeSimulator
-from chia.simulator.time_out_assert import time_out_assert, time_out_assert_not_none
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.peer_info import PeerInfo
-from chia.util.ints import uint16, uint64
-from chia.wallet.did_wallet.did_wallet import DIDWallet
-from chia.wallet.util.wallet_types import WalletType
-from chia.wallet.vc_wallet.vc_store import VCProofs, VCRecord
+from cactus.rpc.wallet_rpc_client import WalletRpcClient
+from cactus.simulator.full_node_simulator import FullNodeSimulator
+from cactus.simulator.time_out_assert import time_out_assert, time_out_assert_not_none
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.peer_info import PeerInfo
+from cactus.util.ints import uint16, uint64
+from cactus.wallet.did_wallet.did_wallet import DIDWallet
+from cactus.wallet.util.wallet_types import WalletType
+from cactus.wallet.vc_wallet.vc_store import VCProofs, VCRecord
 
 
 @pytest.mark.parametrize(

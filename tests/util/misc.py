@@ -20,12 +20,12 @@ import pytest
 from chia_rs import Coin
 from typing_extensions import Protocol, final
 
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.condition_opcodes import ConditionOpcode
-from chia.util.hash import std_hash
-from chia.util.ints import uint64
-from chia.wallet.util.compute_hints import HintedCoin
-from tests.core.data_layer.util import ChiaRoot
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.condition_opcodes import ConditionOpcode
+from cactus.util.hash import std_hash
+from cactus.util.ints import uint64
+from cactus.wallet.util.compute_hints import HintedCoin
+from tests.core.data_layer.util import CactusRoot
 
 
 class GcMode(enum.Enum):
@@ -217,7 +217,7 @@ class _AssertRuntime:
     Produces output of the following form.
 
         Asserting maximum duration: full block
-        /home/altendky/repos/chia-blockchain/tests/core/full_node/test_performance.py:187
+        /home/altendky/repos/cactus-blockchain/tests/core/full_node/test_performance.py:187
             run time: 0.027789528900002837
             allowed: 0.1
             percent: 28 %
@@ -298,8 +298,8 @@ def assert_rpc_error(error: str) -> Iterator[None]:
 
 
 @contextlib.contextmanager
-def closing_chia_root_popen(chia_root: ChiaRoot, args: List[str]) -> Iterator[subprocess.Popen[Any]]:
-    environment = {**os.environ, "CHIA_ROOT": os.fspath(chia_root.path)}
+def closing_cactus_root_popen(cactus_root: CactusRoot, args: List[str]) -> Iterator[subprocess.Popen[Any]]:
+    environment = {**os.environ, "CACTUS_ROOT": os.fspath(cactus_root.path)}
 
     with subprocess.Popen(args=args, env=environment) as process:
         try:

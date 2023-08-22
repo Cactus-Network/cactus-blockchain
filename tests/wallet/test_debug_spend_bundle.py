@@ -5,14 +5,14 @@ from io import StringIO
 
 from blspy import AugSchemeMPL, PrivateKey
 
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.types.condition_opcodes import ConditionOpcode
-from chia.types.spend_bundle import SpendBundle
-from chia.util.hash import std_hash
-from chia.wallet.util.debug_spend_bundle import debug_spend_bundle
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.condition_opcodes import ConditionOpcode
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.hash import std_hash
+from cactus.wallet.util.debug_spend_bundle import debug_spend_bundle
 
 
 def test_debug_spend_bundle() -> None:

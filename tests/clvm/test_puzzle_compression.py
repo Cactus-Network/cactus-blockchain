@@ -4,16 +4,16 @@ from typing import Dict
 
 from blspy import G1Element, G2Element
 
-from chia.types.blockchain_format.coin import Coin
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.types.spend_bundle import SpendBundle
-from chia.util.ints import uint64
-from chia.wallet.cat_wallet.cat_utils import CAT_MOD, construct_cat_puzzle
-from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import puzzle_for_pk
-from chia.wallet.trading.offer import OFFER_MOD
-from chia.wallet.util.puzzle_compression import (
+from cactus.types.blockchain_format.coin import Coin
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.ints import uint64
+from cactus.wallet.cat_wallet.cat_utils import CAT_MOD, construct_cat_puzzle
+from cactus.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import puzzle_for_pk
+from cactus.wallet.trading.offer import OFFER_MOD
+from cactus.wallet.util.puzzle_compression import (
     LATEST_VERSION,
     OFFER_MOD_OLD,
     compress_object_with_puzzles,

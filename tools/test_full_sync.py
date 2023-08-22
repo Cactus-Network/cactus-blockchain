@@ -17,18 +17,18 @@ import aiosqlite
 import click
 import zstd
 
-from chia.cmds.init_funcs import chia_init
-from chia.consensus.default_constants import DEFAULT_CONSTANTS
-from chia.full_node.full_node import FullNode
-from chia.server.outbound_message import Message, NodeType
-from chia.server.server import ChiaServer
-from chia.server.ws_connection import WSChiaConnection
-from chia.simulator.block_tools import make_unfinished_block
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.full_block import FullBlock
-from chia.types.peer_info import PeerInfo
-from chia.util.config import load_config
-from chia.util.ints import uint16
+from cactus.cmds.init_funcs import cactus_init
+from cactus.consensus.default_constants import DEFAULT_CONSTANTS
+from cactus.full_node.full_node import FullNode
+from cactus.server.outbound_message import Message, NodeType
+from cactus.server.server import CactusServer
+from cactus.server.ws_connection import WSCactusConnection
+from cactus.simulator.block_tools import make_unfinished_block
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.full_block import FullBlock
+from cactus.types.peer_info import PeerInfo
+from cactus.util.config import load_config
+from cactus.util.ints import uint16
 from tools.test_constants import test_constants as TEST_CONSTANTS
 
 
@@ -70,7 +70,7 @@ class FakeServer:
 
     def get_connections(
         self, node_type: Optional[NodeType] = None, *, outbound: Optional[bool] = False
-    ) -> List[WSChiaConnection]:
+    ) -> List[WSCactusConnection]:
         return []
 
     def is_duplicate_or_self_connection(self, target_node: PeerInfo) -> bool:
@@ -126,7 +126,7 @@ async def run_sync_test(
         if start_at_checkpoint is not None:
             shutil.copytree(start_at_checkpoint, root_path)
 
-        chia_init(root_path, should_check_keys=False, v1_db=(db_version == 1))
+        cactus_init(root_path, should_check_keys=False, v1_db=(db_version == 1))
         config = load_config(root_path, "config.yaml")
 
         if test_constants:
@@ -145,7 +145,7 @@ async def run_sync_test(
         )
 
         try:
-            full_node.set_server(cast(ChiaServer, FakeServer()))
+            full_node.set_server(cast(CactusServer, FakeServer()))
             await full_node._start()
 
             peak = full_node.blockchain.get_peak()
@@ -154,7 +154,7 @@ async def run_sync_test(
             else:
                 height = 0
 
-            peer: WSChiaConnection = cast(WSChiaConnection, FakePeer())
+            peer: WSCactusConnection = cast(WSCactusConnection, FakePeer())
 
             print()
             counter = 0
@@ -333,7 +333,7 @@ async def run_sync_checkpoint(
 ) -> None:
     root_path.mkdir(parents=True, exist_ok=True)
 
-    chia_init(root_path, should_check_keys=False, v1_db=False)
+    cactus_init(root_path, should_check_keys=False, v1_db=False)
     config = load_config(root_path, "config.yaml")
 
     overrides = config["network_overrides"]["constants"][config["selected_network"]]
@@ -349,7 +349,7 @@ async def run_sync_checkpoint(
         full_node.set_server(FakeServer())  # type: ignore[arg-type]
         await full_node._start()
 
-        peer: WSChiaConnection = FakePeer()  # type: ignore[assignment]
+        peer: WSCactusConnection = FakePeer()  # type: ignore[assignment]
 
         print()
         height = 0

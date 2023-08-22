@@ -13,11 +13,11 @@ import typing
 import click
 import typing_extensions
 
-from chia.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.blockchain_format.sized_bytes import bytes32
 
 here = pathlib.Path(__file__).parent.resolve()
 root = here.parent
-cache_path = root.joinpath(".chia_cache", "manage_clvm.json")
+cache_path = root.joinpath(".cactus_cache", "manage_clvm.json")
 
 # This is a work-around for fixing imports so they get the appropriate top level
 # packages instead of those of the same name in the same directory as this program.
@@ -29,16 +29,16 @@ sys.path = [path for path in sys.path if path != os.fspath(here)]
 
 from clvm_tools_rs import compile_clvm  # noqa: E402
 
-from chia.types.blockchain_format.serialized_program import SerializedProgram  # noqa: E402
+from cactus.types.blockchain_format.serialized_program import SerializedProgram  # noqa: E402
 
 clvm_suffix = ".clvm"
 clsp_suffix = ".clsp"
 hex_suffix = ".clsp.hex"
 all_suffixes = {"clsp": clsp_suffix, "hex": hex_suffix, "clvm": clvm_suffix}
 # TODO: these could be cli options
-top_levels = {"chia"}
-hashes_path = root.joinpath("chia/wallet/puzzles/deployed_puzzle_hashes.json")
-std_libraries = root.joinpath("chia/wallet/puzzles")
+top_levels = {"cactus"}
+hashes_path = root.joinpath("cactus/wallet/puzzles/deployed_puzzle_hashes.json")
+std_libraries = root.joinpath("cactus/wallet/puzzles")
 
 
 class ManageClvmError(Exception):
@@ -421,4 +421,4 @@ def build() -> int:
     sys.exit(1 if overall_fail else 0)
 
 
-main(auto_envvar_prefix="CHIA_MANAGE_CLVM")
+main(auto_envvar_prefix="CACTUS_MANAGE_CLVM")

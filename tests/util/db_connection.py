@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import AsyncIterator
 
-from chia.util.db_wrapper import DBWrapper2
+from cactus.util.db_wrapper import DBWrapper2
 
 
 @asynccontextmanager

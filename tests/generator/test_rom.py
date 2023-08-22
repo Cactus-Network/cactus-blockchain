@@ -5,23 +5,23 @@ from typing import List, Tuple
 from clvm_tools import binutils
 from clvm_tools.clvmc import compile_clvm_text
 
-from chia.consensus.condition_costs import ConditionCost
-from chia.consensus.default_constants import DEFAULT_CONSTANTS
-from chia.full_node.mempool_check_conditions import get_name_puzzle_conditions
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.serialized_program import SerializedProgram
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.generator_types import BlockGenerator
-from chia.types.spend_bundle_conditions import ELIGIBLE_FOR_DEDUP, Spend
-from chia.util.ints import uint32
-from chia.wallet.puzzles.load_clvm import load_clvm
-from chia.wallet.puzzles.rom_bootstrap_generator import GENERATOR_MOD
+from cactus.consensus.condition_costs import ConditionCost
+from cactus.consensus.default_constants import DEFAULT_CONSTANTS
+from cactus.full_node.mempool_check_conditions import get_name_puzzle_conditions
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.serialized_program import SerializedProgram
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.generator_types import BlockGenerator
+from cactus.types.spend_bundle_conditions import ELIGIBLE_FOR_DEDUP, Spend
+from cactus.util.ints import uint32
+from cactus.wallet.puzzles.load_clvm import load_clvm
+from cactus.wallet.puzzles.rom_bootstrap_generator import GENERATOR_MOD
 
 MAX_COST = int(1e15)
 COST_PER_BYTE = int(12000)
 
 
-DESERIALIZE_MOD = load_clvm("chialisp_deserialisation.clsp", package_or_requirement="chia.wallet.puzzles")
+DESERIALIZE_MOD = load_clvm("cactuslisp_deserialisation.clsp", package_or_requirement="cactus.wallet.puzzles")
 
 
 GENERATOR_CODE = """

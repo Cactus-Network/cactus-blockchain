@@ -11,27 +11,27 @@ import pkg_resources
 import pytest
 from aiohttp.web_ws import WebSocketResponse
 
-from chia.daemon.client import connect_to_daemon
-from chia.daemon.keychain_server import (
+from cactus.daemon.client import connect_to_daemon
+from cactus.daemon.keychain_server import (
     DeleteLabelRequest,
     GetKeyRequest,
     GetKeyResponse,
     GetKeysResponse,
     SetLabelRequest,
 )
-from chia.daemon.server import WebSocketServer, plotter_log_path, service_plotter
-from chia.server.outbound_message import NodeType
-from chia.simulator.block_tools import BlockTools
-from chia.simulator.keyring import TempKeyring
-from chia.simulator.time_out_assert import time_out_assert, time_out_assert_custom_interval
-from chia.types.peer_info import PeerInfo
-from chia.util.config import load_config
-from chia.util.ints import uint16
-from chia.util.json_util import dict_to_json_str
-from chia.util.keychain import Keychain, KeyData, supports_os_passphrase_storage
-from chia.util.keyring_wrapper import DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE, KeyringWrapper
-from chia.util.ws_message import create_payload, create_payload_dict
-from chia.wallet.derive_keys import master_sk_to_farmer_sk, master_sk_to_pool_sk
+from cactus.daemon.server import WebSocketServer, plotter_log_path, service_plotter
+from cactus.server.outbound_message import NodeType
+from cactus.simulator.block_tools import BlockTools
+from cactus.simulator.keyring import TempKeyring
+from cactus.simulator.time_out_assert import time_out_assert, time_out_assert_custom_interval
+from cactus.types.peer_info import PeerInfo
+from cactus.util.config import load_config
+from cactus.util.ints import uint16
+from cactus.util.json_util import dict_to_json_str
+from cactus.util.keychain import Keychain, KeyData, supports_os_passphrase_storage
+from cactus.util.keyring_wrapper import DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE, KeyringWrapper
+from cactus.util.ws_message import create_payload, create_payload_dict
+from cactus.wallet.derive_keys import master_sk_to_farmer_sk, master_sk_to_pool_sk
 from tests.core.node_height import node_height_at_least
 from tests.util.misc import Marks, datacases
 
@@ -138,7 +138,7 @@ success_response_data = {
 }
 
 plotter_request_ref = {
-    "service": "chia_plotter",
+    "service": "cactus_plotter",
     "plotter": "chiapos",
     "k": 25,
     "r": 2,
@@ -277,7 +277,7 @@ def mock_daemon_with_services():
             "my_refrigerator": [Service(True)],
             "the_river": [Service(True)],
             "your_nose": [Service(False)],
-            "chia_plotter": [Service(True), Service(True)],
+            "cactus_plotter": [Service(True), Service(True)],
         },
         connections={},
         net_config={},
@@ -290,7 +290,7 @@ def mock_daemon_with_services_and_connections():
     return Daemon(
         services={
             "my_refrigerator": [Service(True)],
-            "chia_plotter": [Service(True), Service(True)],
+            "cactus_plotter": [Service(True), Service(True)],
             "apple": [Service(True)],
         },
         connections={
@@ -392,7 +392,7 @@ async def test_daemon_simulation(self_hostname, daemon_simulation):
 
     read_handler = asyncio.create_task(reader(ws, message_queue))
     data = {}
-    payload = create_payload("get_blockchain_state", data, service_name, "chia_full_node")
+    payload = create_payload("get_blockchain_state", data, service_name, "cactus_full_node")
     await ws.send_str(payload)
 
     await asyncio.sleep(5)
@@ -531,13 +531,13 @@ async def test_get_routes(mock_lonely_daemon):
             "wallet_addresses": {
                 test_key_data.fingerprint: [
                     {
-                        "address": "xch1zze67l3jgxuvyaxhjhu7326sezxxve7lgzvq0497ddggzhff7c9s2pdcwh",
+                        "address": "cac1zze67l3jgxuvyaxhjhu7326sezxxve7lgzvq0497ddggzhff7c9s2pdcwh",
                         "hd_path": "m/12381/8444/2/0",
                     },
                 ],
                 test_key_data_2.fingerprint: [
                     {
-                        "address": "xch1fra5h0qnsezrxenjyslyxx7y4l268gq52m0rgenh58vn8f577uzswzvk4v",
+                        "address": "cac1fra5h0qnsezrxenjyslyxx7y4l268gq52m0rgenh58vn8f577uzswzvk4v",
                         "hd_path": "m/12381/8444/2/0",
                     }
                 ],
@@ -552,7 +552,7 @@ async def test_get_routes(mock_lonely_daemon):
             "wallet_addresses": {
                 test_key_data.fingerprint: [
                     {
-                        "address": "xch1zze67l3jgxuvyaxhjhu7326sezxxve7lgzvq0497ddggzhff7c9s2pdcwh",
+                        "address": "cac1zze67l3jgxuvyaxhjhu7326sezxxve7lgzvq0497ddggzhff7c9s2pdcwh",
                         "hd_path": "m/12381/8444/2/0",
                     },
                 ],
@@ -567,11 +567,11 @@ async def test_get_routes(mock_lonely_daemon):
             "wallet_addresses": {
                 test_key_data.fingerprint: [
                     {
-                        "address": "xch16jqcaguq27z8xvpu89j7eaqfzn6k89hdrrlm0rffku85n8n7m7sqqmmahh",
+                        "address": "cac16jqcaguq27z8xvpu89j7eaqfzn6k89hdrrlm0rffku85n8n7m7sqqmmahh",
                         "hd_path": "m/12381/8444/2/1",
                     },
                     {
-                        "address": "xch1955vj0gx5tqe7v5tceajn2p4z4pup8d4g2exs0cz4xjqses8ru6qu8zp3y",
+                        "address": "cac1955vj0gx5tqe7v5tceajn2p4z4pup8d4g2exs0cz4xjqses8ru6qu8zp3y",
                         "hd_path": "m/12381/8444/2/2",
                     },
                 ]
@@ -586,7 +586,7 @@ async def test_get_routes(mock_lonely_daemon):
             "wallet_addresses": {
                 test_key_data.fingerprint: [
                     {
-                        "address": "xch1k996a7h3agygjhqtrf0ycpa7wfd6k5ye2plkf54ukcmdj44gkqkq880l7n",
+                        "address": "cac1k996a7h3agygjhqtrf0ycpa7wfd6k5ye2plkf54ukcmdj44gkqkq880l7n",
                         "hd_path": "m/12381n/8444n/2n/0n",
                     }
                 ]
@@ -1178,11 +1178,11 @@ async def test_bad_json(daemon_connection_and_temp_keychain: Tuple[aiohttp.Clien
     ),
     RouteCase(
         route="register_service",
-        description="chia_plotter",
+        description="cactus_plotter",
         request={
-            "service": "chia_plotter",
+            "service": "cactus_plotter",
         },
-        response={"success": True, "service": "chia_plotter", "queue": []},
+        response={"success": True, "service": "cactus_plotter", "queue": []},
     ),
     RouteCase(
         route="unknown_command",
@@ -1229,7 +1229,7 @@ async def test_bad_json(daemon_connection_and_temp_keychain: Tuple[aiohttp.Clien
                     "display_name": "BladeBit Plotter",
                     "installed": False,
                 },
-                "chiapos": {"display_name": "Chia Proof of Space", "installed": True, "version": chiapos_version},
+                "chiapos": {"display_name": "Cactus Proof of Space", "installed": True, "version": chiapos_version},
                 "madmax": {"can_install": True, "display_name": "madMAx Plotter", "installed": False},
             },
         },
@@ -1506,7 +1506,7 @@ async def test_keyring_file_deleted(
         },
         response={
             "success": False,
-            "service_name": "chia_plotter",
+            "service_name": "cactus_plotter",
             "error": "Choose one of pool_contract_address and pool_public_key",
         },
     ),
@@ -1596,10 +1596,10 @@ async def test_plotter_options(
 ) -> None:
     ws, keychain = daemon_connection_and_temp_keychain
 
-    # register for chia_plotter events
-    service_name = "chia_plotter"
+    # register for cactus_plotter events
+    service_name = "cactus_plotter"
     data = {"service": service_name}
-    payload = create_payload("register_service", data, "chia_plotter", "daemon")
+    payload = create_payload("register_service", data, "cactus_plotter", "daemon")
     await ws.send_str(payload)
     response = await ws.receive()
     assert_response_success_only(response)
@@ -1660,10 +1660,10 @@ async def test_plotter_roundtrip(
 ) -> None:
     ws, keychain = daemon_connection_and_temp_keychain
 
-    # register for chia_plotter events
-    service_name = "chia_plotter"
+    # register for cactus_plotter events
+    service_name = "cactus_plotter"
     data = {"service": service_name}
-    payload = create_payload("register_service", data, "chia_plotter", "daemon")
+    payload = create_payload("register_service", data, "cactus_plotter", "daemon")
     await ws.send_str(payload)
     response = await ws.receive()
     assert_response_success_only(response)
@@ -1732,10 +1732,10 @@ async def test_plotter_stop_plotting(
 ) -> None:
     ws, keychain = daemon_connection_and_temp_keychain
 
-    # register for chia_plotter events
-    service_name = "chia_plotter"
+    # register for cactus_plotter events
+    service_name = "cactus_plotter"
     data = {"service": service_name}
-    payload = create_payload("register_service", data, "chia_plotter", "daemon")
+    payload = create_payload("register_service", data, "cactus_plotter", "daemon")
     await ws.send_str(payload)
     response = await ws.receive()
     assert_response_success_only(response)

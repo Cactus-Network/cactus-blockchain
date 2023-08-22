@@ -5,20 +5,20 @@ from typing import Dict, Optional, Tuple
 import pytest
 from blspy import AugSchemeMPL, G1Element, G2Element, PrivateKey
 
-from chia.clvm.spend_sim import CostLogger, SimClient, SpendSim, sim_and_client
-from chia.consensus.default_constants import DEFAULT_CONSTANTS
-from chia.simulator.time_out_assert import time_out_assert
-from chia.types.blockchain_format.program import INFINITE_COST, Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.types.condition_opcodes import ConditionOpcode
-from chia.types.mempool_inclusion_status import MempoolInclusionStatus
-from chia.types.spend_bundle import SpendBundle
-from chia.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
-from chia.util.errors import Err
-from chia.util.ints import uint64
-from chia.util.misc import VersionedBlob
-from chia.wallet.puzzles.clawback.drivers import (
+from cactus.clvm.spend_sim import CostLogger, SimClient, SpendSim, sim_and_client
+from cactus.consensus.default_constants import DEFAULT_CONSTANTS
+from cactus.simulator.time_out_assert import time_out_assert
+from cactus.types.blockchain_format.program import INFINITE_COST, Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.condition_opcodes import ConditionOpcode
+from cactus.types.mempool_inclusion_status import MempoolInclusionStatus
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
+from cactus.util.errors import Err
+from cactus.util.ints import uint64
+from cactus.util.misc import VersionedBlob
+from cactus.wallet.puzzles.clawback.drivers import (
     create_augmented_cond_puzzle_hash,
     create_clawback_merkle_tree,
     create_merkle_puzzle,
@@ -26,16 +26,16 @@ from chia.wallet.puzzles.clawback.drivers import (
     create_p2_puzzle_hash_puzzle,
     match_clawback_puzzle,
 )
-from chia.wallet.puzzles.clawback.metadata import ClawbackMetadata, ClawbackVersion
-from chia.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
+from cactus.wallet.puzzles.clawback.metadata import ClawbackMetadata, ClawbackVersion
+from cactus.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
     DEFAULT_HIDDEN_PUZZLE_HASH,
     calculate_synthetic_secret_key,
     puzzle_for_pk,
     solution_for_conditions,
 )
-from chia.wallet.uncurried_puzzle import uncurry_puzzle
-from chia.wallet.util.merkle_utils import check_merkle_proof
-from chia.wallet.util.wallet_types import RemarkDataType
+from cactus.wallet.uncurried_puzzle import uncurry_puzzle
+from cactus.wallet.util.merkle_utils import check_merkle_proof
+from cactus.wallet.util.wallet_types import RemarkDataType
 from tests.clvm.benchmark_costs import cost_of_spend_bundle
 from tests.clvm.test_puzzles import public_key_for_index, secret_exponent_for_index
 from tests.util.key_tool import KeyTool

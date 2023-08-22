@@ -5,14 +5,14 @@ from unittest import TestCase
 
 from blspy import AugSchemeMPL, BasicSchemeMPL, G1Element, G2Element
 
-from chia.consensus.default_constants import DEFAULT_CONSTANTS
-from chia.types.blockchain_format.program import Program
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.coin_spend import CoinSpend
-from chia.types.spend_bundle import SpendBundle
-from chia.util.hash import std_hash
-from chia.util.ints import uint64
-from chia.wallet.puzzles import (
+from cactus.consensus.default_constants import DEFAULT_CONSTANTS
+from cactus.types.blockchain_format.program import Program
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.coin_spend import CoinSpend
+from cactus.types.spend_bundle import SpendBundle
+from cactus.util.hash import std_hash
+from cactus.util.ints import uint64
+from cactus.wallet.puzzles import (
     p2_conditions,
     p2_delegated_conditions,
     p2_delegated_puzzle,
@@ -20,7 +20,7 @@ from chia.wallet.puzzles import (
     p2_m_of_n_delegate_direct,
     p2_puzzle_hash,
 )
-from chia.wallet.puzzles.puzzle_utils import make_create_coin_condition
+from cactus.wallet.puzzles.puzzle_utils import make_create_coin_condition
 from tests.util.key_tool import KeyTool
 
 from ..core.make_block_generator import int_to_public_key

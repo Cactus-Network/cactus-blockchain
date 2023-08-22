@@ -4,7 +4,7 @@ from typing import Collection, List, Optional, Tuple
 
 from chia_rs import Coin, CoinState
 
-from chia.wallet.util.wallet_sync_utils import sort_coin_states
+from cactus.wallet.util.wallet_sync_utils import sort_coin_states
 
 
 def dummy_coin_state(*, created_height: Optional[int], spent_height: Optional[int]) -> CoinState:

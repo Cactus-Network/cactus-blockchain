@@ -5,22 +5,22 @@ from dataclasses import dataclass
 from secrets import token_bytes
 from typing import Optional
 
-from chia.farmer.farmer import Farmer
-from chia.farmer.farmer_api import FarmerAPI
-from chia.harvester.harvester import Harvester
-from chia.harvester.harvester_api import HarvesterAPI
-from chia.plot_sync.sender import Sender
-from chia.protocols.harvester_protocol import PlotSyncIdentifier
-from chia.server.outbound_message import Message, NodeType
-from chia.server.start_service import Service
-from chia.simulator.time_out_assert import time_out_assert
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.types.peer_info import PeerInfo, UnresolvedPeerInfo
-from chia.util.ints import uint16, uint64
+from cactus.farmer.farmer import Farmer
+from cactus.farmer.farmer_api import FarmerAPI
+from cactus.harvester.harvester import Harvester
+from cactus.harvester.harvester_api import HarvesterAPI
+from cactus.plot_sync.sender import Sender
+from cactus.protocols.harvester_protocol import PlotSyncIdentifier
+from cactus.server.outbound_message import Message, NodeType
+from cactus.server.start_service import Service
+from cactus.simulator.time_out_assert import time_out_assert
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.types.peer_info import PeerInfo, UnresolvedPeerInfo
+from cactus.util.ints import uint16, uint64
 
 
 @dataclass
-class WSChiaConnectionDummy:
+class WSCactusConnectionDummy:
     connection_type: NodeType
     peer_node_id: bytes32
     peer_info: PeerInfo = PeerInfo("127.0.0.1", uint16(0))
@@ -30,8 +30,8 @@ class WSChiaConnectionDummy:
         self.last_sent_message = message
 
 
-def get_dummy_connection(node_type: NodeType, peer_id: Optional[bytes32] = None) -> WSChiaConnectionDummy:
-    return WSChiaConnectionDummy(node_type, bytes32(token_bytes(32)) if peer_id is None else peer_id)
+def get_dummy_connection(node_type: NodeType, peer_id: Optional[bytes32] = None) -> WSCactusConnectionDummy:
+    return WSCactusConnectionDummy(node_type, bytes32(token_bytes(32)) if peer_id is None else peer_id)
 
 
 def plot_sync_identifier(current_sync_id: uint64, message_id: uint64) -> PlotSyncIdentifier:

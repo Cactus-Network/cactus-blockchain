@@ -16,26 +16,26 @@ import pytest_asyncio
 # TODO: update after resolution in https://github.com/pytest-dev/pytest/issues/7469
 from _pytest.fixtures import SubRequest
 
-from chia.clvm.spend_sim import CostLogger
+from cactus.clvm.spend_sim import CostLogger
 
 # Set spawn after stdlib imports, but before other imports
-from chia.consensus.constants import ConsensusConstants
-from chia.farmer.farmer import Farmer
-from chia.farmer.farmer_api import FarmerAPI
-from chia.full_node.full_node import FullNode
-from chia.full_node.full_node_api import FullNodeAPI
-from chia.harvester.harvester import Harvester
-from chia.harvester.harvester_api import HarvesterAPI
-from chia.protocols import full_node_protocol
-from chia.rpc.farmer_rpc_client import FarmerRpcClient
-from chia.rpc.harvester_rpc_client import HarvesterRpcClient
-from chia.rpc.wallet_rpc_client import WalletRpcClient
-from chia.seeder.crawler import Crawler
-from chia.seeder.crawler_api import CrawlerAPI
-from chia.server.server import ChiaServer
-from chia.server.start_service import Service
-from chia.simulator.full_node_simulator import FullNodeSimulator
-from chia.simulator.setup_nodes import (
+from cactus.consensus.constants import ConsensusConstants
+from cactus.farmer.farmer import Farmer
+from cactus.farmer.farmer_api import FarmerAPI
+from cactus.full_node.full_node import FullNode
+from cactus.full_node.full_node_api import FullNodeAPI
+from cactus.harvester.harvester import Harvester
+from cactus.harvester.harvester_api import HarvesterAPI
+from cactus.protocols import full_node_protocol
+from cactus.rpc.farmer_rpc_client import FarmerRpcClient
+from cactus.rpc.harvester_rpc_client import HarvesterRpcClient
+from cactus.rpc.wallet_rpc_client import WalletRpcClient
+from cactus.seeder.crawler import Crawler
+from cactus.seeder.crawler_api import CrawlerAPI
+from cactus.server.server import CactusServer
+from cactus.server.start_service import Service
+from cactus.simulator.full_node_simulator import FullNodeSimulator
+from cactus.simulator.setup_nodes import (
     SimulatorsAndWallets,
     setup_full_system,
     setup_full_system_connect_to_deamon,
@@ -44,19 +44,19 @@ from chia.simulator.setup_nodes import (
     setup_simulators_and_wallets_service,
     setup_two_nodes,
 )
-from chia.simulator.setup_services import setup_crawler, setup_daemon, setup_introducer, setup_timelord
-from chia.simulator.time_out_assert import time_out_assert
-from chia.simulator.wallet_tools import WalletTool
-from chia.types.peer_info import PeerInfo
-from chia.util.config import create_default_chia_config, lock_and_load_config
-from chia.util.ints import uint16, uint64
-from chia.util.keychain import Keychain
-from chia.util.task_timing import main as task_instrumentation_main
-from chia.util.task_timing import start_task_instrumentation, stop_task_instrumentation
-from chia.wallet.wallet import Wallet
-from chia.wallet.wallet_node import WalletNode
-from chia.wallet.wallet_node_api import WalletNodeAPI
-from tests.core.data_layer.util import ChiaRoot
+from cactus.simulator.setup_services import setup_crawler, setup_daemon, setup_introducer, setup_timelord
+from cactus.simulator.time_out_assert import time_out_assert
+from cactus.simulator.wallet_tools import WalletTool
+from cactus.types.peer_info import PeerInfo
+from cactus.util.config import create_default_cactus_config, lock_and_load_config
+from cactus.util.ints import uint16, uint64
+from cactus.util.keychain import Keychain
+from cactus.util.task_timing import main as task_instrumentation_main
+from cactus.util.task_timing import start_task_instrumentation, stop_task_instrumentation
+from cactus.wallet.wallet import Wallet
+from cactus.wallet.wallet_node import WalletNode
+from cactus.wallet.wallet_node_api import WalletNodeAPI
+from tests.core.data_layer.util import CactusRoot
 from tests.core.node_height import node_height_at_least
 from tests.simulation.test_simulation import test_constants_modified
 
@@ -64,10 +64,10 @@ multiprocessing.set_start_method("spawn")
 
 from pathlib import Path
 
-from chia.simulator.block_tools import BlockTools, create_block_tools, create_block_tools_async, test_constants
-from chia.simulator.keyring import TempKeyring
-from chia.simulator.setup_nodes import setup_farmer_multi_harvester
-from chia.util.keyring_wrapper import KeyringWrapper
+from cactus.simulator.block_tools import BlockTools, create_block_tools, create_block_tools_async, test_constants
+from cactus.simulator.keyring import TempKeyring
+from cactus.simulator.setup_nodes import setup_farmer_multi_harvester
+from cactus.util.keyring_wrapper import KeyringWrapper
 
 
 @pytest.fixture(name="node_name_for_file")
@@ -137,7 +137,7 @@ def self_hostname():
 
 
 # NOTE:
-#       Instantiating the bt fixture results in an attempt to create the chia root directory
+#       Instantiating the bt fixture results in an attempt to create the cactus root directory
 #       which the build scripts symlink to a sometimes-not-there directory.
 #       When not there, Python complains since, well, the symlink is not a directory nor points to a directory.
 #
@@ -424,7 +424,7 @@ async def wallet_node_100_pk():
 
 @pytest_asyncio.fixture(scope="function")
 async def simulator_and_wallet() -> AsyncIterator[
-    Tuple[List[FullNodeSimulator], List[Tuple[WalletNode, ChiaServer]], BlockTools]
+    Tuple[List[FullNodeSimulator], List[Tuple[WalletNode, CactusServer]], BlockTools]
 ]:
     async for _ in setup_simulators_and_wallets(simulator_count=1, wallet_count=1, dic={}):
         yield _
@@ -448,8 +448,8 @@ async def two_wallet_nodes_services() -> AsyncIterator[
 
 
 @pytest_asyncio.fixture(scope="function")
-async def two_wallet_nodes_custom_spam_filtering(spam_filter_after_n_txs, xch_spam_amount):
-    async for _ in setup_simulators_and_wallets(1, 2, {}, spam_filter_after_n_txs, xch_spam_amount):
+async def two_wallet_nodes_custom_spam_filtering(spam_filter_after_n_txs, cac_spam_amount):
+    async for _ in setup_simulators_and_wallets(1, 2, {}, spam_filter_after_n_txs, cac_spam_amount):
         yield _
 
 
@@ -549,7 +549,7 @@ def enable_softfork2(request):
 @pytest_asyncio.fixture(scope="function")
 async def one_node_one_block_with_softfork2(
     enable_softfork2,
-) -> AsyncIterator[Tuple[Union[FullNodeAPI, FullNodeSimulator], ChiaServer, BlockTools]]:
+) -> AsyncIterator[Tuple[Union[FullNodeAPI, FullNodeSimulator], CactusServer, BlockTools]]:
     if enable_softfork2:
         constant_replacements = {"SOFT_FORK2_HEIGHT": 0}
     else:
@@ -584,7 +584,7 @@ async def one_node_one_block_with_softfork2(
 
 
 @pytest_asyncio.fixture(scope="function")
-async def one_node_one_block() -> AsyncIterator[Tuple[Union[FullNodeAPI, FullNodeSimulator], ChiaServer, BlockTools]]:
+async def one_node_one_block() -> AsyncIterator[Tuple[Union[FullNodeAPI, FullNodeSimulator], CactusServer, BlockTools]]:
     async_gen = setup_simulators_and_wallets(1, 0, {})
     nodes, _, bt = await async_gen.__anext__()
     full_node_1 = nodes[0]
@@ -720,7 +720,7 @@ async def get_daemon(bt):
 
 @pytest.fixture(scope="function")
 def empty_keyring():
-    with TempKeyring(user="user-chia-1.8", service="chia-user-chia-1.8") as keychain:
+    with TempKeyring(user="user-cactus-1.8", service="cactus-user-cactus-1.8") as keychain:
         yield keychain
         KeyringWrapper.cleanup_shared_instance()
 
@@ -909,23 +909,23 @@ async def crawler_service(bt: BlockTools) -> AsyncIterator[Service[Crawler, Craw
 
 
 @pytest.fixture(scope="function")
-def tmp_chia_root(tmp_path):
+def tmp_cactus_root(tmp_path):
     """
-    Create a temp directory and populate it with an empty chia_root directory.
+    Create a temp directory and populate it with an empty cactus_root directory.
     """
-    path: Path = tmp_path / "chia_root"
+    path: Path = tmp_path / "cactus_root"
     path.mkdir(parents=True, exist_ok=True)
     return path
 
 
 @pytest.fixture(scope="function")
-def root_path_populated_with_config(tmp_chia_root) -> Path:
+def root_path_populated_with_config(tmp_cactus_root) -> Path:
     """
-    Create a temp chia_root directory and populate it with a default config.yaml.
-    Returns the chia_root path.
+    Create a temp cactus_root directory and populate it with a default config.yaml.
+    Returns the cactus_root path.
     """
-    root_path: Path = tmp_chia_root
-    create_default_chia_config(root_path)
+    root_path: Path = tmp_cactus_root
+    create_default_cactus_config(root_path)
     return root_path
 
 
@@ -952,9 +952,9 @@ def scripts_path_fixture() -> Path:
     return Path(scripts_string)
 
 
-@pytest.fixture(name="chia_root", scope="function")
-def chia_root_fixture(tmp_path: Path, scripts_path: Path) -> ChiaRoot:
-    root = ChiaRoot(path=tmp_path.joinpath("chia_root"), scripts_path=scripts_path)
+@pytest.fixture(name="cactus_root", scope="function")
+def cactus_root_fixture(tmp_path: Path, scripts_path: Path) -> CactusRoot:
+    root = CactusRoot(path=tmp_path.joinpath("cactus_root"), scripts_path=scripts_path)
     root.run(args=["init"])
     root.run(args=["configure", "--set-log-level", "INFO"])
 

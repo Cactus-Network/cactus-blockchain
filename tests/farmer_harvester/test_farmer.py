@@ -7,21 +7,21 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import pytest
 from blspy import AugSchemeMPL, G1Element, G2Element, PrivateKey
 
-from chia.consensus.constants import ConsensusConstants
-from chia.consensus.default_constants import DEFAULT_CONSTANTS, default_kwargs
-from chia.farmer.farmer import increment_pool_stats, strip_old_entries
-from chia.pools.pool_config import PoolWalletConfig
-from chia.protocols import farmer_protocol, harvester_protocol
-from chia.protocols.harvester_protocol import NewProofOfSpace, RespondSignatures
-from chia.protocols.pool_protocol import PoolErrorCode
-from chia.types.blockchain_format.proof_of_space import (
+from cactus.consensus.constants import ConsensusConstants
+from cactus.consensus.default_constants import DEFAULT_CONSTANTS, default_kwargs
+from cactus.farmer.farmer import increment_pool_stats, strip_old_entries
+from cactus.pools.pool_config import PoolWalletConfig
+from cactus.protocols import farmer_protocol, harvester_protocol
+from cactus.protocols.harvester_protocol import NewProofOfSpace, RespondSignatures
+from cactus.protocols.pool_protocol import PoolErrorCode
+from cactus.types.blockchain_format.proof_of_space import (
     ProofOfSpace,
     generate_plot_public_key,
     verify_and_get_quality_string,
 )
-from chia.types.blockchain_format.sized_bytes import bytes32
-from chia.util.hash import std_hash
-from chia.util.ints import uint8, uint16, uint32, uint64
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.hash import std_hash
+from cactus.util.ints import uint8, uint16, uint32, uint64
 from tests.conftest import HarvesterFarmerEnvironment
 from tests.util.misc import Marks
 

@@ -7,8 +7,8 @@ from typing import Sequence
 
 from click.testing import CliRunner
 
-from chia.util.dump_keyring import dump
-from chia.util.keychain import Keychain
+from cactus.util.dump_keyring import dump
+from cactus.util.keychain import Keychain
 from tests.util.misc import Marks, datacases
 
 output_prefix = """Attempting to dump contents of keyring file: {path}
