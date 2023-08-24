@@ -65,13 +65,16 @@ SERVERS = [
     "timelord",
 ]
 
-# TODO: collapse all these entry points into one `cactus_exec` entrypoint that accepts the server as a parameter
+if THIS_IS_WINDOWS:
+    hidden_imports_for_windows = ["win32timezone", "win32cred", "pywintypes", "win32ctypes.pywin32"]
+else:
+    hidden_imports_for_windows = []
 
-entry_points = ["cactus.cmds.cactus"] + [f"cactus.server.start_{s}" for s in SERVERS]
-
-hiddenimports = []
-hiddenimports.extend(entry_points)
-hiddenimports.extend(keyring_imports)
+hiddenimports = [
+    *collect_submodules("cactus"),
+    *keyring_imports,
+    *hidden_imports_for_windows,
+]
 
 binaries = []
 
@@ -99,12 +102,13 @@ if os.path.exists(f"{ROOT}/bladebit/bladebit"):
         )
     ])
 
-if THIS_IS_WINDOWS:
-    hiddenimports.extend(["win32timezone", "win32cred", "pywintypes", "win32ctypes.pywin32"])
-
-# this probably isn't necessary
-if THIS_IS_WINDOWS:
-    entry_points.extend(["aiohttp", "cactus.util.bip39"])
+if os.path.exists(f"{ROOT}/bladebit/bladebit_cuda"):
+    binaries.extend([
+        (
+            f"{ROOT}/bladebit/bladebit_cuda",
+            "bladebit"
+        )
+    ])
 
 if THIS_IS_WINDOWS:
     cactus_mod = importlib.import_module("cactus")
@@ -130,7 +134,8 @@ datas = []
 
 datas.append((f"{ROOT}/cactus/util/english.txt", "cactus/util"))
 datas.append((f"{ROOT}/cactus/util/initial-config.yaml", "cactus/util"))
-datas.append((f"{ROOT}/cactus/wallet/puzzles/*.hex", "cactus/wallet/puzzles"))
+for path in sorted({path.parent for path in ROOT.joinpath("cactus").rglob("*.hex")}):
+    datas.append((f"{path}/*.hex", path.relative_to(ROOT)))
 datas.append((f"{ROOT}/cactus/ssl/*", "cactus/ssl"))
 datas.append((f"{ROOT}/mozilla-ca/*", "mozilla-ca"))
 datas.append(version_data)
@@ -191,6 +196,7 @@ add_binary("start_crawler", f"{ROOT}/cactus/seeder/start_crawler.py", COLLECT_AR
 add_binary("start_seeder", f"{ROOT}/cactus/seeder/dns_server.py", COLLECT_ARGS)
 add_binary("start_data_layer_http", f"{ROOT}/cactus/data_layer/data_layer_server.py", COLLECT_ARGS)
 add_binary("start_data_layer_s3_plugin", f"{ROOT}/cactus/data_layer/s3_plugin_service.py", COLLECT_ARGS)
+add_binary("timelord_launcher", f"{ROOT}/cactus/timelord/timelord_launcher.py", COLLECT_ARGS)
 
 COLLECT_KWARGS = dict(
     strip=False,
