@@ -29,7 +29,7 @@ def setup_mock_file_keyring(mock_configure_backend, temp_file_keyring_dir, popul
             f.write(
                 # Encrypted using DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE. Data holds an empty keyring.
                 "data: xtcxYOWtbeO9ruv4Nkwhw1pcTJCNh/fvPSdFxez/L0ysnag=\n"
-                "nonce: 17ecac58deb7a392fccef49e\n"
+                "nonce: 17exch58deb7a392fccef49e\n"
                 "salt: b1aa32d5730288d653e82017e4a4057c\n"
                 "version: 1"
             )

@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@cactus-network/notarize-cli": "^0.2.2",
+    "@cactus-network.net/notarize-cli": "^0.2.2",
     "dmg-license": "^1.0.11",
     "electron-builder": "^24.4.0",
     "lerna": "7.1.3",

@@ -48,7 +48,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         development: true
 
-    - uses: cactus-network/actions/activate-venv@main
+    - uses: cactus-network.net/actions/activate-venv@main
 
     - name: Run install-gui script
       run: |
@@ -188,7 +188,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         development: true
 
-    - uses: cactus-network/actions/activate-venv@main
+    - uses: cactus-network.net/actions/activate-venv@main
 
     - name: Run cactus --help
       run: |

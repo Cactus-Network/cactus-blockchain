@@ -195,7 +195,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           development: true
 
-      - uses: cactus-network/actions/activate-venv@main
+      - uses: cactus-network.net/actions/activate-venv@main
 
       - name: Setup Node 16.x
         uses: actions/setup-node@v3

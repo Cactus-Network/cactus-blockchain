@@ -127,7 +127,7 @@ jobs:
           python-version: ${{ matrix.python.action }}
           development: true
 
-      - uses: cactus-network/actions/activate-venv@main
+      - uses: cactus-network.net/actions/activate-venv@main
 
       - name: Coverage Processing
         run: |

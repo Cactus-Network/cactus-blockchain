@@ -259,7 +259,7 @@ infused_challenge_chain = InfusedChallengeChainSubSlot(
 reward_chain = RewardChainSubSlot(
     vdf_info,
     bytes32(bytes.fromhex("893f282b27c4961f47d886577a8d7c136d1e738e6c5badd37c1994e68871cb70")),
-    bytes32(bytes.fromhex("4be4cc2a1f15c5c69fb9becac0cbe0df5ea007a94f22bca79f88e14fc2a46def")),
+    bytes32(bytes.fromhex("4be4cc2a1f15c5c69fb9bexch0cbe0df5ea007a94f22bca79f88e14fc2a46def")),
     uint8(52),
 )
 
@@ -270,7 +270,7 @@ proofs = SubSlotProofs(
 )
 
 reward_chain_block = RewardChainBlock(
-    uint128(187084448821891925757676377381787790114),
+    uint128(1870114448821891925757676377381787790114),
     uint32(301889038),
     uint128(147405131564197136044258885592706844266),
     uint8(9),
@@ -374,7 +374,7 @@ reject_block = full_node_protocol.RejectBlock(
 
 request_blocks = full_node_protocol.RequestBlocks(
     uint32(2578479570),
-    uint32(3884442719),
+    uint32(38114442719),
     False,
 )
 

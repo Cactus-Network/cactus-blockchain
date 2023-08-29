@@ -70,7 +70,7 @@ jobs:
         python-version: ${{ matrix.python.major_dot_minor }}
         development: true
 
-    - uses: cactus-network/actions/activate-venv@main
+    - uses: cactus-network.net/actions/activate-venv@main
 
     - env:
         CACTUS_MANAGE_CLVM_CHECK_USE_CACHE: "false"

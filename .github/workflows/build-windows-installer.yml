@@ -224,7 +224,7 @@ jobs:
       run: |
         .\Install.ps1 -d
 
-    - uses: cactus-network/actions/activate-venv@main
+    - uses: cactus-network.net/actions/activate-venv@main
 
     - name: Prepare GUI cache
       id: gui-ref

@@ -229,7 +229,7 @@ respond_proof_of_weight_json: Dict[str, Any] = {
                                 },
                             },
                             "challenge_chain_sub_slot_hash": "0x893f282b27c4961f47d886577a8d7c136d1e738e6c5badd37c1994e68871cb70",
-                            "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9becac0cbe0df5ea007a94f22bca79f88e14fc2a46def",
+                            "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9bexch0cbe0df5ea007a94f22bca79f88e14fc2a46def",
                             "deficit": 52,
                         },
                         "proofs": {
@@ -252,7 +252,7 @@ respond_proof_of_weight_json: Dict[str, Any] = {
                     }
                 ],
                 "reward_chain_block": {
-                    "weight": 187084448821891925757676377381787790114,
+                    "weight": 1870114448821891925757676377381787790114,
                     "height": 301889038,
                     "total_iters": 147405131564197136044258885592706844266,
                     "signage_point_index": 9,
@@ -381,7 +381,7 @@ reject_block_json: Dict[str, Any] = {"height": 966946253}
 
 request_blocks_json: Dict[str, Any] = {
     "start_height": 2578479570,
-    "end_height": 3884442719,
+    "end_height": 38114442719,
     "include_transaction_block": False,
 }
 
@@ -423,7 +423,7 @@ respond_blocks_json: Dict[str, Any] = {
                             },
                         },
                         "challenge_chain_sub_slot_hash": "0x893f282b27c4961f47d886577a8d7c136d1e738e6c5badd37c1994e68871cb70",
-                        "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9becac0cbe0df5ea007a94f22bca79f88e14fc2a46def",
+                        "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9bexch0cbe0df5ea007a94f22bca79f88e14fc2a46def",
                         "deficit": 52,
                     },
                     "proofs": {
@@ -446,7 +446,7 @@ respond_blocks_json: Dict[str, Any] = {
                 }
             ],
             "reward_chain_block": {
-                "weight": 187084448821891925757676377381787790114,
+                "weight": 1870114448821891925757676377381787790114,
                 "height": 301889038,
                 "total_iters": 147405131564197136044258885592706844266,
                 "signage_point_index": 9,
@@ -599,7 +599,7 @@ respond_blocks_json: Dict[str, Any] = {
                             },
                         },
                         "challenge_chain_sub_slot_hash": "0x893f282b27c4961f47d886577a8d7c136d1e738e6c5badd37c1994e68871cb70",
-                        "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9becac0cbe0df5ea007a94f22bca79f88e14fc2a46def",
+                        "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9bexch0cbe0df5ea007a94f22bca79f88e14fc2a46def",
                         "deficit": 52,
                     },
                     "proofs": {
@@ -622,7 +622,7 @@ respond_blocks_json: Dict[str, Any] = {
                 }
             ],
             "reward_chain_block": {
-                "weight": 187084448821891925757676377381787790114,
+                "weight": 1870114448821891925757676377381787790114,
                 "height": 301889038,
                 "total_iters": 147405131564197136044258885592706844266,
                 "signage_point_index": 9,
@@ -781,7 +781,7 @@ respond_block_json: Dict[str, Any] = {
                         },
                     },
                     "challenge_chain_sub_slot_hash": "0x893f282b27c4961f47d886577a8d7c136d1e738e6c5badd37c1994e68871cb70",
-                    "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9becac0cbe0df5ea007a94f22bca79f88e14fc2a46def",
+                    "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9bexch0cbe0df5ea007a94f22bca79f88e14fc2a46def",
                     "deficit": 52,
                 },
                 "proofs": {
@@ -804,7 +804,7 @@ respond_block_json: Dict[str, Any] = {
             }
         ],
         "reward_chain_block": {
-            "weight": 187084448821891925757676377381787790114,
+            "weight": 1870114448821891925757676377381787790114,
             "height": 301889038,
             "total_iters": 147405131564197136044258885592706844266,
             "signage_point_index": 9,
@@ -968,7 +968,7 @@ respond_unfinished_block_json: Dict[str, Any] = {
                         },
                     },
                     "challenge_chain_sub_slot_hash": "0x893f282b27c4961f47d886577a8d7c136d1e738e6c5badd37c1994e68871cb70",
-                    "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9becac0cbe0df5ea007a94f22bca79f88e14fc2a46def",
+                    "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9bexch0cbe0df5ea007a94f22bca79f88e14fc2a46def",
                     "deficit": 52,
                 },
                 "proofs": {
@@ -1147,7 +1147,7 @@ respond_end_of_subslot_json: Dict[str, Any] = {
                 },
             },
             "challenge_chain_sub_slot_hash": "0x893f282b27c4961f47d886577a8d7c136d1e738e6c5badd37c1994e68871cb70",
-            "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9becac0cbe0df5ea007a94f22bca79f88e14fc2a46def",
+            "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9bexch0cbe0df5ea007a94f22bca79f88e14fc2a46def",
             "deficit": 52,
         },
         "proofs": {
@@ -1321,7 +1321,7 @@ respond_header_block_json: Dict[str, Any] = {
                         },
                     },
                     "challenge_chain_sub_slot_hash": "0x893f282b27c4961f47d886577a8d7c136d1e738e6c5badd37c1994e68871cb70",
-                    "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9becac0cbe0df5ea007a94f22bca79f88e14fc2a46def",
+                    "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9bexch0cbe0df5ea007a94f22bca79f88e14fc2a46def",
                     "deficit": 52,
                 },
                 "proofs": {
@@ -1344,7 +1344,7 @@ respond_header_block_json: Dict[str, Any] = {
             }
         ],
         "reward_chain_block": {
-            "weight": 187084448821891925757676377381787790114,
+            "weight": 1870114448821891925757676377381787790114,
             "height": 301889038,
             "total_iters": 147405131564197136044258885592706844266,
             "signage_point_index": 9,
@@ -1502,7 +1502,7 @@ respond_block_headers_json: Dict[str, Any] = {
                             },
                         },
                         "challenge_chain_sub_slot_hash": "0x893f282b27c4961f47d886577a8d7c136d1e738e6c5badd37c1994e68871cb70",
-                        "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9becac0cbe0df5ea007a94f22bca79f88e14fc2a46def",
+                        "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9bexch0cbe0df5ea007a94f22bca79f88e14fc2a46def",
                         "deficit": 52,
                     },
                     "proofs": {
@@ -1525,7 +1525,7 @@ respond_block_headers_json: Dict[str, Any] = {
                 }
             ],
             "reward_chain_block": {
-                "weight": 187084448821891925757676377381787790114,
+                "weight": 1870114448821891925757676377381787790114,
                 "height": 301889038,
                 "total_iters": 147405131564197136044258885592706844266,
                 "signage_point_index": 9,
@@ -1757,7 +1757,7 @@ respond_header_blocks_json: Dict[str, Any] = {
                             },
                         },
                         "challenge_chain_sub_slot_hash": "0x893f282b27c4961f47d886577a8d7c136d1e738e6c5badd37c1994e68871cb70",
-                        "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9becac0cbe0df5ea007a94f22bca79f88e14fc2a46def",
+                        "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9bexch0cbe0df5ea007a94f22bca79f88e14fc2a46def",
                         "deficit": 52,
                     },
                     "proofs": {
@@ -1780,7 +1780,7 @@ respond_header_blocks_json: Dict[str, Any] = {
                 }
             ],
             "reward_chain_block": {
-                "weight": 187084448821891925757676377381787790114,
+                "weight": 1870114448821891925757676377381787790114,
                 "height": 301889038,
                 "total_iters": 147405131564197136044258885592706844266,
                 "signage_point_index": 9,
@@ -2215,7 +2215,7 @@ error_response_json: Dict[str, Any] = {"error_code": 47018, "error_message": "er
 
 new_peak_timelord_json: Dict[str, Any] = {
     "reward_chain_block": {
-        "weight": 187084448821891925757676377381787790114,
+        "weight": 1870114448821891925757676377381787790114,
         "height": 301889038,
         "total_iters": 147405131564197136044258885592706844266,
         "signage_point_index": 9,
@@ -2444,7 +2444,7 @@ new_end_of_sub_slot_bundle_json: Dict[str, Any] = {
                 },
             },
             "challenge_chain_sub_slot_hash": "0x893f282b27c4961f47d886577a8d7c136d1e738e6c5badd37c1994e68871cb70",
-            "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9becac0cbe0df5ea007a94f22bca79f88e14fc2a46def",
+            "infused_challenge_chain_sub_slot_hash": "0x4be4cc2a1f15c5c69fb9bexch0cbe0df5ea007a94f22bca79f88e14fc2a46def",
             "deficit": 52,
         },
         "proofs": {

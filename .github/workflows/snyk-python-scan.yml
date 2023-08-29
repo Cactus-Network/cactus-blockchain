@@ -63,7 +63,7 @@ jobs:
 
     - name: Activate Cactus venv
       if: steps.check_secrets.outputs.HAS_SNYK_SECRET
-      uses: cactus-network/actions/activate-venv@main
+      uses: cactus-network.net/actions/activate-venv@main
 
     - name: Generate requirements.txt file
       if: steps.check_secrets.outputs.HAS_SNYK_SECRET

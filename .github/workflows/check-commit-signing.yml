@@ -27,4 +27,4 @@ jobs:
       with:
         fetch-depth: 0
 
-    - uses: cactus-network/actions/check-commit-signing@main
+    - uses: cactus-network.net/actions/check-commit-signing@main

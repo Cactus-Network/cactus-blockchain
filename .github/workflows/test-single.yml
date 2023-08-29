@@ -204,7 +204,7 @@ jobs:
           development: true
           legacy_keyring: ${{ matrix.configuration.legacy_keyring_required }}
 
-      - uses: cactus-network/actions/activate-venv@main
+      - uses: cactus-network.net/actions/activate-venv@main
 
       - name: Install timelord
         if: matrix.configuration.install_timelord

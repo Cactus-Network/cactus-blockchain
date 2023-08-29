@@ -77,7 +77,7 @@ jobs:
           development: true
           legacy_keyring: true
 
-      - uses: cactus-network/actions/activate-venv@main
+      - uses: cactus-network.net/actions/activate-venv@main
 
       - name: pytest
         run: |

@@ -77,8 +77,8 @@ legacy_keyring_dependencies = [
 
 kwargs = dict(
     name="cactus-blockchain",
-    author="Dommer",
-    author_email="dommer@cactus-network.net",
+    author="Mariano Sorgente",
+    author_email="mariano@cactus-network.net",
     description="Cactus blockchain full node, farmer, timelord, and wallet.",
     url="https://cactus-network.net/",
     license="Apache License",

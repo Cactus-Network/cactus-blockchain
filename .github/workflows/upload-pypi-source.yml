@@ -80,17 +80,17 @@ jobs:
               matrix: arm
 
     steps:
-    - uses: cactus-network/actions/clean-workspace@main
+    - uses: cactus-network.net/actions/clean-workspace@main
 
     - name: Add safe git directory
-      uses: cactus-network/actions/git-mark-workspace-safe@main
+      uses: cactus-network.net/actions/git-mark-workspace-safe@main
 
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
         submodules: recursive
 
-    - uses: cactus-network/actions/setup-python@main
+    - uses: cactus-network.net/actions/setup-python@main
       with:
         python-version: ${{ matrix.python.major_dot_minor }}
 
@@ -99,7 +99,7 @@ jobs:
         python-version: ${{ matrix.python.major_dot_minor }}
         development: true
 
-    - uses: cactus-network/actions/activate-venv@main
+    - uses: cactus-network.net/actions/activate-venv@main
 
     - name: Check with ${{ matrix.check.name }}
       run: |
@@ -137,17 +137,17 @@ jobs:
               git diff --exit-code
 
     steps:
-    - uses: cactus-network/actions/clean-workspace@main
+    - uses: cactus-network.net/actions/clean-workspace@main
 
     - name: Add safe git directory
-      uses: cactus-network/actions/git-mark-workspace-safe@main
+      uses: cactus-network.net/actions/git-mark-workspace-safe@main
 
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
         submodules: recursive
 
-    - uses: cactus-network/actions/setup-python@main
+    - uses: cactus-network.net/actions/setup-python@main
       with:
         python-version: ${{ matrix.python.major_dot_minor }}
 
@@ -156,7 +156,7 @@ jobs:
         python-version: ${{ matrix.python.major_dot_minor }}
         development: true
 
-    - uses: cactus-network/actions/activate-venv@main
+    - uses: cactus-network.net/actions/activate-venv@main
 
     - name: Check with ${{ matrix.check.name }}
       run: |
@@ -171,7 +171,7 @@ jobs:
       - check
     steps:
     - name: Add safe git directory
-      uses: cactus-network/actions/git-mark-workspace-safe@main
+      uses: cactus-network.net/actions/git-mark-workspace-safe@main
 
     - name: Checkout Code
       uses: actions/checkout@v3
@@ -189,7 +189,7 @@ jobs:
         python-version: ${{ matrix.python.major_dot_minor }}
         development: true
 
-    - uses: cactus-network/actions/activate-venv@main
+    - uses: cactus-network.net/actions/activate-venv@main
 
     - name: Build source distribution
       run: |
