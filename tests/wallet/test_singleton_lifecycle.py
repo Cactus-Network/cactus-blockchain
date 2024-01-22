@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import List, Tuple
 
 import pytest
-from blspy import G2Element
+from chia_rs import G2Element
 from clvm_tools import binutils
 
 from cactus.types.announcement import Announcement
@@ -20,8 +20,8 @@ from tests.core.full_node.test_conditions import check_spend_bundle_validity, in
 SINGLETON_MOD = load_clvm("singleton_top_layer.clsp")
 LAUNCHER_PUZZLE = load_clvm("singleton_launcher.clsp")
 P2_SINGLETON_MOD = load_clvm("p2_singleton.clsp")
-POOL_MEMBER_MOD = load_clvm("pool_member_innerpuz.clsp")
-POOL_WAITINGROOM_MOD = load_clvm("pool_waitingroom_innerpuz.clsp")
+POOL_MEMBER_MOD = load_clvm("pool_member_innerpuz.clsp", package_or_requirement="cactus.pools.puzzles")
+POOL_WAITINGROOM_MOD = load_clvm("pool_waitingroom_innerpuz.clsp", package_or_requirement="cactus.pools.puzzles")
 
 LAUNCHER_PUZZLE_HASH = LAUNCHER_PUZZLE.get_tree_hash()
 SINGLETON_MOD_HASH = SINGLETON_MOD.get_tree_hash()
@@ -94,7 +94,7 @@ def p2_singleton_puzzle_hash(launcher_id: Program, launcher_puzzle_hash: bytes32
     return p2_singleton_puzzle(launcher_id, launcher_puzzle_hash).get_tree_hash()
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_only_odd_coins_0(bt):
     blocks = await initial_blocks(bt)
     farmed_coin = list(blocks[-1].get_included_reward_coins())[0]
@@ -114,8 +114,8 @@ async def test_only_odd_coins_0(bt):
     spend_bundle = SpendBundle.aggregate([launcher_spend_bundle, SpendBundle([coin_spend], G2Element())])
     coins_added, coins_removed, _ = await check_spend_bundle_validity(bt, blocks, spend_bundle)
 
-    coin_set_added = set([_.coin for _ in coins_added])
-    coin_set_removed = set([_.coin for _ in coins_removed])
+    coin_set_added = {_.coin for _ in coins_added}
+    coin_set_removed = {_.coin for _ in coins_removed}
 
     launcher_coin = launcher_spend_bundle.coin_spends[0].coin
 

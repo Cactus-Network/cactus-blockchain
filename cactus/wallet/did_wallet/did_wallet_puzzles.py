@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, Iterator, List, Optional, Tuple
 
-from blspy import G1Element
+from chia_rs import G1Element
 
 from cactus.types.blockchain_format.coin import Coin
 from cactus.types.blockchain_format.program import Program
@@ -19,9 +19,13 @@ from cactus.wallet.singleton import (
 )
 from cactus.wallet.util.curry_and_treehash import calculate_hash_of_quoted_mod_hash, curry_and_treehash
 
-DID_INNERPUZ_MOD = load_clvm_maybe_recompile("did_innerpuz.clsp")
+DID_INNERPUZ_MOD = load_clvm_maybe_recompile(
+    "did_innerpuz.clsp", package_or_requirement="cactus.wallet.did_wallet.puzzles"
+)
 DID_INNERPUZ_MOD_HASH = DID_INNERPUZ_MOD.get_tree_hash()
-INTERMEDIATE_LAUNCHER_MOD = load_clvm_maybe_recompile("nft_intermediate_launcher.clsp")
+INTERMEDIATE_LAUNCHER_MOD = load_clvm_maybe_recompile(
+    "nft_intermediate_launcher.clsp", package_or_requirement="cactus.wallet.nft_wallet.puzzles"
+)
 
 
 def create_innerpuz(
@@ -187,7 +191,7 @@ def metadata_to_program(metadata: Dict) -> Program:
     return Program.to(kv_list)
 
 
-def program_to_metadata(program: Program) -> Dict:
+def did_program_to_metadata(program: Program) -> Dict:
     """
     Convert a program to a metadata dict
     :param program: Cactuslisp program contains the metadata

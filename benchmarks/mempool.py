@@ -6,10 +6,9 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from subprocess import check_call
 from time import monotonic
-from typing import Dict, Iterator, List, Optional, Tuple
+from typing import Collection, Dict, Iterator, List, Optional, Tuple
 
 from cactus.consensus.coinbase import create_farmer_coin, create_pool_coin
-from cactus.consensus.cost_calculator import NPCResult
 from cactus.consensus.default_constants import DEFAULT_CONSTANTS
 from cactus.full_node.mempool_manager import MempoolManager
 from cactus.simulator.wallet_tools import WalletTool
@@ -18,7 +17,6 @@ from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.types.coin_record import CoinRecord
 from cactus.types.mempool_inclusion_status import MempoolInclusionStatus
 from cactus.types.spend_bundle import SpendBundle
-from cactus.types.spend_bundle_conditions import Spend, SpendBundleConditions
 from cactus.util.ints import uint32, uint64
 from cactus.util.misc import to_batches
 
@@ -80,8 +78,13 @@ def fake_block_record(block_height: uint32, timestamp: uint64) -> BenchBlockReco
 async def run_mempool_benchmark() -> None:
     all_coins: Dict[bytes32, CoinRecord] = {}
 
-    async def get_coin_record(coin_id: bytes32) -> Optional[CoinRecord]:
-        return all_coins.get(coin_id)
+    async def get_coin_records(coin_ids: Collection[bytes32]) -> List[CoinRecord]:
+        ret: List[CoinRecord] = []
+        for name in coin_ids:
+            r = all_coins.get(name)
+            if r is not None:
+                ret.append(r)
+        return ret
 
     wt = WalletTool(DEFAULT_CONSTANTS)
 
@@ -158,7 +161,7 @@ async def run_mempool_benchmark() -> None:
         else:
             print("\n== Multi-threaded")
 
-        mempool = MempoolManager(get_coin_record, DEFAULT_CONSTANTS, single_threaded=single_threaded)
+        mempool = MempoolManager(get_coin_records, DEFAULT_CONSTANTS, single_threaded=single_threaded)
 
         height = start_height
         rec = fake_block_record(height, timestamp)
@@ -188,7 +191,7 @@ async def run_mempool_benchmark() -> None:
         print(f"  time: {stop - start:0.4f}s")
         print(f"  per call: {(stop - start) / total_bundles * 1000:0.2f}ms")
 
-        mempool = MempoolManager(get_coin_record, DEFAULT_CONSTANTS, single_threaded=single_threaded)
+        mempool = MempoolManager(get_coin_records, DEFAULT_CONSTANTS, single_threaded=single_threaded)
 
         height = start_height
         rec = fake_block_record(height, timestamp)
@@ -230,55 +233,17 @@ async def run_mempool_benchmark() -> None:
         print(f"  per call: {(stop - start) / 500 * 1000:0.2f}ms")
 
         print("\nProfiling new_peak() (optimized)")
-        blocks: List[Tuple[BenchBlockRecord, NPCResult]] = []
+        blocks: List[Tuple[BenchBlockRecord, List[bytes32]]] = []
         for coin_id in all_coins.keys():
             height = uint32(height + 1)
             timestamp = uint64(timestamp + 19)
             rec = fake_block_record(height, timestamp)
-            npc_result = NPCResult(
-                None,
-                SpendBundleConditions(
-                    [
-                        Spend(
-                            coin_id,
-                            bytes32(b" " * 32),
-                            bytes32(b" " * 32),
-                            123,
-                            None,
-                            None,
-                            None,
-                            None,
-                            None,
-                            None,
-                            [],
-                            [],
-                            [],
-                            [],
-                            [],
-                            [],
-                            [],
-                            [],
-                            0,
-                        )
-                    ],
-                    0,
-                    0,
-                    0,
-                    None,
-                    None,
-                    [],
-                    0,
-                    0,
-                    0,
-                ),
-                uint64(1000000000),
-            )
-            blocks.append((rec, npc_result))
+            blocks.append((rec, [coin_id]))
 
         with enable_profiler(True, f"new-peak-{suffix}"):
             start = monotonic()
-            for rec, npc_result in blocks:
-                await mempool.new_peak(rec, npc_result)
+            for rec, spends in blocks:
+                await mempool.new_peak(rec, spends)
             stop = monotonic()
         print(f"  time: {stop - start:0.4f}s")
         print(f"  per call: {(stop - start) / len(blocks) * 1000:0.2f}ms")
@@ -289,50 +254,12 @@ async def run_mempool_benchmark() -> None:
             height = uint32(height + 2)
             timestamp = uint64(timestamp + 28)
             rec = fake_block_record(height, timestamp)
-            npc_result = NPCResult(
-                None,
-                SpendBundleConditions(
-                    [
-                        Spend(
-                            coin_id,
-                            bytes32(b" " * 32),
-                            bytes32(b" " * 32),
-                            123,
-                            None,
-                            None,
-                            None,
-                            None,
-                            None,
-                            None,
-                            [],
-                            [],
-                            [],
-                            [],
-                            [],
-                            [],
-                            [],
-                            [],
-                            0,
-                        )
-                    ],
-                    0,
-                    0,
-                    0,
-                    None,
-                    None,
-                    [],
-                    0,
-                    0,
-                    0,
-                ),
-                uint64(1000000000),
-            )
-            blocks.append((rec, npc_result))
+            blocks.append((rec, [coin_id]))
 
         with enable_profiler(True, f"new-peak-reorg-{suffix}"):
             start = monotonic()
-            for rec, npc_result in blocks:
-                await mempool.new_peak(rec, npc_result)
+            for rec, spends in blocks:
+                await mempool.new_peak(rec, spends)
             stop = monotonic()
         print(f"  time: {stop - start:0.4f}s")
         print(f"  per call: {(stop - start) / len(blocks) * 1000:0.2f}ms")

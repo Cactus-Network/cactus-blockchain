@@ -8,9 +8,9 @@ from pathlib import Path
 from sys import platform
 from time import sleep
 
-from cactus.simulator.keyring import TempKeyring, using_temp_file_keyring
-from cactus.simulator.time_out_assert import adjusted_timeout
+from cactus.simulator.keyring import TempKeyring
 from cactus.util.keyring_wrapper import KeyringWrapper
+from cactus.util.timing import adjusted_timeout
 from tests.core.util.test_lockfile import wait_for_enough_files_in_directory
 
 log = logging.getLogger(__name__)
@@ -60,8 +60,7 @@ def dummy_set_passphrase(service, user, passphrase, keyring_path, index):
 
 class TestFileKeyringSynchronization:
     # When: using a new empty keyring
-    @using_temp_file_keyring()
-    def test_multiple_writers(self):
+    def test_multiple_writers(self, empty_temp_file_keyring: TempKeyring):
         num_workers = 10
         keyring_path = str(KeyringWrapper.get_shared_instance().keyring.keyring_path)
         passphrase_list = [

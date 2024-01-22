@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 import shutil
 import tempfile
-from functools import wraps
 from pathlib import Path
 from typing import Optional
 from unittest.mock import patch
@@ -29,32 +28,13 @@ def setup_mock_file_keyring(mock_configure_backend, temp_file_keyring_dir, popul
             f.write(
                 # Encrypted using DEFAULT_PASSPHRASE_IF_NO_MASTER_PASSPHRASE. Data holds an empty keyring.
                 "data: xtcxYOWtbeO9ruv4Nkwhw1pcTJCNh/fvPSdFxez/L0ysnag=\n"
-                "nonce: 17exch58deb7a392fccef49e\n"
+                "nonce: 17ecac58deb7a392fccef49e\n"
                 "salt: b1aa32d5730288d653e82017e4a4057c\n"
                 "version: 1"
             )
 
     # Create the file keyring
     mock_configure_backend.return_value = FileKeyring.create(keys_root_path=Path(temp_file_keyring_dir))
-
-
-def using_temp_file_keyring(populate: bool = False):
-    """
-    Decorator that will create a temporary directory with a temporary keyring that is
-    automatically cleaned-up after invoking the decorated function. If `populate` is
-    true, the newly created keyring will be populated with a payload containing 0 keys
-    using the default passphrase.
-    """
-
-    def outer(method):
-        @wraps(method)
-        def inner(self, *args, **kwargs):
-            with TempKeyring(populate=populate):
-                return method(self, *args, **kwargs)
-
-        return inner
-
-    return outer
 
 
 class TempKeyring:

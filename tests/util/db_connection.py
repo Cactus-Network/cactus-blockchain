@@ -5,17 +5,19 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import AsyncIterator
 
-from cactus.util.db_wrapper import DBWrapper2
+from cactus.util.db_wrapper import DBWrapper2, generate_in_memory_db_uri
 
 
 @asynccontextmanager
 async def DBConnection(db_version: int) -> AsyncIterator[DBWrapper2]:
-    db_path = Path(tempfile.NamedTemporaryFile().name)
-    if db_path.exists():
-        db_path.unlink()
-    _db_wrapper = await DBWrapper2.create(database=db_path, reader_count=4, db_version=db_version)
-    try:
+    db_uri = generate_in_memory_db_uri()
+    async with DBWrapper2.managed(database=db_uri, uri=True, reader_count=4, db_version=db_version) as _db_wrapper:
         yield _db_wrapper
-    finally:
-        await _db_wrapper.close()
-        db_path.unlink()
+
+
+@asynccontextmanager
+async def PathDBConnection(db_version: int) -> AsyncIterator[DBWrapper2]:
+    with tempfile.TemporaryDirectory() as directory:
+        db_path = Path(directory).joinpath("db.sqlite")
+        async with DBWrapper2.managed(database=db_path, reader_count=4, db_version=db_version) as _db_wrapper:
+            yield _db_wrapper

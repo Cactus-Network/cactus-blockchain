@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 import time
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, AsyncIterator, ClassVar, Dict, List, Optional, cast
 
 from cactus.rpc.rpc_server import StateChangedProtocol, default_get_connections
 from cactus.server.introducer_peers import VettedPeer
@@ -14,6 +15,11 @@ from cactus.util.ints import uint64
 
 
 class Introducer:
+    if TYPE_CHECKING:
+        from cactus.rpc.rpc_server import RpcServiceProtocol
+
+        _protocol_check: ClassVar[RpcServiceProtocol] = cast("Introducer", None)
+
     @property
     def server(self) -> CactusServer:
         # This is a stop gap until the class usage is refactored such the values of
@@ -30,16 +36,15 @@ class Introducer:
         self._server: Optional[CactusServer] = None
         self.log = logging.getLogger(__name__)
 
-    async def _start(self):
+    @contextlib.asynccontextmanager
+    async def manage(self) -> AsyncIterator[None]:
         self._vetting_task = asyncio.create_task(self._vetting_loop())
-
-    def _close(self):
-        self._shut_down = True
-        self._vetting_task.cancel()
-
-    async def _await_closed(self):
-        pass
-        # await self._vetting_task
+        try:
+            yield
+        finally:
+            self._shut_down = True
+            self._vetting_task.cancel()
+            # await self._vetting_task
 
     async def on_connect(self, peer: WSCactusConnection) -> None:
         pass

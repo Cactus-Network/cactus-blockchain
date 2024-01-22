@@ -6,6 +6,184 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does not yet adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 for setuptools_scm/PEP 440 reasons.
 
+## 2.1.4 Cactus blockchain 2024-01-10
+
+### Fixed
+* Update chia_rs to 0.2.15 for AMD K10 architecture (fixes #16386)
+
+### Changed
+* improved CPU usage due to tight loop in `send_transaction()`
+* improve performance of `total_mempool_fees()` and `total_mempool_cost()`
+* reduced the default maximum peer count to 40 from 80 (only applies to new configs)
+* changed to `normal` SQlite db sync option (previously was `full`)
+* reduced the mempool size to 10 blocks from 50 blocks (improves performance)
+* improve performance of the mempool by batch fetching items from the db
+
+
+## 2.1.3 Cactus blockchain 2023-12-18
+
+### Fixed
+* Fixed a regression in 2.1.2 that could cause a farmer to fail to be able to create a block in some cases
+
+## 2.1.2 Cactus blockchain 2023-12-13
+
+### Fixed
+* Fix deep reorgs and add tests
+* Reduce possible Signage Point bursts by forwarding 4 most recent cached SPs only
+* Fix condition serialization in RPC client
+* Fix DID resync to not create DID wallets that don't belong to the current key
+* Fix `get_block_spends` to work correctly post hard-fork
+* Shutdown on startup failure and log to the log if possible
+* fix issue with syncing testnet10 from 0
+* Chunk SQLite query for old TR/TX conversion (fixes #16589)
+* Allow set_status to overwrite trade in store (fixes #16461)
+* Add cache to wallet node preventing resend of processing TX
+* Correct `FullNodeDiscovery.pending_tasks` typo without `s`
+* Fix `cactus wallet coins list` by adding NFT, DID, DAO_CAT to wallets denominated in mojos
+* generalize JSON serializer
+* Fix possible peak height race
+* Fix invalid sync request
+* request blocks in batches of 32 instead of 33 (saves 3% bandwidth)
+* Fix `get_block_generator` fork detection
+* Fix set_status accidental arg (fixes #16817)
+* Fix issues with upgrading Cactus via RPM by claiming ownership of `/opt/cactus` in the RPM
+* clean out `/opt/cactus` before install and after removal of rpm
+
+### Added
+* Allow DApps to use WalletConnect to sign customized puzzles by extending sign APIs
+* Add support for lists of peers in the config (thanks @felixbrucker)
+* Update to support looking up mnemonic by just the first 4 letters of each word
+* Allow the daemon to use TLS v1.2 via config flag (thanks @dkackman)
+* Add systemd init files to CLI-only Linux packages
+* DL: remove data from the DB on unsubscribe
+
+### Changed
+* ban peers for 10 minutes when violating consensus rules
+* Remove `tx_endpoint` from `select_coins`
+* DID wallet coin_added by @ytx1991 in https://github.com/Cactus-Network/cactus-blockchain/pull/16256
+* Use network overrides for default port for WalletPeers
+* Improve clarity of legacy support policy language
+* Add config option to set rpc timeout and use it for simulator tests
+* rename `ClassgroupElement.from_bytes()`
+* Optimize CRCAT trades
+* harmonize `SerializedProgram` with `Program`
+* Swap some info logs in seeder to warning
+* Distinguish `insufficient_partials` from `invalid_partials`
+* transition away from `__bytes__` conversion for fixed-size integers
+* Use BLS from `chia_rs` and stop using `blspy` wheel in cactus-blockchain
+* simplify the interface to `mempool_manager.new_peak()`
+* reduce redundant calls to compute the header hash
+* Change `-h` to `-k` for `--key` flag for datalayer `get_value` cli command
+* Update `chia_rs` to `0.2.13`
+* Update `clvm_tools` to `0.4.7`
+* Update `aiohttp` to `3.9.1` (fixes a WebSocket bug introduced in 3.9.0)
+* Change `cactus show keys --show-mnemonic-seed` to also show farmer private key (thanks cacdata1)
+* Adjust ban times when unable to download properly DL DAT files
+* return `List[TransactionRecord]` from nft bulk mint functions
+* DL: delete full files when subscribed to a datastore per config
+
+
+## 2.1.1 Cactus blockchain 2023-10-11
+
+### Fixed
+- Changed electron version for GUI to 25.9.0 to fix whitescreen issues seen on some linux systems (fixes #16538)
+
+## 2.1.0 Cactus blockchain 2023-10-05
+
+### Added
+- Credential Restricted CATs
+- Add timelock information to Trades and Transactions
+- Add ergonomic timelock parsing to RPCs
+- Add valid_times to Offer object
+- Add uncurried args to debug_spend_bundle
+- Add force option for spend_clawback_coin
+- Add Wallet CLI Unit tests
+- Add ergonomic condition classes
+- Add the option for arbitrary conditions to make_solution
+- Add flags to CR-CAT offer summary
+- Improve testnet connectivity
+- Add `get_public_key` and `get_public_keys` daemon RPCs
+- Add `extra_conditions` as an option to transaction endpoints
+- DataLayer fingerprint control
+- Delete Datalayer DAT files on unsubscribe
+- add new Datalayer `plugins:` config allowing for custom headers
+- Add support for multi node farmers (thanks @felixbrucker)
+- Add a full node RPC endpoint, `get_mempool_items_by_coin_name` (thanks @kimsk)
+- Add CLI NFT Pagination (thanks @yyolk)
+- Add traceback to front-end error responses
+- Configure number of stored full files in Datalayer
+- Add timelock information to Trades and Transactions
+- Bladebit Hybrid disk mode
+
+### Changed
+- Remove CAT1 UX guards
+- Dedup offer cancellation logic
+- upgrade electron-builder to 24.6.3 and Lerna to 7.1.3
+- Simplify get_max_send_amount for CAC and CATs
+- Added wallet id showing when using the 'cactus plotnft show' (thanks @d1m1trus)
+- Introduce TXConfig and CoinSelectionConfig
+- Print JSON for all DL commands
+- demote log level for TIMESTAMP_TOO_FAR_IN_FUTURE errors
+- Prevent redundant peer calls in coin_added
+- Timelord peak change
+- full_node: Stop updating wallets during long sync
+- Optimize CAT coin_added
+- Optimize NFT coin_added
+- flush only the updated parts of the height-to-hash cache file
+- Rename USDS --> USDSC
+- wallet: Drop `is_peer_synced` / More cache usage
+- run_block_generator2()
+- full_node: Move wallet updates into a separate task
+- send --fix-ssl-permissions to stderr
+- update chiabip158 to 1.3
+- Update chiapos to 2.0.3
+- Update install-gui.sh to check Node 18 and npm 9
+
+### Fixed
+- Fixed python3-venv in install.sh (thanks @d1m1trus)
+- Change include_standard_libraries for CLVM compilation default to True
+- add dust warning message to cactus coins commands & cleanup code
+- Fixed `cactus rpc status` output
+- Fix a typo in code style documentation (thanks @UncertainBadg3r)
+- Add condition opcodes for agg sigs to condition_codes.clib
+- correct netspace calculation
+- fixed issue with reuse_puzhash when minting NFTs (thanks @YeungTing)
+- Refactor Seeder & Crawler code + add tests
+- fix testnet10 sync-from-scratch
+- Fix timelord-install.sh for CentOS\RHEL (thanks @LeroyINC)
+- Don't raise on duplicate VC proof insertion
+- Add self revocation path to VC wallet
+- Support calling get_routes via wss
+- Make sure reuse_puzhash works for nft1 offers
+- Fix comment typo (thanks @cacdata1)
+- type mismatch for last_time_farmed (thanks @dkackman)
+- fix waiting for co-routines in plotters_util.py
+- wallet: Fix and improve untrusted race caching
+- Add `--verbose` option to `data create_data_store` and limit default output to the store id
+- chiavdf==1.0.11 for setuptools fix
+- more ws message type awareness in the deamon
+- add fee for cat creation
+- max_coin_amount should default to None in wallet send command
+- Add extra_conditions to special offer making
+- bump chia_rs to include bugfix for new AGG_SIG_* conditions in mempool mode
+- Fix `cactus farm summary` aborting early if no local full node present (fixes #16164) (thanks @cacdata1)
+- fix typo in PendingTxCache
+- rename `cactus data add_missing_files` `-f`/`--foldername` to `-d`/`--directory`
+- Wallet workaround for python issue 97641 and update anyio for issue 589
+- Fix issue with trade failures
+- Fix glitch NFT wallet test
+
+### Removed
+- Support for MacOS 10.14 and 10.15
+- Support for Cactus database schema version 1
+- Support for minting CATs via RPC
+
+## 2.0.1 Cactus blockchain 2023-09-06
+
+### Fixed
+
+- Fix issue with GUI and `cactus plotters` on Linux when making compressed plots (Fixes #16187)
+
 ## 2.0.0 Cactus blockchain 2023-08-24
 
 ### Added
@@ -229,9 +407,9 @@ for setuptools_scm/PEP 440 reasons.
 ### Added
 - `get_transaction_memo` wallet RPC
 - `set_wallet_resync_on_startup` wallet RPC to reset wallet sync data on wallet restart
-- `nft_count_nfts` wallet RPC - Counts NFTs per wallet or for all wallets
+- `nft_count_nfts` wallet RPC - counts NFTs per wallet or for all wallets
 - Community DNS introducers to initial (default) config.yaml
-- Additional metrics for `state_changed` events (used by cactus-exporter)
+- additional metrics for `state_changed` events (used by cactus-exporter)
 - Python 3.11 support
 - `cactus wallet check` CLI command
 - `reuse_public_key_for_change` config.yaml option to allow address reuse for change
@@ -278,25 +456,25 @@ for setuptools_scm/PEP 440 reasons.
 - New `cactus wallet coins` CLI and RPCs for listing, splitting, and combining coins
 - New on-chain notification for offers, specifically designed for NFT offers
 - New full node dynamic fee estimator (`cactus show -f` and `get_fee_estimate` full node RPC)
-- Implementation of soft fork at block 3630000 - See the 1.7.0 blog post for more details
+- Implementation of soft fork at block 3630000 - see the 1.7.0 blog post for more details
 - Add gzip support to DataLayer download client (Thanks, @Chida82!)
 - Add proxy support to DataLayer download client (Thanks again, @Chida82!)
 - Add `get_timestamp_for_height` Wallet RPC for converting heights to timestamps
 - Add `tools/legacy_keyring.py` to allow migration from the removed old key storage format.  Available only from source installations.
 - Add Arch Linux to install-gui.sh script (Thanks, @DaOneLuna!)
 - Add a `daemon_heartbeat` setting to config.yaml
-- Add `trusted_max_subscribe_items` and `wallet:trusted_peers` to config.yaml
+- add `trusted_max_subscribe_items` and `wallet:trusted_peers` to config.yaml
 - NFT bulk transfer and DID assignment wallet RPCs
 - Add the expected offer ID to some RPCs that take offer blobs
 
 ### Changed
 
-- Bump `chia_rs` dependency to `0.2.0`
+- bump `chia_rs` dependency to `0.2.0`
 - Update version of `clvm_tools_rs` to `0.1.30`
 - Use better check that we are on mainnet when deciding to use default Cactus DNS server
 - Remove conflicting TXs before adding SpendBundle to Mempool in `add_spend_bundle`
 - Try each Cactus DNS Server in list before trying introducers
-- Optimize mempool's potential cache
+- optimize mempool's potential cache
 - Display complete exception info in log file for validation, consensus, and protocol errors
 - Enable setting time between blocks in full node sim
 - Limit rate of log messages when farmer is disconnected from pool
@@ -304,21 +482,21 @@ for setuptools_scm/PEP 440 reasons.
 
 ### Fixed
 
-- Offer security updates: Offers that are generated with this version cannot be accepted with older versions of Cactus - See blog post for details
-- Server: Fix invalid attribute accesses in `WSCactusConnection`
-- Header validation time logging severity reduced from warning to info when time is less than two seconds
-- Replacing transactions in the mempool is normal behavior, not a warning
-- Don't throw unnecessary exception on peer connect
+- Offer security updates: Offers that are generated with this version cannot be accepted with older versions of Cactus - see blog post for details
+- server: Fix invalid attribute accesses in `WSCactusConnection`
+- header validation time logging severity reduced from warning to info when time is less than two seconds
+- replacing transactions in the mempool is normal behavior, not a warning
+- don't throw unnecessary exception on peer connect
 - Return existing CAT wallet instead of raising
 - Resolve peers in harvester and timelord startup (fixes #14158)
-- Bump default bladebit version to `2.0.1` in `install-plotter.sh`
-- Disallow empty SpendBundles in the mempool
-- Avoid an exception in some rare cases when requesting the pool login link
-- Provide a clear error when the `wallet_id` value is missing in a call to the `nft_set_bulk_nft_did` wallet rpc (Thanks, @steppsr!)
-- Allow cancellation of offers when there is no spendable balance
-- Track all transactions of an NFT bulk mint instead of just the first
+- bump default bladebit version to `2.0.1` in `install-plotter.sh`
+- disallow empty SpendBundles in the mempool
+- avoid an exception in some rare cases when requesting the pool login link
+- provide a clear error when the `wallet_id` value is missing in a call to the `nft_set_bulk_nft_did` wallet rpc (Thanks, @steppsr!)
+- allow cancellation of offers when there is no spendable balance
+- track all transactions of an NFT bulk mint instead of just the first
 - Make the `--id` flag on cancel_offer required
-- Corrected a target address vs. metadata mismatch when bulk minting and airdropping NFTs
+- corrected a target address vs. metadata mismatch when bulk minting and airdropping NFTs
 - Fixed wallet DB issues resulting when there are unexpected failures during syncing
 
 ### Deprecated
@@ -352,7 +530,7 @@ for setuptools_scm/PEP 440 reasons.
 - Remove legacy keyring support
 - Drop support for bladebit v1 and use bladebit v2 for RAM and Disk plots
 - Removed remaining vestiges of defunct backup service
-- `debug_spend_bundle` -- Print coin id as hex string
+- `debug_spend_bundle` -- print coin id as hex string
 - Only open SQLite log file once per db wrapper
 - Switch to context manager for task timing instrumentation
 - Revert rate limiting messages from `warning` back to `debug`
@@ -752,15 +930,15 @@ for setuptools_scm/PEP 440 reasons.
 ### Added
 
 - Added support for NFTs!!! :party:
-- Added `cactus wallet nft` command (see <https://docs.cactus-network.net/docs/13cli/did_cli>)
-- Added `cactus wallet did` command (see <https://docs.cactus-network.net/docs/12rpcs/nft_rpcs>)
-- Added RPCs for DID (see <https://docs.cactus-network.net/docs/12rpcs/did_rpcs>)
-- Added RPCs for NFT (see <https://docs.cactus-network.net/docs/12rpcs/nft_rpcs>)
+- Added `cactus wallet nft` command (see <https://docs.cactus-network.network.net/docs/13cli/did_cli>)
+- Added `cactus wallet did` command (see <https://docs.cactus-network.network.net/docs/12rpcs/nft_rpcs>)
+- Added RPCs for DID (see <https://docs.cactus-network.network.net/docs/12rpcs/did_rpcs>)
+- Added RPCs for NFT (see <https://docs.cactus-network.network.net/docs/12rpcs/nft_rpcs>)
 - Enable stricter mempool rule when dealing with multiple extra arguments
 - Added a retry when loading pool info from a pool at 2 minute intervals
 - Added CLI options `--sort-by-height` and –sort-by-relevance` to `cactus wallet get_transactions`
 - Harvester: Introduce `recursive_plot_scan`
-- Add libgmp-dev to Bladebit installation - Thanks to @TheLastCicada
+- Add libgmp-dev to Bladebit installation - thanks to @TheLastCicada
 - Add support for multiple of the same CAT in aggregate offers - Thanks to @roseiliend
 
 ### Changed
@@ -803,16 +981,16 @@ for setuptools_scm/PEP 440 reasons.
 - Coin simplification
 - Harvester: Use a set instead of a list to speed up availability checks
 - Improved performance of debug log output
-- Update plotters installation to include an `apt update` - Thanks to @TheLastCicada
+- Update plotters installation to include an `apt update` - thanks to @TheLastCicada
 - Early return from `_set_spent function` - Thanks @neurosis69
 - Remove redundant condition in `get_coin_records` - Thanks @neurosis69
-- Write python version error to stderr - Thanks to @LuaKT
+- Write python version error to stderr - thanks to @LuaKT
 
 ### Fixed
 
-- Fixed issues with harvesters not reconnecting properly - Fixes #11466
-- Return not synced if there are no connections - Fixes #12090
-- Fix issues with wallet resending transactions on various mempool and node errors - Fixes #10873
+- Fixed issues with harvesters not reconnecting properly - fixes #11466
+- Return not synced if there are no connections - fixes #12090
+- Fix issues with wallet resending transactions on various mempool and node errors - fixes #10873
 - Fix some issues with `plotnft show` (#11897)
 - Handle ephemeral ports and dual stack (ipv4 & ipv6)
 - Fix issues when wallet syncing and rolling back too far in the past
@@ -881,7 +1059,7 @@ There is a known issue where harvesters will not reconnect to the farmer automat
 - Users can show/hide token wallets. If you have auto-discover cats in config.yaml turned off, new tokens will still show up there, but those wallets won’t get created until the token has been toggled on for the first time
 - CATs now have a link to Taildatabase.com to look up the Asset ID
 - Ongoing improvements to the internal test framework for speed and reliability.
-- Significant harvester protocol update: You will need to update your farmer and all your harvesters as this is a breaking change in the harvester protocol. The new protocol solves many scaling issues. In particular, the protocol supports sending delta changes to the farmer - So for example, adding plots to a farm results in only the new plots being reported. We recommend you update your farmer first.
+- Significant harvester protocol update: You will need to update your farmer and all your harvesters as this is a breaking change in the harvester protocol. The new protocol solves many scaling issues. In particular, the protocol supports sending delta changes to the farmer - so for example, adding plots to a farm results in only the new plots being reported. We recommend you update your farmer first.
 - Updated clvm_tools to 0.4.4
 - Updated clvm_tools_rs to 0.1.7
 - Changed code to use by default the Rust implementation of clvm_tools (clvm_tools_rs)
@@ -967,13 +1145,13 @@ There is a known issue where harvesters will not reconnect to the farmer automat
 
 ### Added
 
-- CAT wallet support - Add wallets for your favorite CATs.
-- Offers - Make, take, and share your offers.
-- Integrated lite wallet sync - To get you synced up faster while your full node syncs.
+- CAT wallet support - add wallets for your favorite CATs.
+- Offers - make, take, and share your offers.
+- Integrated lite wallet sync - to get you synced up faster while your full node syncs.
 - Wallet mode - Access just the wallet features to make and receive transactions.
 - Farmer mode - All your farming tools, and full node, while getting all the benefits of the upgraded wallet features.
-- New v2 DB - Improved compression for smaller footprint (the v2 DB is created alongside the v1 DB. Please be sure to have enough disk space before executing the DB upgrade command).
-- Key derivation tool via CLI - Lets you derive wallet addresses, child keys, and also search your keys for arbitrary wallet addresses/keys.
+- New v2 DB - improved compression for smaller footprint (the v2 DB is created alongside the v1 DB. Please be sure to have enough disk space before executing the DB upgrade command).
+- Key derivation tool via CLI - lets you derive wallet addresses, child keys, and also search your keys for arbitrary wallet addresses/keys.
 - Lite wallet data migration - CAT wallets you set up and your offer history will be carried over.
 - The farmer will report version info in User-Agent field for pool protocol (Thanks @FazendaPool).
 - Added new RPC, get_version, to the daemon to return the version of Cactus (Thanks @dkackman).
@@ -1003,11 +1181,11 @@ There is a known issue where harvesters will not reconnect to the farmer automat
 - The new testnet is testnet10.
 - Switch to using npm ci from npm install in the GUI install scripts.
 - Improved sync performance of the full node by doing BLS validation in separate processes.
-- Default log rotation was changed to 50MiB from 20MiB - Added config.yaml setting log_maxbytesrotation to configure this.
+- Default log rotation was changed to 50MiB from 20MiB - added config.yaml setting log_maxbytesrotation to configure this.
 - Thanks to @cross for an optimization to chiapos to use rename instead of copy if the tmp2 and final files are on the same filesystem.
 - Updated to use chiapos 1.0.9.
 - Updated to use blspy 1.0.8.
-- Implemented a limit to the number of PlotNFTs a user can create - With the limit set to 20. This is to prevent users from incorrectly creating multiple PlotNFTs. This limit can be overridden for those users who have specific use cases that require more than 20 PlotNFTs.
+- Implemented a limit to the number of PlotNFTs a user can create - with the limit set to 20. This is to prevent users from incorrectly creating multiple PlotNFTs. This limit can be overridden for those users who have specific use cases that require more than 20 PlotNFTs.
 - Removed the option to display "All" rows per page on the transactions page of the GUI.
 - Updated the background image for the MacOS installer.
 - Changed the behavior of what info is displayed if the database is still syncing.
@@ -1143,7 +1321,7 @@ We have some great improvements in this release: We launched our migration of ke
 - Added a config option for peer_connect_timeout.
 - Added support for unhardened key derivations.
 - Various CoinStore benchmark and performance improvements.
-- Beta builds are built on every merge to main, and are now available from <https://cactus-network.net/download/>.
+- Beta builds are built on every merge to main, and are now available from <https://cactus-network.network.net/download/>.
 - Thanks @Radexito for adding support for Raspberry Pi 4 64Bit to the GUI installation script.
 - Added macOS keyring.yaml support, migrating keys from macOS Keychain to keyring.yaml to support an upcoming release in which we'll add an optional passphrase to wallets.
 - We have made many full node changes to support our upcoming Cactus Asset Token (CAT) standard and our upcoming standalone light wallet, which will use Cactus's new electrum-style protocol to enable faster wallet syncing.
@@ -1234,7 +1412,7 @@ submissions. Thanks to @RuiZhe for Chinese, Traditional; @HansCZ for Czech;
 - Thanks @altendky for changing the default to paginate to cactus wallet get_transactions to address cases such as piping and output redirection to a file where the command previously just hung while waiting for the user to press c for the next page.
 - Removed commented-out debug breakpoints.
 - Enabled Rust condition checker to add the ability to parse the output conditions from a  generator program in Rust. It also validates some of the conditions in Rust.
-- Switched IP address lookup to first use Cactus's service ip.cactus-network.net.
+- Switched IP address lookup to first use Cactus's service ip.cactus-network.network.net.
 - Made changes so that when creating SSL certificate and private key files, we ensure that files are written with the proper file permissions.
 - Define a new encrypted keyring format to be used to store keys, and which is optionally encrypted to a user-supplied passphrase. GUI for the passphrase will come in an upcoming release.
 - Removed initial transaction freeze put in place at mainnet launch as it is no longer necessary.
@@ -1549,7 +1727,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Fixed
 
-- Performance of streamable has been increased, which should help the full node use less CPU - Especially when syncing.
+- Performance of streamable has been increased, which should help the full node use less CPU - especially when syncing.
 - Timelords are now successfully infusing almost 100% of blocks.
 - Harvester should be a bit more tolerant of some bad plots.
 
@@ -1557,7 +1735,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Added
 
-- This is a maintenance release for 1.0.4 to fix a few mostly cosmetic issues. Please refer to the 1.0.4 notes for the substantive plotting changes - For example - In that release.
+- This is a maintenance release for 1.0.4 to fix a few mostly cosmetic issues. Please refer to the 1.0.4 notes for the substantive plotting changes - for example - in that release.
 
 ### Changed
 
@@ -1577,7 +1755,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 ### Added
 
 - Starting approximately April 21, 2021, the GUI will notify you that this version will stop working at block height 193,536 and will persistently warn you from that block on that you can not use this version (or any earlier version) to farm. This is to support the upgrade to the transaction fork.
-- We now have translations for Brazilian Portuguese, Australian English, and Pirate. Thanks to @fsavaget, @darkflare, @maahhh, @harold_257, @kontin, and @GunnlaugurCalvi. Yarr - Don't be losing your 24 word treasure map...
+- We now have translations for Brazilian Portuguese, Australian English, and Pirate. Thanks to @fsavaget, @darkflare, @maahhh, @harold_257, @kontin, and @GunnlaugurCalvi. Yarr - don't be losing your 24 word treasure map...
 
 ### Changed
 
@@ -1704,7 +1882,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Added
 
-- This is a hard fork/breaking change from RC6/7. TCAC Coins will **not** be moved forward but your plots and keys and parts of your configuration do. When you install this version before 10AM PDST on 3/16/2021 it will load up, start finding peers, and otherwise wait for the flag drop at that time to start farming. This is likely to be the last dress rehearsal for mainnet launch. Our [3/15/2021 blog post](https://www.cactus-network.net/2021/03/15/mainnet-update.html) has more details on the current mainnet launch plan.
+- This is a hard fork/breaking change from RC6/7. TCAC Coins will **not** be moved forward but your plots and keys and parts of your configuration do. When you install this version before 10AM PDST on 3/16/2021 it will load up, start finding peers, and otherwise wait for the flag drop at that time to start farming. This is likely to be the last dress rehearsal for mainnet launch. Our [3/15/2021 blog post](https://www.cactus-network.network.net/2021/03/15/mainnet-update.html) has more details on the current mainnet launch plan.
 - The GUI now has a tooltip that directs users to the explanation of the plot filter.
 - The GUI now has a tooltip to explain the "Disable bitfield plotting" option. Thanks @shaneo257 for the idea.
 - The GUI now has a tooltip to explain Hierarchical Deterministic keys next to Receive Address on the Wallet page.
@@ -1733,7 +1911,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 - Our green flag test blockchain launch worked but it uncovered a flaw in our installer versions. This release is a bug fix release to address that flaw. You should read the RC6 changes below if this is your first time installing since RC5.
 - Thanks to @dkackman for implementing an early exit of the GUI if you run `npm run build` without being in the `venv`.
-- `cactus-network.netspace` now defaults to 1000 blocks to mirror the GUI.
+- `cactus-network.network.net` now defaults to 1000 blocks to mirror the GUI.
 - The installer build process was spruced up some.
 
 ### Fixed
@@ -1743,12 +1921,12 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - Wallet notoriously showed "not synced" when it was in sync.
 - Installers were not correctly placing root TLS certificates into the bundle.
 - Weight proofs had a logic typo.
-- There was a typo in `cactus-network.netspace`. Thanks @altendky.
+- There was a typo in `cactus-network.network.net`. Thanks @altendky.
 - There was a typo in `cactus plots`. Thanks @adamfiddler.
 
 ### Known Issues
 
-- Some users can't plot in the GUI in MacOS Big Sur - Especially on M1. See issue [1189](https://github.com/Cactus-Network/cactus-blockchain/issues/1189)
+- Some users can't plot in the GUI in MacOS Big Sur - especially on M1. See issue [1189](https://github.com/Cactus-Network/cactus-blockchain/issues/1189)
 
 ## 1.0rc6 aka Release Candidate 6 - 2021-03-11
 
@@ -1760,7 +1938,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - Functionally has been added to the farmer rpc including checking and changing your farming rewards target addresses.
 - Added the ability to translate material-ui components like `Row 1 of 10`. Thanks @jespino.
 - Arch linux support has been added to `sh install.sh`. Thanks @jespino.
-- Update FullBlock to Allow Generator References - A list of block heights of generators to be made available to the block program of the current block at generator runtime. This sets the stage for smart coins calling existing "libraries" already on the chain to lower fees and increase the scale of complex smart coins.
+- Update FullBlock to Allow Generator References - a list of block heights of generators to be made available to the block program of the current block at generator runtime. This sets the stage for smart coins calling existing "libraries" already on the chain to lower fees and increase the scale of complex smart coins.
 
 ## Changed
 
@@ -1777,14 +1955,14 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - The network maximum k size is now set to k=50. We think that may be more storage than atoms in the solar system so it should be ok. But we will probably be hated for it in 200 years...
 - The formula for computing iterations is simplified, so that only one division is necessary, and inverting the (1-x) into just x.
 - There are new timestamp consensus rules. A block N must have a greater timestamp than block N-1. Also, a block's timestamp cannot be more than 5 minutes in the future. Note that we have decided that work factor difficulty resets are now going to be 24 hours on mainnet but are still shorter on testnet.
-- A List[Tuple[uint16, str]] is added to the peer network handshake. These are the capabilities that the node supports, to add new features to the protocol in an easy - Soft fork - Manner. The message_id is now before the data in each message.
+- A List[Tuple[uint16, str]] is added to the peer network handshake. These are the capabilities that the node supports, to add new features to the protocol in an easy - soft fork - manner. The message_id is now before the data in each message.
 - Peer gossip limits were set.
 - Generators have been re-worked in CLVM. We added a cactuslisp deserialization puzzle and improved the low-level generator. We reduce the accepted atom size to 1MB during CactusLisp native deserialization.
 - When processing mempool transactions, Coin IDs are now calculated from parent coin ID and amount
 - We implemented rate limiting for full node. This can and will lead to short term bans of certain peers that didn't behave in expected ways. This is ok and normal, but strong defense against many DDOS attacks.
 - `requirements-dev.txt` has been removed in favor of the CI actions and test scripts.
-- We have moved to a new and much higher scalability download.cactus-network.net to support the mainnet launch flag and additional download demand.
-- To always get the latest testnet and then mainnet installers you can now use a latest URL: [Windows](https://download.cactus-network.net/latest/Setup-Win64.exe) and [MacOS x86_64](https://download.cactus-network.net/latest/Setup-MacOS.dmg).
+- We have moved to a new and much higher scalability download.cactus-network.network.net to support the mainnet launch flag and additional download demand.
+- To always get the latest testnet and then mainnet installers you can now use a latest URL: [Windows](https://download.cactus-network.network.net/latest/Setup-Win64.exe) and [MacOS x86_64](https://download.cactus-network.network.net/latest/Setup-MacOS.dmg).
 - Cactus wheels not on Pypi and some dependecies not found there also are now on pypi.chia.net.
 - Additional typing has been added to the Python code with thanks to @jespino.
 - Cryptography and Keyring have been bumped to their current releases.
@@ -1807,7 +1985,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 ### Added
 
 - The RC5 release is a new breaking change/hard fork blockchain. Plots and keys from previous chains will work fine on RC5 but balances of TCAC will not come forward.
-- We now support a "green flag" chain launch process. A new version of the software will poll download.cactus-network.net/notify/ for a signed json file that will be the genesis block of the chain for that version. This will allow unattended start at mainnet.
+- We now support a "green flag" chain launch process. A new version of the software will poll download.cactus-network.network.net/notify/ for a signed json file that will be the genesis block of the chain for that version. This will allow unattended start at mainnet.
 - Bluebox Timelords are back. These are Timelords most anyone can run. They search through the historical chain and find large proofs of times and compact them down to their smallest representation. This significantly speeds up syncing for newly started nodes. Currently this is only supported on Linux and MacOS x86_64 but we will expand that. Any desktop or server of any age will be fast enough to be a useful Bluebox Timelord.
 - Thanks to @jespino there is now `cactus farm summary`. You can now get almost exactly the same farming information on the CLI as the GUI.
 - We have added Romanian to the GUI translations. Thank you to @bicilis on [Crowdin](https://crowdin.com/project/cactus-blockchain). We also added a couple of additional target languages. Klingon anyone?
@@ -1826,11 +2004,11 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - In chiavdf we changed n-Wesolowski proofs to include B instead of y in segments. Proof segments now have the form (iters, B, proof) instead of (iters, y, proof). This reduces proof segment size from 208 to 141 bytes.
 - The new chiavdf proof format is not compatible with the old one, however zero-Wesolowski proofs are not affected as they have zero proof segments and consist only of (y, proof).
 - We made two HashPrime optimizations in chiavdf. This forces numbers being tested for primality to be odd and avoids an unnecessary update of the sprout vector by stopping after the first non-zero value. This is a breaking change as it changes the prime numbers generated from a given seed. We believe this is the final breaking change for chiavdf.
-- Chiabip158 was set to a gold 1.0 version.
+- chiabip158 was set to a gold 1.0 version.
 - Comments to Cactuslisp and clvm source have been updated for all of the Cactuslisp changes over the proceeding three weeks.
 - And thanks yet again to @jespino for a host of PRs to add more detailed typing to various components in cactus-blockchain.
-- Aiohttp was updated to 3.7.4 to address a low severity [security issue](https://github.com/advisories/GHSA-v6wp-4m6f-gcjg).
-- Calccrypto/uint128_t was updated in the Windows chiapos implementation. Chiapos required some changes its build process to support MacOS ARM64.
+- aiohttp was updated to 3.7.4 to address a low severity [security issue](https://github.com/advisories/GHSA-v6wp-4m6f-gcjg).
+- calccrypto/uint128_t was updated in the Windows chiapos implementation. Chiapos required some changes its build process to support MacOS ARM64.
 
 ### Fixed
 
@@ -1838,7 +2016,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - Nodes that were interrupted by a network crash or standby on a laptop were not syncing upon reconnection in RC4.
 - Sync issues could stop syncing from restarting and could lead to a peer host that you could not remove.
 - Adding Click changed the behavior of `cactus keys add -m`. The help now makes it clear that the 24 word mnemonic needs to be surrounded by a pair of quotes.
-- Python root CA certificates have issues so we have added the Mozilla certificate store via curl.se and use that to connect to backup.cactus-network.net via https, for example.
+- Python root CA certificates have issues so we have added the Mozilla certificate store via curl.se and use that to connect to backup.cactus-network.network.net via https, for example.
 - The difficulty adjustment calculation was simplified.
 - All of the cactus sub repositories that were attempting to build MacOS Universal wheels were only generating x86_64 wheels internally. We have moved back to only generating x86_64 MacOS wheels on CI.
 - However, we have updated and test compiled all Cactus dependencies on Apple Silicon and will be making available a test .dmg for MacOS ARM64 shortly.
@@ -1876,7 +2054,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - If you run install-gui.sh or install-timelord.sh without being in the venv, the script will warn you that you need to `. ./activate` and exit with error.
 - If you attempt to install on a 32 bit Pi/ARM OS, the installer exits with a helpful error message. You  can still fail when running under a 64 bit kernel but using a 32 bit Python 3.
 - The application is now more aware of whether it is running a testnet or mainnet. This impacts wallet's display behavior and certain blockchain validation rules.
-- Interface improvements for `cactus-network.netspace`.
+- Interface improvements for `cactus-network.network.net`.
 - Now that aiosqlite included our upstream improvements we install version 0.17.0.
 - `cactus init` only migrates release candidate directories. The versioned sub directories under `~/cactus` will be going away before mainnet.
 
@@ -1966,7 +2144,7 @@ all fields that referred to sub blocks are changed to blocks.
 - We no longer replace addresses in the config. **IMPORTANT** - This means if you change the target address in config.yml, you have to make sure you control the correct keys.
 - We now only migrate Beta 19 and newer installations.
 - We have removed cbor2 as a dependency.
-- We updated various dependencies including cryptography, packaging, portalocker, and pyyaml - Most of which are only development dependencies.
+- We updated various dependencies including cryptography, packaging, portalocker, and pyyaml - most of which are only development dependencies.
 
 ### Fixed
 
@@ -2040,9 +2218,9 @@ all fields that referred to sub blocks are changed to blocks.
 
 - On starting full node, the weight proof cache does not attempt to load all sub blocks. Startup times are noticeably improved though there remains a hesitation when validating the mempool. Our clvm Rust implementation, which will likely ship in the next release, will drop example processing times from 180 to 3 seconds.
 - Changes to weight proofs and sub block storage and cacheing required a new database schema. This will require a re-sync or obtaining a synced blockchain_v23.db.
-- Clvm bytecode is now generated and confirmed that the checked-in clvm and CactusLisp code matches the CI compiled code.
+- clvm bytecode is now generated and confirmed that the checked-in clvm and CactusLisp code matches the CI compiled code.
 - We have removed the '-r' flag from `cactus` as it was being overridden in most cases by the `-r` for restart flag to `cactus start`. Use `cactus --root-path` instead.
-- `cactus -h` now recommends `cactus-network.netspace -d 192` which is approximately one hours worth of sub blocks. Use `-d 1000` to get the same estimate of netspace as the RPC and GUI.
+- `cactus -h` now recommends `cactus-network.network.net -d 192` which is approximately one hours worth of sub blocks. Use `-d 1000` to get the same estimate of netspace as the RPC and GUI.
 - `cactus show -c` now displays in MiB and the GUI has been changed to MiB to match.
 - `cactus configure` now accepts the shorter `-upnp` and `-log-level` arguments also.
 - `cactus plots check` now defaults to `-n 30` instead of `-n 1` - HT @eFishCent.
@@ -2102,7 +2280,7 @@ all fields that referred to sub blocks are changed to blocks.
 
 - Weight proofs were failing to verify contributing to a chain stall. This release gets things moving again but nodes are using too much CPU and can pause/lag at times. This may resolve as people upgrade to Beta 21.
 - A toxic combination of transaction limits set too high and a non performant clvm kept the chain stalled. A faster rust implementation of clvm is already nearing completion.
-- `cactus-network.netspace -s` would not correctly look up the start block height by block hash. Additionally netspace now flips to PiB above 1024 TiB. To compare netspace to `cactus show` of the GUI use `cactus-network.netspace -d 1000` as `cactus-network.netspace` defaults to `-d 192` which is one hour.
+- `cactus-network.network.net -s` would not correctly look up the start block height by block hash. Additionally netspace now flips to PiB above 1024 TiB. To compare netspace to `cactus show` of the GUI use `cactus-network.network.net -d 1000` as `cactus-network.network.net` defaults to `-d 192` which is one hour.
 
 ## [1.0beta20] aka Beta 1.20 - 2021-01-14
 
@@ -2130,7 +2308,7 @@ all fields that referred to sub blocks are changed to blocks.
 
 - Welcome to the new consensus. This release is an all but a full re-write of the blockchain in under 30 days. There is now only one tip of the blockchain but we went from two chains to three. Block times are now a little under a minute but there are a couple of sub blocks between each transaction block. A block is also itself a special kind of sub block and each sub block rewards the farmer who won it 1 TCAC. Sub blocks come, on average, about every 17 to 18 seconds.
 - Starting with this Beta, there are 4608 opportunities per day for a farmer to win 1 TCAC compared to Beta 18 where there were 288 opportunities per day for a farmer to win 16 TCAC.
-- There is a lot more information and explanation of the new consensus algorithm in the New Consensus Working Document linked from [cactus-network.net](https://cactus-network.net/). Among the improvements this gives the Cactus blockchain are a much higher security level against all attacks, more frequent transaction blocks that have less time variation between them and are then buried under confirmations (sub blocks also count towards re-org security) much more quickly.
+- There is a lot more information and explanation of the new consensus algorithm in the New Consensus Working Document linked from [cactus-network.network.net](https://cactus-network.network.net/). Among the improvements this gives the Cactus blockchain are a much higher security level against all attacks, more frequent transaction blocks that have less time variation between them and are then buried under confirmations (sub blocks also count towards re-org security) much more quickly.
 - New consensus means this is a very hard fork. All of your TCAC from Beta 17/18 will be gone. Your plots and keys will work just fine however. You will have to sync to the new chain.
 - You now have to sync 16 times more "blocks" for every 5 minutes of historical time so syncing is slower than it was on the old chain. We're aware of this and will be speeding it up and addressing blockchain database growth in the nest couple of releases.
 - Prior to this Beta 19, we had block times that targeted 5 minutes and rewarded 16 TCAC to one farmer. Moving forward we have epoch times that target 10 minutes and reward 32 TCAC to 32 farmers about every 17-18 seconds over that period. This has subtle naming and UI impacts in various places.
@@ -2149,7 +2327,7 @@ all fields that referred to sub blocks are changed to blocks.
 - The Plot tab on the GUI is now the Plots tab. It starts out with a much more friendly new user wizard and otherwise keeps all of your farming plots listed here. Use the "+ ADD A PLOT" button in the top right to plot your second or later plot.
 - The new plots page offers advanced plotting options in the various "Show Advanced Options" fold outs.
 - The plotter supports the new bitfield back propagation method and the old method from Beta 17. To choose the old method add a `-e` to the command line or choose "Disable bitfield plotting" in "Show Advanced Options" of the Plots tab. Bitfield back propagation writes about 13% less total writes and can be faster on some slower hard drive temp spaces. For now, SSD temp space will likely plot faster with bitfield back propagation disabled. We will be returning to speed enhancements to the plotter as we approach and pass our mainnet launch.
-- The Farm tab in the GUI is significantly enhanced. Here you have a dashboard overview of your farm and your activity in response to challenges blockchain challnegs, how long it will take you - On average - To win a block, and how much TCAC you've won so far. Harvester and Full Node connections have moved to Advanced Options.
+- The Farm tab in the GUI is significantly enhanced. Here you have a dashboard overview of your farm and your activity in response to challenges blockchain challnegs, how long it will take you - on average - to win a block, and how much TCAC you've won so far. Harvester and Full Node connections have moved to Advanced Options.
 - Harvester and farmer will start when the GUI starts instead of waiting for key selection if there are already keys available. This means you will start farming on reboot if you have the Cactus application set to launch on start.
 - Testnet is now running at the primary port of 511444. Update your routers appropriately. This opens 11444 for mainnet.
 - All networking code has been refactored and mostly moved to websockets.
@@ -2160,11 +2338,11 @@ all fields that referred to sub blocks are changed to blocks.
 - All appropriate Cactuslisp smart transactions have been updated to use aggsig_me.
 - Full node should be more aggressive about finding other peers.
 - Peer disconnect messages are now set to log level INFO down from WARNING.
-- Chiavdf now allows passing in input to a VDF for new consensus.
-- Sha256tree has been removed from Cactuslisp.
+- chiavdf now allows passing in input to a VDF for new consensus.
+- sha256tree has been removed from Cactuslisp.
 - `cactus show -s` has been refactored to support the new consensus.
-- `cactus-network.netspace` has been refactored for new consensus.
-- Aiohttp, clvm-tools, colorlog, concurrent-log-handler, keyring, cryptography, and sortedcontainers have been upgraded to their current versions.
+- `cactus-network.network.net` has been refactored for new consensus.
+- aiohttp, clvm-tools, colorlog, concurrent-log-handler, keyring, cryptography, and sortedcontainers have been upgraded to their current versions.
 - Tests now place a cache of blocks and plots in the ~/.cactus/ directory to speed up total testing time.
 - Changes were made to chiapos to correctly support the new bitfiled backpropogation on FreeBSD and OpenBSD. With the exception of needing to work around python cryptography as outlined on the wiki, FreeBSD and OpenBSD should be able to compile and run cactus-blockchain.
 - With the change to new consensus many components of the chain and local database are not yet stored optimally. Startup and sync times may be slower than usual so please be patient. This will improve next release.
@@ -2174,7 +2352,7 @@ all fields that referred to sub blocks are changed to blocks.
 ### Fixed
 
 - There was a regression in Beta 18 where the plotter took 499GiB of temp space for a k32 when it used to only use 332GiB. The plotter should now use just slightly less than it did in Beta 17.
-- Blspy was bumped to 0.3.1 which now correctly supports the aggsig of no signatures and is built with gmp-6.2.1.
+- blspy was bumped to 0.3.1 which now correctly supports the aggsig of no signatures and is built with gmp-6.2.1.
 - Fixed a plotter crash after pulling a disk without ejecting it first.
 - `sh install.sh` now works properly on Linux Mint.
 - `cactus show -s` now is less brain dead when a node is initially starting to sync.
@@ -2238,7 +2416,7 @@ all fields that referred to sub blocks are changed to blocks.
 
 - A bug in bls-singatures/blspy could cause a stack overflow if too many signatures were verified at once. This caused the block of death at 11997 of the Beta 15 chain. Updated to 0.2.4 to address the issue.
 - GUI Wallet now correctly updates around reorgs.
-- Chiapos 0.12.32 fixed a an out of bounds read that could crash the plotter. It also contains a fix to better handle the case of drive letters on Windows.
+- chiapos 0.12.32 fixed a an out of bounds read that could crash the plotter. It also contains a fix to better handle the case of drive letters on Windows.
 - Node would fail to start on Windows Server 2016 with lots of cores. This [python issue explains]( https://bugs.python.org/issue26903) the problem.
 
 ### Known Issues
@@ -2271,7 +2449,7 @@ all fields that referred to sub blocks are changed to blocks.
 - The rate limited wallet library now supports coin aggregation for adding additional funds after the time of creation.
 - Fees are now used in all applicable rate limited wallet calls
 - New parameters for plotting: -r (number of threads) -s (stripe size) -u (number of buckets) in cli and GUI
-- Chiavdf now has full IFMA optimizations for processors that support it.
+- chiavdf now has full IFMA optimizations for processors that support it.
 
 ### Changed
 
@@ -2313,20 +2491,20 @@ all fields that referred to sub blocks are changed to blocks.
 ### Added
 
 - Rate limited wallets can now have unspent and un-spendable funds clawed back by the Admin wallet.
-- You can now backup your wallet related metadata in an encrypted and signed file to a free service from Cactus Network at backup.cactus-network.net. Simply having a backup of your private key will allow you to fully restore the state of your wallet including coloured coins, rate limited wallets, distributed identity wallets and many more. Your private key is used to automatically restore the last backup you saved to the Cactus backup cloud service. This service is open source and ultimately you will be able to configure your backups to go to backup.cactus-network.net, your own installation, or a third party's version of it.
+- You can now backup your wallet related metadata in an encrypted and signed file to a free service from Cactus Network at backup.cactus-network.network.net. Simply having a backup of your private key will allow you to fully restore the state of your wallet including coloured coins, rate limited wallets, distributed identity wallets and many more. Your private key is used to automatically restore the last backup you saved to the Cactus backup cloud service. This service is open source and ultimately you will be able to configure your backups to go to backup.cactus-network.network.net, your own installation, or a third party's version of it.
 - Added a Code of Conduct in CODE_OF_CONDUCT.md.
 - Added a bug report template in `.github/ISSUE_TEMPLATE/bug_report.md`.
 
 ### Changed
 
 - This is a new blockchain as we changed how the default puzzle hashes are generated and previous coins would not be easy to spend. Plots made with Beta 8 and newer continue to work, but all previous test cactus are left on the old chain and do not migrate over. Configuration data like plot directories automatically migrate in your `~/.cactus` directory.
-- Proof of Space now requires significantly less temp space to generate a new plot. A k=32 that used to require 524GiB now requires only 313GiB - Generally a 40% decrease across all k sizes.
-- When plotting, instead of 1 monolithic temp file, there are now 8 files - One for each of the 7 tables and one for sorting plot data. These files are deleted as the `-2` or `-d` final file is written so the final file can fit within the footprint of the temporary files on the same filesystem.
+- Proof of Space now requires significantly less temp space to generate a new plot. A k=32 that used to require 524GiB now requires only 313GiB - generally a 40% decrease across all k sizes.
+- When plotting, instead of 1 monolithic temp file, there are now 8 files - one for each of the 7 tables and one for sorting plot data. These files are deleted as the `-2` or `-d` final file is written so the final file can fit within the footprint of the temporary files on the same filesystem.
 - We've made various additional CPU optimizations to the Proof of Space plotter that reduces plotting time by an additional 13%. These changes will also reduce CPU utilization in harvesting.
 - We have ruled out k=30 for mainnet minimum plot size. k=31 may still make mainnet. k=32 and larger will be viable on mainnet.
 - We moved to react-styleguidist to develop reusable components in isolation and better document the UI. Thanks to @embiem for this pull request.
 - Coloured coins have been updated to simplify them, remove 'a', and stop using an 'auditor'.
-- Clvm has been significantly changed to support the new coloured coins implementation.
+- clvm has been significantly changed to support the new coloured coins implementation.
 - Bumped cryptography to 3.1. Cryptography is now publishing ARM64 binary wheels to PyPi so Raspberry Pi installs should be even easier.
 - `cactus init` now automatically discovers previous releases in each new release.
 
@@ -2353,8 +2531,8 @@ all fields that referred to sub blocks are changed to blocks.
 
 ### Fixed
 
-- KOffsetSize should have been 10 bits and not 9. This was causing plots, especially larger plots, to fail with "Error 0". This bug was introduced in Beta 8 with the new plot file format.
-- A bug in aiosqlite was causing tests to hang - Especially on the ci. This may also have been causing wallet database corruption.
+- kOffsetSize should have been 10 bits and not 9. This was causing plots, especially larger plots, to fail with "Error 0". This bug was introduced in Beta 8 with the new plot file format.
+- A bug in aiosqlite was causing tests to hang - especially on the ci. This may also have been causing wallet database corruption.
 - `cactus show -w` now correctly outputs all wallet types and balances from the local wallet.
 
 ## [1.0beta10] aka Beta 1.10 - 2020-08-18
@@ -2442,7 +2620,7 @@ new [IETF standard for BLS signatures](https://tools.ietf.org/html/draft-irtf-cf
 - Added a faster VDF process which generates n-wesolowski proofs quickly
 after the VDF result is known. This requires a high number of CPUs. To use it,
 set timelord.fast_algorithm = True in the config file.
-- Added a new type of timelord helper - Blue boxes, which generate compact
+- Added a new type of timelord helper - blue boxes, which generate compact
 proofs of time for existing proven blocks. This helps reducing the database
 size and speeds up syncing a node for new users joining the network. Full nodes
 send 100 random un-compact blocks per hour to blue boxes, and if
@@ -2505,7 +2683,7 @@ other chains.
 
 ### Fixed
 
-- UPnP now works on Windows.
+- uPnP now works on Windows.
 - Log rotation should now properly rotate every 20MB and keep 7 historical logs.
 - Node had a significant memory leak under load due to an extraneous fork
 in the network code.
@@ -2586,13 +2764,13 @@ relic. We will make a patch available for these systems shortly.
 - We replaced the Electron/JavaScript interface with a React user interface which is cleaner and more responsive.
 - We now have a multithreaded harvester to farm more plots concurrently. This is especially faster when there are multiple disks being harvested. The class is also made thread safe with mutex guards. This is achieved by releasing GIL in the python bindings when fetching qualities and proofs. We estimate that the former guidance of only 50 plots per physical drive should be updated to 250-350 plots per physical drive. We will continue to improve the plots per physical drive limit during the beta period.
 - Syncing a node is now much faster and uses less memory.
-- `cactus-network.netspace` has been refactored to use the `/get_network_space` RPC. The command
+- `cactus-network.network.net` has been refactored to use the `/get_network_space` RPC. The command
   syntax has changed slightly. By default it calculates the last 24 blocks from the
   current LCA. Optionally you can use the `-b` flag to start the calculation from a different block
   height. Use `-d` to specify the delta number of blocks back into history to estimate over from either LCA or your `-b` block height.
 - The Full node RPC response formats have been changed. All API calls now return a dict with success, and an additional value, for example {"success": True, "block": block}.
-- Chiapos is now easier to compile with MSVC.
-- Create plots now takes in an optional sk_seed, it is no longer read in from keys.yaml. If not passed in, it is randomly generated. The -i argument can now only be used when you provide an sk_seed.
+- chiapos is now easier to compile with MSVC.
+- create plots now takes in an optional sk_seed, it is no longer read in from keys.yaml. If not passed in, it is randomly generated. The -i argument can now only be used when you provide an sk_seed.
 - Moved to PyYAML 5.3.1 which prevents arbitrary code execution during python/object/new constructor.
 - Moved to Python cryptography 2.9.2 which deprecates OpenSSL 1.0.1 and now relies upon OpenSSL 1.1.1g.
 - Moved to aiosqlite 0.13.0 which adds official support for Python 3.8 and fixes a possible hung thread if a connection failed.
@@ -2639,18 +2817,18 @@ relic. We will make a patch available for these systems shortly.
 
 ### Known issues
 
-- UPnP support on Windows may be broken. However, Windows nodes will be able to connect to other nodes and, once connected, participate fully in the network.
+- uPnP support on Windows may be broken. However, Windows nodes will be able to connect to other nodes and, once connected, participate fully in the network.
 - Currently, there is no way to restore a Coloured Coin Wallet.
 
 ## [1.0beta4] aka Beta 1.4 - 2020-04-29
 
 ### Added
 
-- This release adds Coloured coin support with offers. Yes that is the correct spelling. Coloured coins allow you to issue a coin, token, or asset with nearly unlimited issuance plans and functionality. They support inner smart transactions so they can inherit any of the other functionality you can implement in Cactuslisp. Offers are especially cool as they create a truly decentralized exchange capability. Read much more about them in Bram's [blog post on Coloured coins](https://cactus-network.net/2020/04/29/coloured-coins-launch.en.html).
+- This release adds Coloured coin support with offers. Yes that is the correct spelling. Coloured coins allow you to issue a coin, token, or asset with nearly unlimited issuance plans and functionality. They support inner smart transactions so they can inherit any of the other functionality you can implement in Cactuslisp. Offers are especially cool as they create a truly decentralized exchange capability. Read much more about them in Bram's [blog post on Coloured coins](https://cactus-network.network.net/2020/04/29/coloured-coins-launch.en.html).
 - This release adds support for native Windows via a (mostly) automated installer and MacOS Mojave. Windows still requires some PowerShell command line use. You should expect ongoing improvements in ease of install and replication of the command line tools in the GUI. Again huge thanks to @dkackman for continued Windows installer development. Native Windows is currently slightly slower than the same version running in WSL 2 on the same machine for both block verification and plotting.
 - We made some speed improvements that positively affected all platforms while trying to increase plotting speed in Windows.
 - The graphical Full Node display now shows the expected finish times of each of the prospective chain tips.
-- Now you can run estimates of the total space currently farming the network. Try `cactus-network.netspace -d 12` to run an estimate over the last 12 blocks which is approximately 1 hour.
+- Now you can run estimates of the total space currently farming the network. Try `cactus-network.network.net -d 12` to run an estimate over the last 12 blocks which is approximately 1 hour.
 - We’ve added TLS authentication for incoming farmer connections. TLS certs and keys are generated during cactus init and only full nodes with your keys will be able to connect to your Farmer. Also, Harvester, Timelord, and Wallet will now not accept incoming connections which reduces the application attack surface.
 - The node RPC has a new endpoint get_header_by_height which allows you to retrieve the block header from a block height. Try `cactus show -bh 1000` to see the block header hash of block 1000. You can then look up the block details with `cactus show -b f655e1a9f7f8c89a703e40d9ce82ae33508badaf7b37fa1a56cad27926b5e936` which will look up a block by it's header hash.
 - Our Windows binaries check the processor they are about to run on at runtime and choose the best processor optimizations for our [MPIR](http://mpir.org/) VDF dependency on Windows.
@@ -2663,8 +2841,8 @@ relic. We will make a patch available for these systems shortly.
 - Most scripts have been removed in favor of cactus action commands. You can run `cactus version` or `cactus start node` for example. Just running `cactus` will show you more options. However `cactus-create-plots` continues to use the hyphenated form. Also it's now `cactus generate keys` as another example.
 - Cactus start commands like `cactus start farmer` and `cactus stop node` now keep track of process IDs in a run/ directory in your configuration directory. `cactus stop` is unlikely to work on Windows native for now. If `cactus start -r node` doesn't work you can force the run/ directory to be reset with `cactus start -f node`.
 - We suggest you take a look at our [Upgrading documentation](https://github.com/Cactus-Network/cactus-blockchain/wiki/Updating-beta-software) if you aren't performing a new install.
-- Blspy now has libsodium included in the MacOS and Linux binary wheels.
-- Miniupnpc and setprotitle were dynamically checked for an installed at runtime. Removed those checks and we rely upon the install tools installing them before first run.
+- blspy now has libsodium included in the MacOS and Linux binary wheels.
+- miniupnpc and setprotitle were dynamically checked for an installed at runtime. Removed those checks and we rely upon the install tools installing them before first run.
 - Windows wheels that the Windows Installer packages are also available in the ci Artifacts in a .zip file.
 - The script `cactus start wallet-gui` has been chaned to `cactus start wallet` which launches but the GUI and server on MacOS and Linux. `cactus start wallet-server` remains for WSL 2 and Windows native.
 
@@ -2676,7 +2854,7 @@ relic. We will make a patch available for these systems shortly.
 
 - Plots of k>=32 are not working for farming, and some broken plots can cause a memory leak. A [workaround is available](https://github.com/Cactus-Network/cactus-blockchain/wiki/Beta-1.4-k=32-or-larger-work-around).
 - If you are running a simulation, blockchain tips are not saved in the database and this is a regression. If you stop a node it can go back in time and cause an odd state. This doesn't practically effect testnet participation as, on restart, node will just sync up a few blocks to the then current tips.
-- UPnP support on Windows may be broken. However, Windows nodes will be able to connect to other nodes and, once connected, participate fully in the network.
+- uPnP support on Windows may be broken. However, Windows nodes will be able to connect to other nodes and, once connected, participate fully in the network.
 - Coins are not currently reserved as part of trade offers and thus could potentially be spent before the offer is accepted resulting in a failed offer transaction.
 - Currently, there is no way to restore a Coloured Coin Wallet.
 - The `cactus stop all` command sometimes fails, use `cactus-stop-all` instead. In windows, use the task manager to stop the servers.
@@ -2739,7 +2917,7 @@ relic. We will make a patch available for these systems shortly.
 - The libraries cactus-pos, cactus-fast-vdf, and cactus-bip-158 have been moved to their own repositories: [chiapos](https://github.com/Cactus-Network/chiapos), [chiavdf](https://github.com/Cactus-Network/chiavdf), and [chaibip158](https://github.com/Cactus-Network/chiabip158). They are brought in by cactus-blockchain at install time. Our BLS signature library remains at [bls-signatures](https://github.com/Cactus-Network/bls-signatures).
 - The install process now brings in chiapos, chiavdf, etc from Pypi where they are auto published via GitHub Actions ci using cibuildwheel. Check out `.github/workflows/build.yml` for build methods in each of the sub repositories.
 - `cactus-regenerate-keys` has been renamed `cactus-generate-keys`.
-- Setproctitle is now an optional install dependency that we will continue to install in the default install methods.
+- setproctitle is now an optional install dependency that we will continue to install in the default install methods.
 - The project now defaults to `venv` without the proceeding . to better match best practices.
 - Developer requirements were separated from the actual requirements.
 - `install-timelord.sh` has been pulled out from `install.sh`. This script downloads the source python package for chiavdf and compiles it locally for timelords. vdf_client can be included or excluded to make building normal user wheels easier.
@@ -2806,7 +2984,7 @@ relic. We will make a patch available for these systems shortly.
 - Loading the blockchain only loads headers into memory instead of header blocks (header + proofs), speeds up the startup, and reduces normal operation memory usage by 80%.
 - Memory access is now synchronous to reduce use of locks and speed up block processing.
 - Cactus fullnode, farmer and harvester now default to logging to cactus.log in the cactus-blockchain directory. This is configured in config.yaml and due to config.yaml changes it is recommended to edit the new template config instead of using older config.yaml’s from previous versions.
-- Uvloop is now an optional add on.
+- uvloop is now an optional add on.
 - Harvester/farmer will not try to farm plots that they don’t have the key for.
 
 ### Fixed
@@ -2820,7 +2998,7 @@ relic. We will make a patch available for these systems shortly.
 
 - FullNode performance improvements - Syncing up to the blockchain by importing all blocks is faster due to improvements in VDF verification speed and multithreading block verification.
 - VDF improvements - VDF verification and generation speed has increased and dependence on flint2 has been removed. We wish to thank Dr. William Hart (@wbhart) for dual licensing parts of his contributions in FLINT and Antic for inclusion in the Cactus blockchain.
-- Implemented an RPC interface with JSON serialization for streamables - Currently on port 11555.
+- Implemented an RPC interface with JSON serialization for streamables - currently on port 11555.
 - Added details on how to contribute in CONTRIBUTING.md. Thanks @RichardLitt.
 - Added color logging
 - Now cactus_harvester will periodically announce which plots it is currently farming and their k sizes.
@@ -2854,7 +3032,7 @@ relic. We will make a patch available for these systems shortly.
 
 ### Changed
 
-- Improvements to plotting via lookup table - As much as 15% faster
+- Improvements to plotting via lookup table - as much as 15% faster
 
 ### Fixed
 
@@ -2872,11 +3050,11 @@ relic. We will make a patch available for these systems shortly.
 ### Changed
 
 - Installation is now separated into everything except timelord/vdf and timelord/vdf.
-- Replaced VDF server compilation scripts with Makefile
+- replaced VDF server compilation scripts with Makefile
 
 ### Fixed
 
-- Setuptools_scm was corrupting .zip downloads of the repository.
+- setuptools_scm was corrupting .zip downloads of the repository.
 
 ## [Alpha 1.1] - 2019-12-12
 
@@ -2901,7 +3079,7 @@ relic. We will make a patch available for these systems shortly.
 ### Added
 
 - This is the first release of the Cactus testnet! Blockchain consensus, proof of time, and proof of space are included.
-- More details on the release at [https://www.cactus-network.net/developer/](https://www.cactus-network.net/developer/)
+- More details on the release at [https://www.cactus-network.network.net/developer/](https://www.cactus-network.network.net/developer/)
 
 [unreleased]: https://github.com/Cactus-Network/cactus-blockchain/compare/1.0beta5...dev
 [1.0beta5]: https://github.com/Cactus-Network/cactus-blockchain/compare/1.0beta4...1.0beta5

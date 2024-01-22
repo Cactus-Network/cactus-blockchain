@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 from typing import Any, AsyncGenerator, Dict, Optional, Tuple
 
-from blspy import PrivateKey
+from chia_rs import PrivateKey
 
 from cactus.consensus.coinbase import create_puzzlehash_for_pk
 from cactus.daemon.server import WebSocketServer, daemon_launch_lock_path
@@ -26,6 +26,7 @@ from cactus.util.errors import KeychainFingerprintExists
 from cactus.util.ints import uint32
 from cactus.util.keychain import Keychain
 from cactus.util.lock import Lockfile
+from cactus.util.misc import SignalHandlers
 from cactus.wallet.derive_keys import master_sk_to_wallet_sk
 
 """
@@ -107,13 +108,11 @@ def create_config(
 
 async def start_simulator(cactus_root: Path, automated_testing: bool = False) -> AsyncGenerator[FullNodeSimulator, None]:
     sys.argv = [sys.argv[0]]  # clear sys.argv to avoid issues with config.yaml
-    service = await start_simulator_main(True, automated_testing, root_path=cactus_root)
-    await service.start()
+    started_simulator = await start_simulator_main(True, automated_testing, root_path=cactus_root)
+    service = started_simulator.service
 
-    yield service._api
-
-    service.stop()
-    await service.wait_closed()
+    async with service.manage():
+        yield service._api
 
 
 async def get_full_cactus_simulator(
@@ -157,7 +156,8 @@ async def get_full_cactus_simulator(
         ca_key_path = cactus_root / config["private_ssl_ca"]["key"]
 
         ws_server = WebSocketServer(cactus_root, ca_crt_path, ca_key_path, crt_path, key_path)
-        await ws_server.setup_process_global_state()
-        async with ws_server.run():
-            async for simulator in start_simulator(cactus_root, automated_testing):
-                yield simulator, cactus_root, config, mnemonic, fingerprint, keychain
+        async with SignalHandlers.manage() as signal_handlers:
+            await ws_server.setup_process_global_state(signal_handlers=signal_handlers)
+            async with ws_server.run():
+                async for simulator in start_simulator(cactus_root, automated_testing):
+                    yield simulator, cactus_root, config, mnemonic, fingerprint, keychain

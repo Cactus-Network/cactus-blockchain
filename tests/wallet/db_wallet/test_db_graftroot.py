@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Dict, List, Tuple
 
 import pytest
-from blspy import G2Element
+from chia_rs import G2Element
 
 from cactus.clvm.spend_sim import CostLogger, sim_and_client
 from cactus.types.blockchain_format.coin import Coin
@@ -16,7 +16,7 @@ from cactus.util.errors import Err
 from cactus.wallet.puzzles.load_clvm import load_clvm
 from cactus.wallet.util.merkle_utils import build_merkle_tree, build_merkle_tree_from_binary_tree, simplify_merkle_proof
 
-GRAFTROOT_MOD = load_clvm("graftroot_dl_offers.clsp")
+GRAFTROOT_MOD = load_clvm("graftroot_dl_offers.clsp", package_or_requirement="cactus.data_layer.puzzles")
 
 # Always returns the last value
 # (mod solution
@@ -38,7 +38,7 @@ ACS_PH = ACS.get_tree_hash()
 NIL_PH = Program.to(None).get_tree_hash()
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_graftroot(cost_logger: CostLogger) -> None:
     async with sim_and_client() as (sim, sim_client):
         # Create the coin we're testing

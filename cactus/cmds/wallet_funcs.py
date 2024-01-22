@@ -10,7 +10,13 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
-from cactus.cmds.cmds_util import get_wallet_client, transaction_status_msg, transaction_submitted_msg
+from cactus.cmds.cmds_util import (
+    CMDTXConfigLoader,
+    cli_confirm,
+    get_wallet_client,
+    transaction_status_msg,
+    transaction_submitted_msg,
+)
 from cactus.cmds.peer_funcs import print_connections
 from cactus.cmds.units import units
 from cactus.rpc.wallet_rpc_client import WalletRpcClient
@@ -82,17 +88,20 @@ def print_transaction(
         print("")
 
 
-def get_mojo_per_unit(wallet_type: WalletType) -> int:
+def get_mojo_per_unit(wallet_type: WalletType) -> int:  # pragma: no cover
     mojo_per_unit: int
     if wallet_type in {
         WalletType.STANDARD_WALLET,
         WalletType.POOLING_WALLET,
         WalletType.DATA_LAYER,
         WalletType.VC,
-    }:  # pragma: no cover
+        WalletType.DAO,
+    }:
         mojo_per_unit = units["cactus"]
-    elif wallet_type == WalletType.CAT:
+    elif wallet_type in {WalletType.CAT, WalletType.CRCAT}:
         mojo_per_unit = units["cat"]
+    elif wallet_type in {WalletType.NFT, WalletType.DECENTRALIZED_ID, WalletType.DAO_CAT}:
+        mojo_per_unit = units["mojo"]
     else:
         raise LookupError(f"Operation is not supported for Wallet type {wallet_type.name}")
 
@@ -115,7 +124,7 @@ async def get_unit_name_for_wallet_id(
     wallet_type: WalletType,
     wallet_id: int,
     wallet_client: WalletRpcClient,
-) -> str:
+) -> str:  # pragma: no cover
     if wallet_type in {
         WalletType.STANDARD_WALLET,
         WalletType.POOLING_WALLET,
@@ -123,7 +132,7 @@ async def get_unit_name_for_wallet_id(
         WalletType.VC,
     }:  # pragma: no cover
         name: str = config["network_overrides"]["config"][config["selected_network"]]["address_prefix"].upper()
-    elif wallet_type == WalletType.CAT:
+    elif wallet_type in {WalletType.CAT, WalletType.CRCAT}:
         name = await wallet_client.get_cat_name(wallet_id=wallet_id)
     else:
         raise LookupError(f"Operation is not supported for Wallet type {wallet_type.name}")
@@ -257,13 +266,13 @@ async def send(
     fee: Decimal,
     address: str,
     override: bool,
-    min_coin_amount: Decimal,
-    max_coin_amount: Decimal,
+    min_coin_amount: str,
+    max_coin_amount: Optional[str],
     excluded_coin_ids: Sequence[str],
     reuse_puzhash: Optional[bool],
     clawback_time_lock: int,
 ) -> None:  # pragma: no cover
-    async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, _):
+    async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
         if memo is None:
             memos = None
         else:
@@ -290,38 +299,40 @@ async def send(
 
         final_fee: uint64 = uint64(int(fee * units["cactus"]))  # fees are always in CAC mojos
         final_amount: uint64 = uint64(int(amount * mojo_per_unit))
-        final_min_coin_amount: uint64 = uint64(int(min_coin_amount * mojo_per_unit))
-        final_max_coin_amount: uint64 = uint64(int(max_coin_amount * mojo_per_unit))
         if typ == WalletType.STANDARD_WALLET:
             print("Submitting transaction...")
             res = await wallet_client.send_transaction(
                 wallet_id,
                 final_amount,
                 address,
+                CMDTXConfigLoader(
+                    min_coin_amount=min_coin_amount,
+                    max_coin_amount=max_coin_amount,
+                    excluded_coin_ids=list(excluded_coin_ids),
+                    reuse_puzhash=reuse_puzhash,
+                ).to_tx_config(mojo_per_unit, config, fingerprint),
                 final_fee,
                 memos,
-                final_min_coin_amount,
-                final_max_coin_amount,
-                excluded_coin_ids=excluded_coin_ids,
-                reuse_puzhash=reuse_puzhash,
                 puzzle_decorator_override=[
                     {"decorator": PuzzleDecoratorType.CLAWBACK.name, "clawback_timelock": clawback_time_lock}
                 ]
                 if clawback_time_lock > 0
                 else None,
             )
-        elif typ == WalletType.CAT:
+        elif typ in {WalletType.CAT, WalletType.CRCAT}:
             print("Submitting transaction...")
             res = await wallet_client.cat_spend(
                 wallet_id,
+                CMDTXConfigLoader(
+                    min_coin_amount=min_coin_amount,
+                    max_coin_amount=max_coin_amount,
+                    excluded_coin_ids=list(excluded_coin_ids),
+                    reuse_puzhash=reuse_puzhash,
+                ).to_tx_config(mojo_per_unit, config, fingerprint),
                 final_amount,
                 address,
                 final_fee,
                 memos,
-                final_min_coin_amount,
-                final_max_coin_amount,
-                excluded_coin_ids=excluded_coin_ids,
-                reuse_puzhash=reuse_puzhash,
             )
         else:
             print("Only standard wallet and CAT wallets are supported")
@@ -528,32 +539,31 @@ async def make_offer(
                         converted_amount = Decimal(requested_amount) / divisor
                         print(f"  - {converted_amount} {asset} ({requested_amount} mojos)")
 
-                    print()
-                    nft_confirmation = input(
-                        "Offers for NFTs will have royalties automatically added. "
-                        + "Are you sure you would like to continue? (y/n): "
+                    cli_confirm(
+                        "\nOffers for NFTs will have royalties automatically added. "
+                        "Are you sure you would like to continue? (y/n): ",
+                        "Not creating offer...",
                     )
-                    if nft_confirmation not in ["y", "yes"]:
-                        print("Not creating offer...")
-                        return
 
-                confirmation = input("Confirm (y/n): ")
-                if confirmation not in ["y", "yes"]:
-                    print("Not creating offer...")
-                else:
+                cli_confirm("Confirm (y/n): ", "Not creating offer...")
+
+                offer, trade_record = await wallet_client.create_offer_for_ids(
+                    offer_dict,
+                    driver_dict=driver_dict,
+                    fee=fee,
+                    tx_config=CMDTXConfigLoader(
+                        reuse_puzhash=reuse_puzhash,
+                    ).to_tx_config(units["cactus"], config, fingerprint),
+                )
+                if offer is not None:
                     with open(pathlib.Path(filepath), "w") as file:
-                        offer, trade_record = await wallet_client.create_offer_for_ids(
-                            offer_dict, driver_dict=driver_dict, fee=fee, reuse_puzhash=reuse_puzhash
-                        )
-                        if offer is not None:
-                            file.write(offer.to_bech32())
-                            print(f"Created offer with ID {trade_record.trade_id}")
-                            print(
-                                f"Use cactus wallet get_offers --id "
-                                f"{trade_record.trade_id} -f {fingerprint} to view status"
-                            )
-                        else:
-                            print("Error creating offer")
+                        file.write(offer.to_bech32())
+                    print(f"Created offer with ID {trade_record.trade_id}")
+                    print(
+                        f"Use cactus wallet get_offers --id " f"{trade_record.trade_id} -f {fingerprint} to view status"
+                    )
+                else:
+                    print("Error creating offer")
 
 
 def timestamp_to_time(timestamp: int) -> str:
@@ -606,7 +616,7 @@ async def print_trade_record(record: TradeRecord, wallet_client: WalletRpcClient
     if summaries:
         print("Summary:")
         offer = Offer.from_bytes(record.offer)
-        offered, requested, _ = offer.summary()
+        offered, requested, _, _ = offer.summary()
         outbound_balances: Dict[str, int] = offer.get_pending_amounts()
         fees: Decimal = Decimal(offer.fees())
         cat_name_resolver = wallet_client.cat_asset_id_to_name
@@ -680,7 +690,7 @@ async def take_offer(
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
         if os.path.exists(file):
             filepath = pathlib.Path(file)
-            with open(filepath, "r") as ffile:
+            with open(filepath) as ffile:
                 offer_hex: str = ffile.read()
                 ffile.close()
         else:
@@ -694,7 +704,7 @@ async def take_offer(
             print("Please enter a valid offer file or hex blob")
             return
 
-        offered, requested, _ = offer.summary()
+        offered, requested, _, _ = offer.summary()
         cat_name_resolver = wallet_client.cat_asset_id_to_name
         network_cac = AddressType.CAC.hrp(config).upper()
         print("Summary:")
@@ -756,15 +766,22 @@ async def take_offer(
 
         if not examine_only:
             print()
-            confirmation = input("Would you like to take this offer? (y/n): ")
-            if confirmation in ["y", "yes"]:
-                trade_record = await wallet_client.take_offer(offer, fee=fee)
-                print(f"Accepted offer with ID {trade_record.trade_id}")
-                print(f"Use cactus wallet get_offers --id {trade_record.trade_id} -f {fingerprint} to view its status")
+            cli_confirm("Would you like to take this offer? (y/n): ")
+            trade_record = await wallet_client.take_offer(
+                offer,
+                fee=fee,
+                tx_config=CMDTXConfigLoader().to_tx_config(units["cactus"], config, fingerprint),
+            )
+            print(f"Accepted offer with ID {trade_record.trade_id}")
+            print(f"Use cactus wallet get_offers --id {trade_record.trade_id} -f {fingerprint} to view its status")
 
 
 async def cancel_offer(
-    wallet_rpc_port: Optional[int], fp: Optional[int], d_fee: Decimal, offer_id_hex: str, secure: bool
+    wallet_rpc_port: Optional[int],
+    fp: Optional[int],
+    d_fee: Decimal,
+    offer_id_hex: str,
+    secure: bool,
 ) -> None:
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
         offer_id = bytes32.from_hexstr(offer_id_hex)
@@ -773,16 +790,17 @@ async def cancel_offer(
         trade_record = await wallet_client.get_offer(offer_id, file_contents=True)
         await print_trade_record(trade_record, wallet_client, summaries=True)
 
-        confirmation = input(f"Are you sure you wish to cancel offer with ID: {trade_record.trade_id}? (y/n): ")
-        if confirmation in ["y", "yes"]:
-            await wallet_client.cancel_offer(offer_id, secure=secure, fee=fee)
-            print(f"Cancelled offer with ID {trade_record.trade_id}")
-            if secure:
-                print(f"Use cactus wallet get_offers --id {trade_record.trade_id} -f {fingerprint} to view cancel status")
+        cli_confirm(f"Are you sure you wish to cancel offer with ID: {trade_record.trade_id}? (y/n): ")
+        await wallet_client.cancel_offer(
+            offer_id, CMDTXConfigLoader().to_tx_config(units["cactus"], config, fingerprint), secure=secure, fee=fee
+        )
+        print(f"Cancelled offer with ID {trade_record.trade_id}")
+        if secure:
+            print(f"Use cactus wallet get_offers --id {trade_record.trade_id} -f {fingerprint} to view cancel status")
 
 
-def wallet_coin_unit(typ: WalletType, address_prefix: str) -> Tuple[str, int]:
-    if typ == WalletType.CAT:
+def wallet_coin_unit(typ: WalletType, address_prefix: str) -> Tuple[str, int]:  # pragma: no cover
+    if typ in {WalletType.CAT, WalletType.CRCAT}:
         return "", units["cat"]
     if typ in [WalletType.STANDARD_WALLET, WalletType.POOLING_WALLET, WalletType.MULTI_SIG]:
         return address_prefix, units["cactus"]
@@ -802,7 +820,7 @@ def print_balance(amount: int, scale: int, address_prefix: str, *, decimal_only:
 
 async def print_balances(
     wallet_rpc_port: Optional[int], fp: Optional[int], wallet_type: Optional[WalletType] = None
-) -> None:
+) -> None:  # pragma: no cover
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
         summaries_response = await wallet_client.get_wallets(wallet_type)
         address_prefix = selected_network_address_prefix(config)
@@ -839,24 +857,39 @@ async def print_balances(
                 )
                 spendable_balance: str = print_balance(balances["spendable_balance"], scale, address_prefix)
                 my_did: Optional[str] = None
+                ljust = 23
+                if typ == WalletType.CRCAT:
+                    ljust = 36
                 print()
                 print(f"{summary['name']}:")
-                print(f"{indent}{'-Total Balance:'.ljust(23)} {total_balance}")
-                print(f"{indent}{'-Pending Total Balance:'.ljust(23)} {unconfirmed_wallet_balance}")
-                print(f"{indent}{'-Spendable:'.ljust(23)} {spendable_balance}")
-                print(f"{indent}{'-Type:'.ljust(23)} {typ.name}")
+                print(f"{indent}{'-Total Balance:'.ljust(ljust)} {total_balance}")
+                if typ == WalletType.CRCAT:
+                    print(
+                        f"{indent}{'-Balance Pending VC Approval:'.ljust(ljust)} "
+                        f"{print_balance(balances['pending_approval_balance'], scale, address_prefix)}"
+                    )
+                print(f"{indent}{'-Pending Total Balance:'.ljust(ljust)} {unconfirmed_wallet_balance}")
+                print(f"{indent}{'-Spendable:'.ljust(ljust)} {spendable_balance}")
+                print(f"{indent}{'-Type:'.ljust(ljust)} {typ.name}")
                 if typ == WalletType.DECENTRALIZED_ID:
                     get_did_response = await wallet_client.get_did_id(wallet_id)
                     my_did = get_did_response["my_did"]
-                    print(f"{indent}{'-DID ID:'.ljust(23)} {my_did}")
+                    print(f"{indent}{'-DID ID:'.ljust(ljust)} {my_did}")
                 elif typ == WalletType.NFT:
                     get_did_response = await wallet_client.get_nft_wallet_did(wallet_id)
                     my_did = get_did_response["did_id"]
                     if my_did is not None and len(my_did) > 0:
-                        print(f"{indent}{'-DID ID:'.ljust(23)} {my_did}")
+                        print(f"{indent}{'-DID ID:'.ljust(ljust)} {my_did}")
+                elif typ == WalletType.DAO:
+                    get_id_response = await wallet_client.dao_get_treasury_id(wallet_id)
+                    treasury_id = get_id_response["treasury_id"][2:]
+                    print(f"{indent}{'-Treasury ID:'.ljust(ljust)} {treasury_id}")
+                elif typ == WalletType.DAO_CAT:
+                    cat_asset_id = summary["data"][32:96]
+                    print(f"{indent}{'-Asset ID:'.ljust(ljust)} {cat_asset_id}")
                 elif len(asset_id) > 0:
-                    print(f"{indent}{'-Asset ID:'.ljust(23)} {asset_id}")
-                print(f"{indent}{'-Wallet ID:'.ljust(23)} {wallet_id}")
+                    print(f"{indent}{'-Asset ID:'.ljust(ljust)} {asset_id}")
+                print(f"{indent}{'-Wallet ID:'.ljust(ljust)} {wallet_id}")
 
         print(" ")
         trusted_peers: dict[str, str] = config["wallet"].get("trusted_peers", {})
@@ -921,11 +954,21 @@ async def get_did_info(wallet_rpc_port: Optional[int], fp: Optional[int], coin_i
 
 
 async def update_did_metadata(
-    wallet_rpc_port: Optional[int], fp: Optional[int], did_wallet_id: int, metadata: str, reuse_puzhash: bool
+    wallet_rpc_port: Optional[int],
+    fp: Optional[int],
+    did_wallet_id: int,
+    metadata: str,
+    reuse_puzhash: bool,
 ) -> None:
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
         try:
-            response = await wallet_client.update_did_metadata(did_wallet_id, json.loads(metadata), reuse_puzhash)
+            response = await wallet_client.update_did_metadata(
+                did_wallet_id,
+                json.loads(metadata),
+                tx_config=CMDTXConfigLoader(
+                    reuse_puzhash=reuse_puzhash,
+                ).to_tx_config(units["cactus"], config, fingerprint),
+            )
             print(
                 f"Successfully updated DID wallet ID: {response['wallet_id']}, Spend Bundle: {response['spend_bundle']}"
             )
@@ -942,7 +985,12 @@ async def did_message_spend(
 ) -> None:
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
         try:
-            response = await wallet_client.did_message_spend(did_wallet_id, puzzle_announcements, coin_announcements)
+            response = await wallet_client.did_message_spend(
+                did_wallet_id,
+                puzzle_announcements,
+                coin_announcements,
+                CMDTXConfigLoader().to_tx_config(units["cactus"], config, fingerprint),
+            )
             print(f"Message Spend Bundle: {response['spend_bundle']}")
         except Exception as e:
             print(f"Failed to update DID metadata: {e}")
@@ -964,7 +1012,9 @@ async def transfer_did(
                 target_address,
                 fee,
                 with_recovery,
-                reuse_puzhash,
+                tx_config=CMDTXConfigLoader(
+                    reuse_puzhash=reuse_puzhash,
+                ).to_tx_config(units["cactus"], config, fingerprint),
             )
             print(f"Successfully transferred DID to {target_address}")
             print(f"Transaction ID: {response['transaction_id']}")
@@ -1063,6 +1113,9 @@ async def mint_nft(
                 target_address,
                 hash,
                 uris,
+                CMDTXConfigLoader(
+                    reuse_puzhash=reuse_puzhash,
+                ).to_tx_config(units["cactus"], config, fingerprint),
                 metadata_hash,
                 metadata_uris,
                 license_hash,
@@ -1072,7 +1125,6 @@ async def mint_nft(
                 fee,
                 royalty_percentage,
                 did_id,
-                reuse_puzhash=reuse_puzhash,
             )
             spend_bundle = response["spend_bundle"]
             print(f"NFT minted Successfully with spend bundle: {spend_bundle}")
@@ -1087,9 +1139,9 @@ async def add_uri_to_nft(
     wallet_id: int,
     d_fee: Decimal,
     nft_coin_id: str,
-    uri: str,
-    metadata_uri: str,
-    license_uri: str,
+    uri: Optional[str],
+    metadata_uri: Optional[str],
+    license_uri: Optional[str],
     reuse_puzhash: Optional[bool],
 ) -> None:
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
@@ -1108,7 +1160,16 @@ async def add_uri_to_nft(
             else:
                 raise ValueError("You must provide at least one of the URI flags")
             fee: int = int(d_fee * units["cactus"])
-            response = await wallet_client.add_uri_to_nft(wallet_id, nft_coin_id, key, uri_value, fee, reuse_puzhash)
+            response = await wallet_client.add_uri_to_nft(
+                wallet_id,
+                nft_coin_id,
+                key,
+                uri_value,
+                fee,
+                tx_config=CMDTXConfigLoader(
+                    reuse_puzhash=reuse_puzhash,
+                ).to_tx_config(units["cactus"], config, fingerprint),
+            )
             spend_bundle = response["spend_bundle"]
             print(f"URI added successfully with spend bundle: {spend_bundle}")
         except Exception as e:
@@ -1130,7 +1191,13 @@ async def transfer_nft(
             target_address = ensure_valid_address(target_address, allowed_types={AddressType.CAC}, config=config)
             fee: int = int(d_fee * units["cactus"])
             response = await wallet_client.transfer_nft(
-                wallet_id, nft_coin_id, target_address, fee, reuse_puzhash=reuse_puzhash
+                wallet_id,
+                nft_coin_id,
+                target_address,
+                fee,
+                tx_config=CMDTXConfigLoader(
+                    reuse_puzhash=reuse_puzhash,
+                ).to_tx_config(units["cactus"], config, fingerprint),
             )
             spend_bundle = response["spend_bundle"]
             print(f"NFT transferred successfully with spend bundle: {spend_bundle}")
@@ -1175,10 +1242,12 @@ def print_nft_info(nft: NFTInfo, *, config: Dict[str, Any]) -> None:
         print(f"{indent}{license_uri}")
 
 
-async def list_nfts(wallet_rpc_port: Optional[int], fp: Optional[int], wallet_id: int) -> None:
+async def list_nfts(
+    wallet_rpc_port: Optional[int], fp: Optional[int], wallet_id: int, num: int, start_index: int
+) -> None:
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
         try:
-            response = await wallet_client.list_nfts(wallet_id)
+            response = await wallet_client.list_nfts(wallet_id, num, start_index)
             nft_list = response["nft_list"]
             if len(nft_list) > 0:
                 for n in nft_list:
@@ -1203,7 +1272,15 @@ async def set_nft_did(
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
         fee: int = int(d_fee * units["cactus"])
         try:
-            response = await wallet_client.set_nft_did(wallet_id, did_id, nft_coin_id, fee, reuse_puzhash=reuse_puzhash)
+            response = await wallet_client.set_nft_did(
+                wallet_id,
+                did_id,
+                nft_coin_id,
+                fee,
+                tx_config=CMDTXConfigLoader(
+                    reuse_puzhash=reuse_puzhash,
+                ).to_tx_config(units["cactus"], config, fingerprint),
+            )
             spend_bundle = response["spend_bundle"]
             print(f"Transaction to set DID on NFT has been initiated with: {spend_bundle}")
         except Exception as e:
@@ -1362,7 +1439,7 @@ async def sign_message(
 
 
 async def spend_clawback(
-    *, wallet_rpc_port: Optional[int], fp: Optional[int], fee: Decimal, tx_ids_str: str
+    *, wallet_rpc_port: Optional[int], fp: Optional[int], fee: Decimal, tx_ids_str: str, force: bool = False
 ) -> None:  # pragma: no cover
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, _, _):
         tx_ids = []
@@ -1374,7 +1451,7 @@ async def spend_clawback(
         if fee < 0:
             print("Batch fee cannot be negative.")
             return
-        response = await wallet_client.spend_clawback_coins(tx_ids, int(fee * units["cactus"]))
+        response = await wallet_client.spend_clawback_coins(tx_ids, int(fee * units["cactus"]), force)
         print(str(response))
 
 
@@ -1384,6 +1461,7 @@ async def mint_vc(
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
         vc_record, txs = await wallet_client.vc_mint(
             decode_puzzle_hash(ensure_valid_address(did, allowed_types={AddressType.DID}, config=config)),
+            CMDTXConfigLoader().to_tx_config(units["cactus"], config, fingerprint),
             None
             if target_address is None
             else decode_puzzle_hash(
@@ -1446,7 +1524,9 @@ async def spend_vc(
             new_puzhash=None if new_puzhash is None else bytes32.from_hexstr(new_puzhash),
             new_proof_hash=bytes32.from_hexstr(new_proof_hash),
             fee=uint64(int(d_fee * units["cactus"])),
-            reuse_puzhash=reuse_puzhash,
+            tx_config=CMDTXConfigLoader(
+                reuse_puzhash=reuse_puzhash,
+            ).to_tx_config(units["cactus"], config, fingerprint),
         )
 
         print("Proofs successfully updated!")
@@ -1507,13 +1587,15 @@ async def revoke_vc(
             if record is None:
                 print(f"Cannot find a VC with ID {vc_id}")
                 return
-            parent_id: bytes32 = record.vc.coin.parent_coin_info
+            parent_id: bytes32 = bytes32(record.vc.coin.parent_coin_info)
         else:
             parent_id = bytes32.from_hexstr(parent_coin_id)
         txs = await wallet_client.vc_revoke(
             parent_id,
             fee=uint64(fee * units["cactus"]),
-            reuse_puzhash=reuse_puzhash,
+            tx_config=CMDTXConfigLoader(
+                reuse_puzhash=reuse_puzhash,
+            ).to_tx_config(units["cactus"], config, fingerprint),
         )
 
         print("VC successfully revoked!")
@@ -1526,4 +1608,54 @@ async def revoke_vc(
                 name="CAC",
                 address_prefix=selected_network_address_prefix(config),
                 mojo_per_unit=get_mojo_per_unit(wallet_type=WalletType.STANDARD_WALLET),
+            )
+
+
+async def approve_r_cats(
+    wallet_rpc_port: Optional[int],
+    fingerprint: int,
+    id: int,
+    min_amount_to_claim: str,
+    fee: Decimal,
+    min_coin_amount: Optional[Decimal],
+    max_coin_amount: Optional[Decimal],
+    reuse: bool,
+) -> None:  # pragma: no cover
+    async with get_wallet_client(wallet_rpc_port, fingerprint) as (wallet_client, fingerprint, config):
+        if wallet_client is None:
+            return
+        txs = await wallet_client.crcat_approve_pending(
+            wallet_id=uint32(id),
+            min_amount_to_claim=uint64(int(Decimal(min_amount_to_claim) * units["cat"])),
+            fee=uint64(int(fee * units["cactus"])),
+            tx_config=CMDTXConfigLoader(
+                min_coin_amount=None if min_coin_amount is None else str(min_coin_amount),
+                max_coin_amount=None if max_coin_amount is None else str(max_coin_amount),
+                reuse_puzhash=reuse,
+            ).to_tx_config(units["cat"], config, fingerprint),
+        )
+
+        print("VC successfully approved R-CATs!")
+        print("Relevant TX records:")
+        print("")
+        for tx in txs:
+            try:
+                wallet_type = await get_wallet_type(wallet_id=tx.wallet_id, wallet_client=wallet_client)
+                mojo_per_unit = get_mojo_per_unit(wallet_type=wallet_type)
+                name = await get_unit_name_for_wallet_id(
+                    config=config,
+                    wallet_type=wallet_type,
+                    wallet_id=tx.wallet_id,
+                    wallet_client=wallet_client,
+                )
+            except LookupError as e:
+                print(e.args[0])
+                return
+
+            print_transaction(
+                tx,
+                verbose=False,
+                name=name,
+                address_prefix=selected_network_address_prefix(config),
+                mojo_per_unit=mojo_per_unit,
             )

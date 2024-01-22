@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from blspy import AugSchemeMPL, G1Element, G2Element
+from chia_rs import AugSchemeMPL, G1Element, G2Element
 
 from cactus.consensus.pot_iterations import calculate_iterations_quality, calculate_sp_interval_iters
 from cactus.harvester.harvester import Harvester
@@ -272,7 +272,7 @@ class HarvesterAPI:
             uint32(passed),
             uint32(total_proofs_found),
             uint32(total),
-            uint64(time_taken * 1_000_000),  # nano seconds,
+            uint64(time_taken * 1_000_000),  # microseconds
         )
         pass_msg = make_msg(ProtocolMessageTypes.farming_info, farming_info)
         await peer.send_message(pass_msg)
@@ -293,7 +293,7 @@ class HarvesterAPI:
             },
         )
 
-    @api_request()
+    @api_request(reply_types=[ProtocolMessageTypes.respond_signatures])
     async def request_signatures(self, request: harvester_protocol.RequestSignatures) -> Optional[Message]:
         """
         The farmer requests a signature on the header hash, for one of the proofs that we found.

@@ -23,8 +23,8 @@ jobs:
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - uses: cactus-network.net/actions/check-commit-signing@main
+    - uses: cactus-network.network/actions/check-commit-signing@main

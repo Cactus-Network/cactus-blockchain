@@ -7,13 +7,12 @@ git status
 echo "Installing global npm packages"
 cd npm_macos || exit 1
 npm ci
-PATH=$(npm bin):$PATH
 cd ../../ || exit 1
 git submodule update --init cactus-blockchain-gui
 
 cd ./cactus-blockchain-gui || exit 1
 echo "npm build"
-lerna clean -y
+npx lerna clean -y
 npm ci
 # Audit fix does not currently work with Lerna. See https://github.com/lerna/lerna/issues/1663
 # npm audit fix
@@ -29,7 +28,7 @@ rm -rf node_modules
 
 # Other than `cactus-blockchain-gui/package/gui`, all other packages are no longer necessary after build.
 # Since these unused packages make cache unnecessarily fat, unused packages should be removed.
-echo "Remove unused @cactus-network.net packages to make cache slim"
+echo "Remove unused @cactus-network.network packages to make cache slim"
 ls -l packages
 rm -rf packages/api
 rm -rf packages/api-react
@@ -44,5 +43,5 @@ rm -rf electron/dist # ~186MB
 rm -rf "@mui" # ~71MB
 rm -rf typescript # ~63MB
 
-# Remove `packages/gui/node_modules/@cactus-network.net` because it causes an error on later `electron-packager` command
-rm -rf "@cactus-network.net"
+# Remove `packages/gui/node_modules/@cactus-network.network.network` because it causes an error on later `electron-packager` command
+rm -rf "@cactus-network.network.network"

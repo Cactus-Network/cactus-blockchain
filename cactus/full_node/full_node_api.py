@@ -8,11 +8,9 @@ import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
-from secrets import token_bytes
 from typing import TYPE_CHECKING, Dict, List, Optional, Set, Tuple
 
-from blspy import AugSchemeMPL, G1Element, G2Element
-from chia_rs import ALLOW_BACKREFS
+from chia_rs import AugSchemeMPL, G1Element, G2Element
 from chiabip158 import PyBIP158
 
 from cactus.consensus.block_creation import create_unfinished_block
@@ -215,7 +213,7 @@ class FullNodeAPI:
                     if task_id in full_node.full_node_store.tx_fetch_tasks:
                         full_node.full_node_store.tx_fetch_tasks.pop(task_id)
 
-            task_id: bytes32 = bytes32(token_bytes(32))
+            task_id: bytes32 = bytes32.secret()
             fetch_task = asyncio.create_task(
                 tx_request_and_timeout(self.full_node, transaction.transaction_id, task_id)
             )
@@ -330,6 +328,9 @@ class FullNodeAPI:
 
     @api_request(reply_types=[ProtocolMessageTypes.respond_blocks, ProtocolMessageTypes.reject_blocks])
     async def request_blocks(self, request: full_node_protocol.RequestBlocks) -> Optional[Message]:
+        # note that we treat the request range as *inclusive*, but we check the
+        # size before we bump end_height. So MAX_BLOCK_COUNT_PER_REQUESTS is off
+        # by one
         if (
             request.end_height < request.start_height
             or request.end_height - request.start_height > self.full_node.constants.MAX_BLOCK_COUNT_PER_REQUESTS
@@ -377,9 +378,9 @@ class FullNodeAPI:
                 blocks_bytes.append(block_bytes)
 
             respond_blocks_manually_streamed: bytes = (
-                bytes(uint32(request.start_height))
-                + bytes(uint32(request.end_height))
-                + len(blocks_bytes).to_bytes(4, "big", signed=False)
+                uint32(request.start_height).stream_to_bytes()
+                + uint32(request.end_height).stream_to_bytes()
+                + uint32(len(blocks_bytes)).stream_to_bytes()
             )
             for block_bytes in blocks_bytes:
                 respond_blocks_manually_streamed += block_bytes
@@ -1275,7 +1276,7 @@ class FullNodeAPI:
         )
         # Waits for the transaction to go into the mempool, times out after 45 seconds.
         status, error = None, None
-        sleep_time = 0.01
+        sleep_time = 0.5
         for i in range(int(45 / sleep_time)):
             await asyncio.sleep(sleep_time)
             for potential_name, potential_status, potential_error in self.full_node.transaction_responses:
@@ -1323,12 +1324,13 @@ class FullNodeAPI:
         block_generator: Optional[BlockGenerator] = await self.full_node.blockchain.get_block_generator(block)
         assert block_generator is not None
         try:
-            flags = 0
-            if height >= self.full_node.constants.HARD_FORK_HEIGHT:
-                flags = ALLOW_BACKREFS
-
             spend_info = await asyncio.get_running_loop().run_in_executor(
-                self.executor, get_puzzle_and_solution_for_coin, block_generator, coin_record.coin, flags
+                self.executor,
+                get_puzzle_and_solution_for_coin,
+                block_generator,
+                coin_record.coin,
+                height,
+                self.full_node.constants,
             )
         except ValueError:
             return reject_msg
@@ -1376,9 +1378,9 @@ class FullNodeAPI:
         # we start building RespondBlockHeaders response (start_height, end_height)
         # and then need to define size of list object
         respond_header_blocks_manually_streamed: bytes = (
-            bytes(uint32(request.start_height))
-            + bytes(uint32(request.end_height))
-            + len(header_blocks_bytes).to_bytes(4, "big", signed=False)
+            uint32(request.start_height).stream_to_bytes()
+            + uint32(request.end_height).stream_to_bytes()
+            + uint32(len(header_blocks_bytes)).stream_to_bytes()
         )
         # and now stream the whole list in bytes
         respond_header_blocks_manually_streamed += b"".join(header_blocks_bytes)

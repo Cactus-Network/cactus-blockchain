@@ -8,11 +8,11 @@ jobs:
   update_ca_module:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: "${{ github.event.inputs.cactus_ref }}"
-          repository: cactus-network.net/cactus-blockchain
+          repository: cactus-network.network/cactus-blockchain
           submodules: recursive
           token: "${{ secrets.GITHUB_TOKEN }}"
 
@@ -39,5 +39,5 @@ jobs:
           assignees: "wallentx"
           title: "CA Cert updates"
           token: "${{ secrets.GITHUB_TOKEN }}"
-          committer: "CactusAutomation <automation@cactus-network.net>"
-          author: "CactusAutomation <automation@cactus-network.net>"
+          committer: "CactusAutomation <automation@cactus-network.network.net>"
+          author: "CactusAutomation <automation@cactus-network.network.net>"

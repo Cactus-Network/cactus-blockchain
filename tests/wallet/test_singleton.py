@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from clvm_tools import binutils
 
 from cactus.types.announcement import Announcement
@@ -11,8 +12,8 @@ from cactus.wallet.puzzles.load_clvm import load_clvm
 SINGLETON_MOD = load_clvm("singleton_top_layer.clsp")
 LAUNCHER_PUZZLE = load_clvm("singleton_launcher.clsp")
 P2_SINGLETON_MOD = load_clvm("p2_singleton.clsp")
-POOL_MEMBER_MOD = load_clvm("pool_member_innerpuz.clsp")
-POOL_WAITINGROOM_MOD = load_clvm("pool_waitingroom_innerpuz.clsp")
+POOL_MEMBER_MOD = load_clvm("pool_member_innerpuz.clsp", package_or_requirement="cactus.pools.puzzles")
+POOL_WAITINGROOM_MOD = load_clvm("pool_waitingroom_innerpuz.clsp", package_or_requirement="cactus.pools.puzzles")
 
 LAUNCHER_PUZZLE_HASH = LAUNCHER_PUZZLE.get_tree_hash()
 SINGLETON_MOD_HASH = SINGLETON_MOD.get_tree_hash()
@@ -50,12 +51,10 @@ def test_only_odd_coins():
             [],
         ]
     )
-    try:
+
+    with pytest.raises(Exception) as exception_info:
         cost, result = SINGLETON_MOD.run_with_cost(INFINITE_COST, solution)
-    except Exception as e:
-        assert e.args == ("clvm raise", "80")
-    else:
-        assert False
+    assert exception_info.value.args == ("clvm raise", "80")
 
     solution = Program.to(
         [
@@ -66,10 +65,7 @@ def test_only_odd_coins():
             0,
         ]
     )
-    try:
-        cost, result = SINGLETON_MOD.run_with_cost(INFINITE_COST, solution)
-    except Exception:
-        assert False
+    cost, result = SINGLETON_MOD.run_with_cost(INFINITE_COST, solution)
 
 
 def test_only_one_odd_coin_created():
@@ -83,12 +79,11 @@ def test_only_one_odd_coin_created():
             [],
         ]
     )
-    try:
+
+    with pytest.raises(Exception) as exception_info:
         cost, result = SINGLETON_MOD.run_with_cost(INFINITE_COST, solution)
-    except Exception as e:
-        assert e.args == ("clvm raise", "80")
-    else:
-        assert False
+    assert exception_info.value.args == ("clvm raise", "80")
+
     solution = Program.to(
         [
             (singleton_mod_hash, (LAUNCHER_ID, LAUNCHER_PUZZLE_HASH)),
@@ -98,10 +93,7 @@ def test_only_one_odd_coin_created():
             [],
         ]
     )
-    try:
-        cost, result = SINGLETON_MOD.run_with_cost(INFINITE_COST, solution)
-    except Exception:
-        assert False
+    cost, result = SINGLETON_MOD.run_with_cost(INFINITE_COST, solution)
 
 
 def test_p2_singleton():

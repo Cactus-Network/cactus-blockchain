@@ -1,5 +1,7 @@
 [run]
 branch=True
+disable_warnings=
+  module-not-measured
 relative_files=True
 source_pkgs=
   cactus
@@ -9,12 +11,17 @@ omit=
 concurrency=multiprocessing, thread
 parallel=True
 
+[paths]
+source =
+  cactus/
+  venv/**/site-packages/cactus/
+
 [report]
 precision = 1
-exclude_lines =
-  pragma: no cover
+exclude_also =
   abc\.abstractmethod
   typing\.overload
   ^\s*\.\.\.\s*$
   if typing.TYPE_CHECKING:
   if TYPE_CHECKING:
+  ^ *@pytest.mark.skip($|\()

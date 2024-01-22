@@ -1,0 +1,16 @@
+[Unit]
+Description=Cactus Daemon Service for %i
+StopWhenUnneeded=true
+
+[Service]
+Type=simple
+Environment=CACTUS_ROOT=/home/%i/.cactus/mainnet
+ExecStart=/opt/cactus/daemon
+ExecStartPost=/bin/bash -c '(while ! nc -z -v -w1 localhost 58400 2>/dev/null; do echo "Waiting for the daemon to listen on port 58400..."; sleep 1; done); sleep 1'
+User=%i
+Group=%i
+LimitNOFILE=1048576
+LimitNPROC=1048576
+
+[Install]
+WantedBy=multi-user.target

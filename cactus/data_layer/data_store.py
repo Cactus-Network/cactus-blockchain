@@ -50,7 +50,7 @@ class DataStore:
     @classmethod
     async def create(
         cls, database: Union[str, Path], uri: bool = False, sql_log_path: Optional[Path] = None
-    ) -> "DataStore":
+    ) -> DataStore:
         db_wrapper = await DBWrapper2.create(
             database=database,
             uri=uri,
@@ -329,6 +329,7 @@ class DataStore:
                         SELECT *
                         FROM ancestors
                         WHERE hash == :hash AND generation == :generation AND tree_id == :tree_id
+                        LIMIT 1
                         """,
                         {"hash": hash, "generation": generation, "tree_id": tree_id},
                     ) as cursor:
@@ -368,7 +369,7 @@ class DataStore:
     async def get_pending_root(self, tree_id: bytes32) -> Optional[Root]:
         async with self.db_wrapper.reader() as reader:
             cursor = await reader.execute(
-                "SELECT * FROM root WHERE tree_id == :tree_id AND status == :status",
+                "SELECT * FROM root WHERE tree_id == :tree_id AND status == :status LIMIT 2",
                 {"tree_id": tree_id, "status": Status.PENDING.value},
             )
 
@@ -470,7 +471,7 @@ class DataStore:
         if len(bad_node_hashes) > 0:
             raise NodeHashError(node_hashes=bad_node_hashes)
 
-    _checks: Tuple[Callable[["DataStore"], Awaitable[None]], ...] = (
+    _checks: Tuple[Callable[[DataStore], Awaitable[None]], ...] = (
         _check_roots_are_incrementing,
         _check_hashes,
     )
@@ -514,7 +515,12 @@ class DataStore:
             if generation is None:
                 generation = await self.get_tree_generation(tree_id=tree_id)
             cursor = await reader.execute(
-                "SELECT * FROM root WHERE tree_id == :tree_id AND generation == :generation AND status == :status",
+                """
+                SELECT *
+                FROM root
+                WHERE tree_id == :tree_id AND generation == :generation AND status == :status
+                LIMIT 1
+                """,
                 {"tree_id": tree_id, "generation": generation, "status": Status.COMMITTED.value},
             )
             row = await cursor.fetchone()
@@ -522,16 +528,12 @@ class DataStore:
             if row is None:
                 raise Exception(f"unable to find root for id, generation: {tree_id.hex()}, {generation}")
 
-            maybe_extra_result = await cursor.fetchone()
-            if maybe_extra_result is not None:
-                raise Exception(f"multiple roots found for id, generation: {tree_id.hex()}, {generation}")
-
         return Root.from_row(row=row)
 
     async def tree_id_exists(self, tree_id: bytes32) -> bool:
         async with self.db_wrapper.reader() as reader:
             cursor = await reader.execute(
-                "SELECT 1 FROM root WHERE tree_id == :tree_id AND status == :status",
+                "SELECT 1 FROM root WHERE tree_id == :tree_id AND status == :status LIMIT 1",
                 {"tree_id": tree_id, "status": Status.COMMITTED.value},
             )
             row = await cursor.fetchone()
@@ -723,7 +725,10 @@ class DataStore:
 
     async def get_node_type(self, node_hash: bytes32) -> NodeType:
         async with self.db_wrapper.reader() as reader:
-            cursor = await reader.execute("SELECT node_type FROM node WHERE hash == :hash", {"hash": node_hash})
+            cursor = await reader.execute(
+                "SELECT node_type FROM node WHERE hash == :hash LIMIT 1",
+                {"hash": node_hash},
+            )
             raw_node_type = await cursor.fetchone()
 
         if raw_node_type is None:
@@ -734,26 +739,53 @@ class DataStore:
     async def get_terminal_node_for_seed(
         self, tree_id: bytes32, seed: bytes32, root_hash: Optional[bytes32] = None
     ) -> Optional[bytes32]:
-        path = int.from_bytes(seed, byteorder="big")
-        async with self.db_wrapper.reader():
+        path = "".join(reversed("".join(f"{b:08b}" for b in seed)))
+        async with self.db_wrapper.reader() as reader:
             if root_hash is None:
                 root = await self.get_tree_root(tree_id)
                 root_hash = root.node_hash
             if root_hash is None:
                 return None
-            node_hash = root_hash
-            while True:
-                node = await self.get_node(node_hash)
-                assert node is not None
-                if isinstance(node, TerminalNode):
-                    break
-                if path % 2 == 0:
-                    node_hash = node.left_hash
-                else:
-                    node_hash = node.right_hash
-                path = path // 2
 
-            return node_hash
+            async with reader.execute(
+                """
+                WITH RECURSIVE
+                    random_leaf(hash, node_type, left, right, depth, side) AS (
+                        SELECT
+                            node.hash AS hash,
+                            node.node_type AS node_type,
+                            node.left AS left,
+                            node.right AS right,
+                            1 AS depth,
+                            SUBSTR(:path, 1, 1) as side
+                        FROM node
+                        WHERE node.hash == :root_hash
+                        UNION ALL
+                        SELECT
+                            node.hash AS hash,
+                            node.node_type AS node_type,
+                            node.left AS left,
+                            node.right AS right,
+                            random_leaf.depth + 1 AS depth,
+                            SUBSTR(:path, random_leaf.depth + 1, 1) as side
+                        FROM node, random_leaf
+                        WHERE (
+                            (random_leaf.side == "0" AND node.hash == random_leaf.left)
+                            OR (random_leaf.side != "0" AND node.hash == random_leaf.right)
+                        )
+                    )
+                SELECT hash AS hash FROM random_leaf
+                WHERE node_type == :node_type
+                LIMIT 1
+                """,
+                {"root_hash": root_hash, "node_type": NodeType.TERMINAL, "path": path},
+            ) as cursor:
+                row = await cursor.fetchone()
+                if row is None:
+                    # No cover since this is an error state that should be unreachable given the code
+                    # above has already verified that there is a non-empty tree.
+                    raise Exception("No terminal node found for seed")  # pragma: no cover
+                return bytes32(row["hash"])
 
     def get_side_for_seed(self, seed: bytes32) -> Side:
         side_seed = bytes(seed)[0]
@@ -1041,13 +1073,35 @@ class DataStore:
 
         return new_root
 
+    async def clean_node_table(self, writer: aiosqlite.Connection) -> None:
+        await writer.execute(
+            """
+            WITH RECURSIVE pending_nodes AS (
+                SELECT node_hash AS hash FROM root
+                WHERE status = ?
+                UNION ALL
+                SELECT n.left FROM node n
+                INNER JOIN pending_nodes pn ON n.hash = pn.hash
+                WHERE n.left IS NOT NULL
+                UNION ALL
+                SELECT n.right FROM node n
+                INNER JOIN pending_nodes pn ON n.hash = pn.hash
+                WHERE n.right IS NOT NULL
+            )
+            DELETE FROM node
+            WHERE hash NOT IN (SELECT hash FROM ancestors)
+            AND hash NOT IN (SELECT hash FROM pending_nodes)
+            """,
+            (Status.PENDING.value,),
+        )
+
     async def insert_batch(
         self,
         tree_id: bytes32,
         changelist: List[Dict[str, Any]],
         status: Status = Status.PENDING,
     ) -> Optional[bytes32]:
-        async with self.db_wrapper.writer():
+        async with self.db_wrapper.writer() as writer:
             old_root = await self.get_tree_root(tree_id)
             root_hash = old_root.node_hash
             if old_root.node_hash is None:
@@ -1114,6 +1168,8 @@ class DataStore:
                     "Didn't get the expected generation after batch update: "
                     f"Expected: {old_root.generation + 1}. Got: {new_root.generation}"
                 )
+
+            await self.clean_node_table(writer)
             return root.node_hash
 
     async def _get_one_ancestor(
@@ -1158,7 +1214,7 @@ class DataStore:
                     tree_id=tree_id,
                     root_hash=previous_root.node_hash,
                 )
-                known_hashes: Set[bytes32] = set(node.hash for node in previous_internal_nodes)
+                known_hashes: Set[bytes32] = {node.hash for node in previous_internal_nodes}
             else:
                 known_hashes = set()
             internal_nodes: List[InternalNode] = await self.get_internal_nodes(
@@ -1196,7 +1252,7 @@ class DataStore:
 
     async def get_node(self, node_hash: bytes32) -> Node:
         async with self.db_wrapper.reader() as reader:
-            cursor = await reader.execute("SELECT * FROM node WHERE hash == :hash", {"hash": node_hash})
+            cursor = await reader.execute("SELECT * FROM node WHERE hash == :hash LIMIT 1", {"hash": node_hash})
             row = await cursor.fetchone()
 
         if row is None:
@@ -1386,7 +1442,7 @@ class DataStore:
             )
             old_urls = set()
             if old_subscription is not None:
-                old_urls = set(server_info.url for server_info in old_subscription.servers_info)
+                old_urls = {server_info.url for server_info in old_subscription.servers_info}
             new_servers = [server_info for server_info in subscription.servers_info if server_info.url not in old_urls]
             for server_info in new_servers:
                 await writer.execute(
@@ -1410,6 +1466,74 @@ class DataStore:
                         "url": url,
                     },
                 )
+
+    async def delete_store_data(self, tree_id: bytes32) -> None:
+        async with self.db_wrapper.writer() as writer:
+            await self.clean_node_table(writer)
+            cursor = await writer.execute(
+                """
+                WITH RECURSIVE all_nodes AS (
+                    SELECT a.hash, n.left, n.right
+                    FROM ancestors AS a
+                    JOIN node AS n ON a.hash = n.hash
+                    WHERE a.tree_id = :tree_id
+                ),
+                pending_nodes AS (
+                    SELECT node_hash AS hash FROM root
+                    WHERE status = :status
+                    UNION ALL
+                    SELECT n.left FROM node n
+                    INNER JOIN pending_nodes pn ON n.hash = pn.hash
+                    WHERE n.left IS NOT NULL
+                    UNION ALL
+                    SELECT n.right FROM node n
+                    INNER JOIN pending_nodes pn ON n.hash = pn.hash
+                    WHERE n.right IS NOT NULL
+                )
+
+                SELECT hash, left, right
+                FROM all_nodes
+                WHERE hash NOT IN (SELECT hash FROM ancestors WHERE tree_id != :tree_id)
+                AND hash NOT IN (SELECT hash from pending_nodes)
+                """,
+                {"tree_id": tree_id, "status": Status.PENDING.value},
+            )
+            to_delete: Dict[bytes, Tuple[bytes, bytes]] = {}
+            ref_counts: Dict[bytes, int] = {}
+            async for row in cursor:
+                hash = row["hash"]
+                left = row["left"]
+                right = row["right"]
+                if hash in to_delete:
+                    prev_left, prev_right = to_delete[hash]
+                    assert prev_left == left
+                    assert prev_right == right
+                    continue
+                to_delete[hash] = (left, right)
+                if left is not None:
+                    ref_counts[left] = ref_counts.get(left, 0) + 1
+                if right is not None:
+                    ref_counts[right] = ref_counts.get(right, 0) + 1
+
+            await writer.execute("DELETE FROM ancestors WHERE tree_id == ?", (tree_id,))
+            await writer.execute("DELETE FROM root WHERE tree_id == ?", (tree_id,))
+            queue = [hash for hash in to_delete if ref_counts.get(hash, 0) == 0]
+            while queue:
+                hash = queue.pop(0)
+                if hash not in to_delete:
+                    continue
+                await writer.execute("DELETE FROM node WHERE hash == ?", (hash,))
+
+                left, right = to_delete[hash]
+                if left is not None:
+                    ref_counts[left] -= 1
+                    if ref_counts[left] == 0:
+                        queue.append(left)
+
+                if right is not None:
+                    ref_counts[right] -= 1
+                    if ref_counts[right] == 0:
+                        queue.append(right)
 
     async def unsubscribe(self, tree_id: bytes32) -> None:
         async with self.db_wrapper.writer() as writer:
@@ -1459,7 +1583,8 @@ class DataStore:
         await self.update_server_info(tree_id, new_server_info)
 
     async def server_misses_file(self, tree_id: bytes32, server_info: ServerInfo, timestamp: int) -> None:
-        BAN_TIME_BY_MISSING_COUNT = [5 * 60] * 3 + [15 * 60] * 3 + [60 * 60] * 2 + [240 * 60]
+        # Max banned time is 1 hour.
+        BAN_TIME_BY_MISSING_COUNT = [5 * 60] * 3 + [15 * 60] * 3 + [30 * 60] * 2 + [60 * 60]
         index = min(server_info.num_consecutive_failures, len(BAN_TIME_BY_MISSING_COUNT) - 1)
         new_server_info = replace(
             server_info,
@@ -1524,14 +1649,14 @@ class DataStore:
                 return set()
             if len(new_pairs) == 0 and hash_2 != bytes32([0] * 32):
                 return set()
-            insertions = set(
+            insertions = {
                 DiffData(type=OperationType.INSERT, key=node.key, value=node.value)
                 for node in new_pairs
                 if node not in old_pairs
-            )
-            deletions = set(
+            }
+            deletions = {
                 DiffData(type=OperationType.DELETE, key=node.key, value=node.value)
                 for node in old_pairs
                 if node not in new_pairs
-            )
+            }
             return set.union(insertions, deletions)

@@ -9,6 +9,7 @@ from cactus import __version__
 from cactus.cmds.beta import beta_cmd
 from cactus.cmds.completion import completion
 from cactus.cmds.configure import configure_cmd
+from cactus.cmds.dao import dao_cmd
 from cactus.cmds.data import data_cmd
 from cactus.cmds.db import db_cmd
 from cactus.cmds.dev import dev_cmd
@@ -36,7 +37,7 @@ CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 @click.group(
     help=f"\n  Manage cactus blockchain infrastructure ({__version__})\n",
-    epilog="Try 'cactus start node', 'cactus-network.netspace -d 192', or 'cactus show -s'",
+    epilog="Try 'cactus start node', 'cactus-network.network.net -d 192', or 'cactus show -s'",
     context_settings=CONTEXT_SETTINGS,
 )
 @click.option("--root-path", default=DEFAULT_ROOT_PATH, help="Config file root", type=click.Path(), show_default=True)
@@ -128,6 +129,7 @@ cli.add_command(data_cmd)
 cli.add_command(passphrase_cmd)
 cli.add_command(beta_cmd)
 cli.add_command(completion)
+cli.add_command(dao_cmd)
 cli.add_command(dev_cmd)
 
 

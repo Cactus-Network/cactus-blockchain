@@ -15,12 +15,12 @@ from cactus.harvester.harvester_api import HarvesterAPI
 from cactus.server.start_service import Service
 from cactus.simulator.block_tools import BlockTools
 from cactus.simulator.full_node_simulator import FullNodeSimulator
-from cactus.simulator.time_out_assert import time_out_assert
 from cactus.wallet.wallet_node import WalletNode
 from cactus.wallet.wallet_node_api import WalletNodeAPI
+from tests.util.time_out_assert import time_out_assert
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_farm_summary_command(
     capsys: CaptureFixture[str],
     farmer_one_harvester_simulator_wallet: Tuple[

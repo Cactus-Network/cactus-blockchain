@@ -13,7 +13,7 @@ from cactus.simulator.block_tools import BlockTools
 from cactus.util.default_root import SIMULATOR_ROOT_PATH
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_enable_private_networks(
     two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools],
 ) -> None:
@@ -31,7 +31,7 @@ async def test_enable_private_networks(
             legacy_peer_db_path_key="db/peer_table_node.sqlite",
             default_peers_file_path="db/peers.dat",
         ),
-        {"host": "introducer.cactus-network.net", "port": 11444},
+        {"host": "introducer.cactus-network.network.net", "port": 11444},
         [],
         0,
         cactus_server.config["selected_network"],
@@ -56,7 +56,7 @@ async def test_enable_private_networks(
             legacy_peer_db_path_key="db/peer_table_node.sqlite",
             default_peers_file_path="db/peers.dat",
         ),
-        {"host": "introducer.cactus-network.net", "port": 11444, "enable_private_networks": False},
+        {"host": "introducer.cactus-network.network.net", "port": 11444, "enable_private_networks": False},
         [],
         0,
         cactus_server.config["selected_network"],
@@ -81,7 +81,7 @@ async def test_enable_private_networks(
             legacy_peer_db_path_key="db/peer_table_node.sqlite",
             default_peers_file_path="db/peers.dat",
         ),
-        {"host": "introducer.cactus-network.net", "port": 11444, "enable_private_networks": True},
+        {"host": "introducer.cactus-network.network.net", "port": 11444, "enable_private_networks": True},
         [],
         0,
         cactus_server.config["selected_network"],

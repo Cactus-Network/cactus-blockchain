@@ -1,0 +1,16 @@
+[Unit]
+Description=Cactus Timelord Service for %i
+Requires=cactus-daemon@%i.service
+After=cactus-daemon@%i.service
+
+[Service]
+Type=simple
+Environment=CACTUS_ROOT=/home/%i/.cactus/mainnet
+ExecStart=/opt/cactus/start_timelord
+User=%i
+Group=%i
+LimitNOFILE=1048576
+LimitNPROC=1048576
+
+[Install]
+WantedBy=multi-user.target

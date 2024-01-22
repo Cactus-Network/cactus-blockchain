@@ -74,15 +74,15 @@ jobs:
             apt: '3.9'
             install_sh: '3.9'
             matrix: '3.9'
+            exclude_from:
+              limited: True
+              main: True
           - name: '3.10'
             file_name: '3.10'
             action: '3.10'
             apt: '3.10'
             install_sh: '3.10'
             matrix: '3.10'
-            exclude_from:
-              limited: True
-              main: True
           - name: '3.11'
             file_name: '3.11'
             action: '3.11'
@@ -113,7 +113,7 @@ jobs:
       CACTUS_ROOT: ${{ github.workspace }}/.cactus/mainnet
       CACTUS_SIMULATOR_ROOT: ${{ github.workspace }}/.cactus/simulator
       JOB_FILE_NAME: tests_${{ matrix.os.file_name }}_python-${{ matrix.python.file_name }}_${{ matrix.configuration.name }}
-      BLOCKS_AND_PLOTS_VERSION: 0.30.0
+      BLOCKS_AND_PLOTS_VERSION: 0.38.0
 
     steps:
       - name: Configure git
@@ -121,7 +121,7 @@ jobs:
           git config --global core.autocrlf false
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -202,9 +202,10 @@ jobs:
         with:
           python-version: ${{ matrix.python.install_sh }}
           development: true
+          editable: false
           legacy_keyring: ${{ matrix.configuration.legacy_keyring_required }}
 
-      - uses: cactus-network.net/actions/activate-venv@main
+      - uses: cactus-network.network/actions/activate-venv@main
 
       - name: Install timelord
         if: matrix.configuration.install_timelord
@@ -212,11 +213,26 @@ jobs:
           sh install-timelord.sh -n
           ./vdf_bench square_asm 400000
 
+      - name: Move cactus/ so we test the installed code
+        run: |
+          mv cactus/ notcactus/
+
       - name: Test blockchain code with pytest
         env:
           ENABLE_PYTEST_MONITOR: ${{ matrix.os.matrix == 'ubuntu' && matrix.configuration.enable_pytest_monitor || '' }}
         run: |
-          pytest --cov=cactus --cov=tests --cov-config=.coveragerc --cov-report= --durations=10 ${{ matrix.configuration.pytest_parallel_args[matrix.os.matrix] }} -m "not benchmark" ${{ env.ENABLE_PYTEST_MONITOR }} ${{ matrix.configuration.test_files }}
+          pytest --cov=cactus --cov=tests --cov-config=.coveragerc --cov-report= -o 'junit_suite_name=${{ env.JOB_FILE_NAME }}' --junitxml=junit-data/junit.${{ env.JOB_FILE_NAME }}.xml --durations=10 ${{ matrix.configuration.pytest_parallel_args[matrix.os.matrix] }} -m "not benchmark" ${{ env.ENABLE_PYTEST_MONITOR }} ${{ matrix.configuration.test_files }}
+
+      - name: Move back to cactus/ for coverage
+        run: |
+          mv notcactus/ cactus/
+
+      - name: Publish JUnit results
+        uses: actions/upload-artifact@v3
+        with:
+          name: junit-data
+          path: junit-data/*
+          if-no-files-found: error
 
       - name: Process coverage data
         run: |

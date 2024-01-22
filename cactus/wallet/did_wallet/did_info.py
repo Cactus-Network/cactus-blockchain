@@ -3,10 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
+from cactus.protocols.wallet_protocol import CoinState
 from cactus.types.blockchain_format.coin import Coin
 from cactus.types.blockchain_format.program import Program
 from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.util.ints import uint64
+from cactus.util.ints import uint16, uint64
 from cactus.util.streamable import Streamable, streamable
 from cactus.wallet.lineage_proof import LineageProof
 
@@ -24,3 +25,15 @@ class DIDInfo(Streamable):
     temp_pubkey: Optional[bytes]
     sent_recovery_transaction: bool
     metadata: str  # JSON of the user defined metadata
+
+
+@streamable
+@dataclass(frozen=True)
+class DIDCoinData(Streamable):
+    p2_puzzle: Program
+    recovery_list_hash: bytes32
+    num_verification: uint16
+    singleton_struct: Program
+    metadata: Program
+    inner_puzzle: Optional[Program]
+    coin_state: CoinState

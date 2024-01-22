@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from blspy import G2Element
+from chia_rs import G2Element
 
 from cactus.types.blockchain_format.pool_target import PoolTarget
 from cactus.types.blockchain_format.proof_of_space import ProofOfSpace

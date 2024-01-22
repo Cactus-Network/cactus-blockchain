@@ -1,0 +1,17 @@
+[Unit]
+Description=Cactus Data Layer Service for %i
+Requires=cactus-daemon@%i.service
+After=cactus-daemon@%i.service
+
+[Service]
+Type=simple
+Environment=CACTUS_ROOT=/home/%i/.cactus/mainnet
+ExecStart=/opt/cactus/start_data_layer
+User=%i
+Group=%i
+LimitNOFILE=1048576
+LimitNPROC=1048576
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

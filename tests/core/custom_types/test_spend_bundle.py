@@ -6,7 +6,7 @@ import unittest
 from typing import List, Tuple
 
 import pytest
-from blspy import G2Element
+from chia_rs import G2Element
 
 from cactus.types.blockchain_format.coin import Coin
 from cactus.types.blockchain_format.program import Program

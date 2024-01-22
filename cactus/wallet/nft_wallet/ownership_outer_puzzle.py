@@ -11,7 +11,9 @@ from cactus.wallet.puzzle_drivers import PuzzleInfo, Solver
 from cactus.wallet.puzzles.load_clvm import load_clvm_maybe_recompile
 from cactus.wallet.uncurried_puzzle import UncurriedPuzzle, uncurry_puzzle
 
-OWNERSHIP_LAYER_MOD = load_clvm_maybe_recompile("nft_ownership_layer.clsp")
+OWNERSHIP_LAYER_MOD = load_clvm_maybe_recompile(
+    "nft_ownership_layer.clsp", package_or_requirement="cactus.wallet.nft_wallet.puzzles"
+)
 
 
 def match_ownership_layer_puzzle(puzzle: UncurriedPuzzle) -> Tuple[bool, List[Program]]:

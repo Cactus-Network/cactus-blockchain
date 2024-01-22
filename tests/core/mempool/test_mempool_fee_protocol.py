@@ -12,13 +12,13 @@ from cactus.protocols.wallet_protocol import RespondFeeEstimates
 from cactus.server.server import CactusServer
 from cactus.simulator.block_tools import BlockTools
 from cactus.simulator.full_node_simulator import FullNodeSimulator
-from cactus.simulator.time_out_assert import time_out_assert
 from cactus.util.ints import uint64
 from cactus.wallet.wallet import Wallet
 from tests.core.node_height import node_height_at_least
+from tests.util.time_out_assert import time_out_assert
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_protocol_messages(
     simulator_and_wallet: Tuple[
         List[Union[FullNodeAPI, FullNodeSimulator]], List[Tuple[Wallet, CactusServer]], BlockTools

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Optional, Set, Tuple
 
-from blspy import AugSchemeMPL, G1Element, PrivateKey
+from chia_rs import AugSchemeMPL, G1Element, PrivateKey
 
 from cactus.consensus.coinbase import create_puzzlehash_for_pk
 from cactus.types.blockchain_format.sized_bytes import bytes32
@@ -11,7 +11,7 @@ from cactus.util.ints import uint32
 # EIP 2334 bls key derivation
 # https://eips.ethereum.org/EIPS/eip-2334
 # 12381 = bls spec number
-# 8444 = Cactus blockchain number and port number
+# 11444 = Cactus blockchain number and port number
 # 0, 1, 2, 3, 4, 5, 6 farmer, pool, wallet, local, backup key, singleton, pooling authentication key numbers
 
 # Allows up to 100 pool wallets (plot NFTs)

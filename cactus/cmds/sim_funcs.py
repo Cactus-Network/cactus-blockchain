@@ -8,16 +8,17 @@ from random import randint
 from typing import Any, Dict, List, Optional
 
 from aiohttp import ClientConnectorError
-from blspy import PrivateKey
+from chia_rs import PrivateKey
 
 from cactus.cmds.cmds_util import get_any_service_client
 from cactus.cmds.start_funcs import async_start
 from cactus.consensus.coinbase import create_puzzlehash_for_pk
+from cactus.server.outbound_message import NodeType
 from cactus.simulator.simulator_full_node_rpc_client import SimulatorFullNodeRpcClient
 from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.types.coin_record import CoinRecord
 from cactus.util.bech32m import decode_puzzle_hash, encode_puzzle_hash
-from cactus.util.config import load_config, save_config
+from cactus.util.config import load_config, save_config, set_peer_info
 from cactus.util.errors import KeychainFingerprintExists
 from cactus.util.ints import uint32
 from cactus.util.keychain import Keychain, bytes_to_mnemonic
@@ -85,14 +86,12 @@ def create_cactus_directory(
             config["daemon_port"] -= port_offset
             config["network_overrides"]["config"]["simulator0"]["default_full_node_port"] = 311444 + port_offset
             # wallet
-            config["wallet"]["port"] += port_offset
             config["wallet"]["rpc_port"] += port_offset
             # full node
             config["full_node"]["port"] -= port_offset
             config["full_node"]["rpc_port"] += port_offset
             # connect wallet to full node
-            config["wallet"]["full_node_peer"]["port"] = config["full_node"]["port"]
-            config["full_node"]["wallet_peer"]["port"] = config["wallet"]["port"]
+            set_peer_info(config["wallet"], peer_type=NodeType.FULL_NODE, peer_port=config["full_node"]["port"])
             # ui
             config["ui"]["daemon_port"] = config["daemon_port"]
         else:

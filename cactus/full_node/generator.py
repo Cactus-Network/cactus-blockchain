@@ -9,15 +9,15 @@ from cactus.types.generator_types import BlockGenerator, CompressorArg, Generato
 from cactus.util.ints import uint32
 from cactus.wallet.puzzles.load_clvm import load_clvm_maybe_recompile
 
-DECOMPRESS_BLOCK = load_clvm_maybe_recompile("block_program_zero.clsp", package_or_requirement="cactus.wallet.puzzles")
-DECOMPRESS_PUZZLE = load_clvm_maybe_recompile("decompress_puzzle.clsp", package_or_requirement="cactus.wallet.puzzles")
+DECOMPRESS_BLOCK = load_clvm_maybe_recompile("block_program_zero.clsp", package_or_requirement="cactus.full_node.puzzles")
+DECOMPRESS_PUZZLE = load_clvm_maybe_recompile("decompress_puzzle.clsp", package_or_requirement="cactus.full_node.puzzles")
 # DECOMPRESS_CSE = load_clvm_maybe_recompile(
 #     "decompress_coin_spend_entry.clsp",
-#     package_or_requirement="cactus.wallet.puzzles",
+#     package_or_requirement="cactus.full_node.puzzles",
 # )
 
 DECOMPRESS_CSE_WITH_PREFIX = load_clvm_maybe_recompile(
-    "decompress_coin_spend_entry_with_prefix.clsp", package_or_requirement="cactus.wallet.puzzles"
+    "decompress_coin_spend_entry_with_prefix.clsp", package_or_requirement="cactus.full_node.puzzles"
 )
 log = logging.getLogger(__name__)
 
