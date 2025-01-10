@@ -76,7 +76,7 @@ zstd = [
 	{version="1.5.5.1", python = "<3.12"},
 	{version="1.5.5.1", python = "3.12", source="chia"},
 ]
-importlib-resources = "6.4.0"
+importlib-resources = "6.5.2"
 hsms = "0.3.1"
 aiohttp_cors = { version = "0.7.0", optional = true }
 black = { version = "24.8.0", optional = true }
