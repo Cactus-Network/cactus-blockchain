@@ -1,28 +1,28 @@
 {
-  "productName": "chia",
-  "appId": "net.chia.blockchain",
+  "productName": "cactus",
+  "appId": "net.cactus.blockchain",
   "asar": true,
   "asarUnpack": "**/daemon/**",
   "npmRebuild": false,
   "files": ["build", "daemon", "!node_modules", "!src", "!public"],
   "protocols": [
     {
-      "name": "Chia URL",
-      "schemes": ["chia"]
+      "name": "Cactus URL",
+      "schemes": ["cactus"]
     },
     {
-      "name": "Chia XCH Address",
+      "name": "Cactus XCH Address",
       "schemes": ["xch"]
     }
   ],
   "win": {
     "target": "nsis",
-    "icon": "src/assets/img/chia.ico",
+    "icon": "src/assets/img/cactus.ico",
     "timeStampServer": "http://timestamp.comodoca.com",
-    "executableName": "Chia"
+    "executableName": "Cactus"
   },
   "nsis": {
-    "artifactName": "ChiaSetup-${env.CHIA_INSTALLER_VERSION}.exe",
+    "artifactName": "CactusSetup-${env.CACTUS_INSTALLER_VERSION}.exe",
     "oneClick": false,
     "deleteAppDataOnUninstall": true,
     "allowToChangeInstallationDirectory": true,
@@ -32,13 +32,13 @@
     "include": "installer.nsh"
   },
   "mac": {
-    "executableName": "Chia",
-    "artifactName": "${productName}-${env.CHIA_INSTALLER_VERSION}.${ext}",
+    "executableName": "Cactus",
+    "artifactName": "${productName}-${env.CACTUS_INSTALLER_VERSION}.${ext}",
     "category": "public.app-category.finance",
     "target": "dmg",
-    "icon": "src/assets/img/chia.icns",
+    "icon": "src/assets/img/cactus.icns",
     "entitlements": "entitlements.mac.plist",
-    "provisioningProfile": "chiablockchain.provisionprofile",
+    "provisioningProfile": "cactusblockchain.provisionprofile",
     "darkModeSupport": true,
     "hardenedRuntime": true,
     "gatekeeperAssess": false
@@ -65,8 +65,8 @@
     }
   },
   "linux": {
-    "artifactName": "${productName}-${env.CHIA_INSTALLER_VERSION}.${ext}",
-    "icon": "src/assets/img/chia.icns"
+    "artifactName": "${productName}-${env.CACTUS_INSTALLER_VERSION}.${ext}",
+    "icon": "src/assets/img/cactus.icns"
   },
   "deb": {
     "afterInstall": "../../../build_scripts/assets/deb/postinst.sh",
@@ -92,9 +92,9 @@
       "--rpm-rpmbuild-define=_enable_debug_package 0",
       "--rpm-rpmbuild-define=debug_package %{nil}",
       "--rpm-rpmbuild-define=__os_install_post /usr/lib/rpm/brp-compress %{nil}",
-      "--rpm-attr=4755,root,root:/opt/chia/chrome-sandbox",
+      "--rpm-attr=4755,root,root:/opt/cactus/chrome-sandbox",
       "--rpm-tag=Recommends: libxcrypt-compat",
-      "--directories=/opt/chia",
+      "--directories=/opt/cactus",
       "--rpm-tag=Requires(pre): findutils",
       "--before-install=../../../build_scripts/assets/rpm/before-install.sh"
     ]

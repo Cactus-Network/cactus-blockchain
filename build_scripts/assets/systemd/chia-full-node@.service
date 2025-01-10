@@ -1,12 +1,12 @@
 [Unit]
-Description=Chia Full Node Service for %i
-Requires=chia-daemon@%i.service
-After=chia-daemon@%i.service
+Description=Cactus Full Node Service for %i
+Requires=cactus-daemon@%i.service
+After=cactus-daemon@%i.service
 
 [Service]
 Type=simple
-Environment=CHIA_ROOT=/home/%i/.chia/mainnet
-ExecStart=/opt/chia/start_full_node
+Environment=CACTUS_ROOT=/home/%i/.cactus/mainnet
+ExecStart=/opt/cactus/start_full_node
 User=%i
 Group=%i
 LimitNOFILE=1048576

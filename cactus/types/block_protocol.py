@@ -1,0 +1,20 @@
+from __future__ import annotations
+
+from typing import List, Optional
+
+from typing_extensions import Protocol
+
+from cactus.types.blockchain_format.serialized_program import SerializedProgram
+from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.util.ints import uint32
+
+
+class BlockInfo(Protocol):
+    @property
+    def prev_header_hash(self) -> bytes32: ...
+
+    @property
+    def transactions_generator(self) -> Optional[SerializedProgram]: ...
+
+    @property
+    def transactions_generator_ref_list(self) -> List[uint32]: ...

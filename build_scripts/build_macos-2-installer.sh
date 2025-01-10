@@ -8,11 +8,11 @@ git submodule
 # If the env variable NOTARIZE and the username and password variables are
 # set, this will attempt to Notarize the signed DMG.
 
-if [ ! "$CHIA_INSTALLER_VERSION" ]; then
-  echo "WARNING: No environment variable CHIA_INSTALLER_VERSION set. Using 0.0.0."
-  CHIA_INSTALLER_VERSION="0.0.0"
+if [ ! "$CACTUS_INSTALLER_VERSION" ]; then
+  echo "WARNING: No environment variable CACTUS_INSTALLER_VERSION set. Using 0.0.0."
+  CACTUS_INSTALLER_VERSION="0.0.0"
 fi
-echo "Chia Installer Version is: $CHIA_INSTALLER_VERSION"
+echo "Cactus Installer Version is: $CACTUS_INSTALLER_VERSION"
 
 echo "Installing npm utilities"
 cd npm_macos || exit 1
@@ -42,21 +42,21 @@ bash ./build_license_directory.sh
 # appears sometimes m-series chips (prefer bundled from @loader_path/..)
 bash ./remove_brew_rpaths.sh
 
-cp -r dist/daemon ../chia-blockchain-gui/packages/gui
+cp -r dist/daemon ../cactus-blockchain-gui/packages/gui
 # Change to the gui package
-cd ../chia-blockchain-gui/packages/gui || exit 1
+cd ../cactus-blockchain-gui/packages/gui || exit 1
 
-# sets the version for chia-blockchain in package.json
+# sets the version for cactus-blockchain in package.json
 brew install jq
 cp package.json package.json.orig
-jq --arg VER "$CHIA_INSTALLER_VERSION" '.version=$VER' package.json >temp.json && mv temp.json package.json
+jq --arg VER "$CACTUS_INSTALLER_VERSION" '.version=$VER' package.json >temp.json && mv temp.json package.json
 
 echo "Building macOS Electron app"
 OPT_ARCH="--x64"
 if [ "$(arch)" = "arm64" ]; then
   OPT_ARCH="--arm64"
 fi
-PRODUCT_NAME="Chia"
+PRODUCT_NAME="Cactus"
 if [ "$NOTARIZE" == true ]; then
   echo "Setting credentials for signing"
   export CSC_LINK=$APPLE_DEV_ID_APP
@@ -76,7 +76,7 @@ echo "${NPM_PATH}/electron-builder" build --mac "${OPT_ARCH}" \
   --config.mac.minimumSystemVersion="11" \
   --config ../../../build_scripts/electron-builder.json
 LAST_EXIT_CODE=$?
-ls -l dist/mac*/chia.app/Contents/Resources/app.asar
+ls -l dist/mac*/cactus.app/Contents/Resources/app.asar
 
 # reset the package.json to the original
 mv package.json.orig package.json
@@ -90,12 +90,12 @@ mv dist/* ../../../build_scripts/dist/
 cd ../../../build_scripts || exit 1
 
 mkdir final_installer
-ORIGINAL_DMG_NAME="chia-${CHIA_INSTALLER_VERSION}.dmg"
+ORIGINAL_DMG_NAME="cactus-${CACTUS_INSTALLER_VERSION}.dmg"
 if [ "$(arch)" = "arm64" ]; then
-  DMG_NAME=Chia-${CHIA_INSTALLER_VERSION}-arm64.dmg
+  DMG_NAME=Cactus-${CACTUS_INSTALLER_VERSION}-arm64.dmg
 else
-  # NOTE: when coded, this changes the case to Chia
-  DMG_NAME=Chia-${CHIA_INSTALLER_VERSION}.dmg
+  # NOTE: when coded, this changes the case to Cactus
+  DMG_NAME=Cactus-${CACTUS_INSTALLER_VERSION}.dmg
 fi
 mv dist/"$ORIGINAL_DMG_NAME" final_installer/"$DMG_NAME"
 
@@ -115,11 +115,11 @@ fi
 #
 # Ask for username and password. password should be an app specific password.
 # Generate app specific password https://support.apple.com/en-us/HT204397
-# xcrun notarytool submit --wait --apple-id username --password password --team-id team-id Chia-0.1.X.dmg
+# xcrun notarytool submit --wait --apple-id username --password password --team-id team-id Cactus-0.1.X.dmg
 # Wait until the command returns a success message
 #
 # Once that is successful, execute the following command":
-# xcrun stapler staple Chia-0.1.X.dmg
+# xcrun stapler staple Cactus-0.1.X.dmg
 #
 # Validate DMG:
-# xcrun stapler validate Chia-0.1.X.dmg
+# xcrun stapler validate Cactus-0.1.X.dmg

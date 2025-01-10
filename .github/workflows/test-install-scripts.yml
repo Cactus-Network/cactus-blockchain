@@ -58,7 +58,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Python environment
-        uses: Chia-Network/actions/setup-python@main
+        uses: Cactus-Network/actions/setup-python@main
         with:
           python-version: ${{ matrix.python.major-dot-minor }}
 
@@ -69,11 +69,11 @@ jobs:
           editable: ${{ matrix.editable.value }}
           do-system-installs: true
 
-      - uses: chia-network/actions/activate-venv@main
+      - uses: cactus-network/actions/activate-venv@main
 
-      - name: Run chia --help
+      - name: Run cactus --help
         run: |
-          chia --help
+          cactus --help
 
       - name: Run install-gui script (Linux, macOS)
         if: matrix.os.matrix != 'windows'
@@ -89,9 +89,9 @@ jobs:
         id: editable-info
         shell: bash
         run: |
-          echo "pre-edit-version=$(chia version)" >> "$GITHUB_OUTPUT"
-          echo '__version__ = "shooby-doowah"' >> chia/__init__.py
-          echo "post-edit-version=$(chia version)" >> "$GITHUB_OUTPUT"
+          echo "pre-edit-version=$(cactus version)" >> "$GITHUB_OUTPUT"
+          echo '__version__ = "shooby-doowah"' >> cactus/__init__.py
+          echo "post-edit-version=$(cactus version)" >> "$GITHUB_OUTPUT"
 
       - name: Check editable
         if: matrix.editable.matrix == 'editable'
@@ -242,8 +242,8 @@ jobs:
           development: true
           do-system-installs: true
 
-      - uses: chia-network/actions/activate-venv@main
+      - uses: cactus-network/actions/activate-venv@main
 
-      - name: Run chia --help
+      - name: Run cactus --help
         run: |
-          chia --help
+          cactus --help

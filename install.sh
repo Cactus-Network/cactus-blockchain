@@ -51,9 +51,9 @@ done
 if [ "$(uname -m)" = "armv7l" ]; then
   echo ""
   echo "WARNING:"
-  echo "The Chia Blockchain requires a 64 bit OS and this is 32 bit armv7l"
+  echo "The Cactus Blockchain requires a 64 bit OS and this is 32 bit armv7l"
   echo "For more information, see"
-  echo "https://github.com/Chia-Network/chia-blockchain/wiki/Raspberry-Pi"
+  echo "https://github.com/Cactus-Network/cactus-blockchain/wiki/Raspberry-Pi"
   echo "Exiting."
   exit 1
 fi
@@ -74,7 +74,7 @@ OPENSSL_VERSION_INT=
 find_python() {
   set +e
   unset BEST_VERSION
-  for V in 312 3.12 311 3.11 310 3.10 39 3.9 3; do
+  for V in 310 3.10 39 3.9 3; do
     if command -v python$V >/dev/null; then
       if [ "$BEST_VERSION" = "" ]; then
         BEST_VERSION=$V
@@ -138,7 +138,7 @@ if ! command -v "$INSTALL_PYTHON_PATH" >/dev/null; then
 fi
 
 if [ "$PYTHON_MAJOR_VER" -ne "3" ] || [ "$PYTHON_MINOR_VER" -lt "7" ] || [ "$PYTHON_MINOR_VER" -ge "13" ]; then
-  echo "Chia requires Python version >= 3.9 and  < 3.13.0" >&2
+  echo "Cactus requires Python version >= 3.9 and  < 3.13.0" >&2
   echo "Current Python version = $INSTALL_PYTHON_VERSION" >&2
   # If Arch, direct to Arch Wiki
   if type pacman >/dev/null 2>&1 && [ -f "/etc/arch-release" ]; then
@@ -192,13 +192,13 @@ if [ -n "$PLOTTER_INSTALL" ]; then
 fi
 
 echo ""
-echo "Chia blockchain install.sh complete."
+echo "Cactus blockchain install.sh complete."
 echo "For assistance join us on Discord in the #support chat channel:"
-echo "https://discord.gg/chia"
+echo "https://discord.gg/cactus"
 echo ""
-echo "Try the Quick Start Guide to running chia-blockchain:"
-echo "https://docs.chia.net/introduction"
+echo "Try the Quick Start Guide to running cactus-blockchain:"
+echo "https://docs.cactus-network.net/introduction"
 echo ""
 echo "To install the GUI run '. ./activate' then 'sh install-gui.sh'."
 echo ""
-echo "Type '. ./activate' and then 'chia init' to begin."
+echo "Type '. ./activate' and then 'cactus init' to begin."

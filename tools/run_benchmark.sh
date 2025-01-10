@@ -11,7 +11,7 @@ run_benchmark() {
   mv test-full-sync.log cpu.png cpu-usage.log plot-cpu.gnuplot "$2"
   python -m tools.test_full_sync analyze
   mv slow-batch-*.profile slow-batch-*.png "$2"
-  # python -m chia.util.profiler profile-node >"$2/node-profile.txt"
+  # python -m cactus.util.profiler profile-node >"$2/node-profile.txt"
   # mv profile-node "$2"
 }
 

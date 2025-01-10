@@ -17,11 +17,11 @@ permissions:
 
 jobs:
   trigger:
-    name: Trigger building a new `main` tag for the chia-docker image
+    name: Trigger building a new `main` tag for the cactus-docker image
     runs-on: ubuntu-latest
     steps:
       - name: Trigger docker main workflow via github-glue
-        uses: Chia-Network/actions/github/glue@main
+        uses: Cactus-Network/actions/github/glue@main
         with:
           json_data: "{}"
           glue_url: "${{ secrets.GLUE_API_URL }}"
@@ -29,7 +29,7 @@ jobs:
           glue_path: "start"
 
       - name: Trigger docker main success via github-glue
-        uses: Chia-Network/actions/github/glue@main
+        uses: Cactus-Network/actions/github/glue@main
         with:
           json_data: "{}"
           glue_url: "${{ secrets.GLUE_API_URL }}"

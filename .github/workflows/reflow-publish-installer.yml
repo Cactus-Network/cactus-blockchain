@@ -6,10 +6,10 @@ on:
       concurrency-name:
         required: true
         type: string
-      chia-installer-version:
+      cactus-installer-version:
         required: true
         type: string
-      chia-dev-version:
+      cactus-dev-version:
         required: true
         type: string
       configuration:
@@ -35,26 +35,26 @@ jobs:
       matrix: ${{ fromJson(inputs.configuration) }}
 
     env:
-      FILE: ${{ format(matrix.os.names[matrix.mode.matrix].file, inputs.chia-installer-version, inputs.chia-dev-version, matrix.os.file-arch-name[matrix.arch.matrix], matrix.os.file-suffix[matrix.arch.matrix]) }}
-      DEV_FILE: ${{ format(matrix.os.names[matrix.mode.matrix].dev-file, inputs.chia-installer-version, inputs.chia-dev-version, matrix.os.file-arch-name[matrix.arch.matrix], matrix.os.file-suffix[matrix.arch.matrix]) }}
-      LATEST_DEV_FILE: ${{ format(matrix.os.names[matrix.mode.matrix].latest-dev-file, inputs.chia-installer-version, inputs.chia-dev-version, matrix.os.file-arch-name[matrix.arch.matrix], matrix.os.file-suffix[matrix.arch.matrix]) }}
-      INSTALL_S3_URL: s3://download.chia.net/install/
-      DEV_S3_URL: s3://download.chia.net/dev/
-      LATEST_DEV_S3_URL: s3://download.chia.net/latest-dev/
-      TORRENT_S3_URL: s3://download.chia.net/torrents/
+      FILE: ${{ format(matrix.os.names[matrix.mode.matrix].file, inputs.cactus-installer-version, inputs.cactus-dev-version, matrix.os.file-arch-name[matrix.arch.matrix], matrix.os.file-suffix[matrix.arch.matrix]) }}
+      DEV_FILE: ${{ format(matrix.os.names[matrix.mode.matrix].dev-file, inputs.cactus-installer-version, inputs.cactus-dev-version, matrix.os.file-arch-name[matrix.arch.matrix], matrix.os.file-suffix[matrix.arch.matrix]) }}
+      LATEST_DEV_FILE: ${{ format(matrix.os.names[matrix.mode.matrix].latest-dev-file, inputs.cactus-installer-version, inputs.cactus-dev-version, matrix.os.file-arch-name[matrix.arch.matrix], matrix.os.file-suffix[matrix.arch.matrix]) }}
+      INSTALL_S3_URL: s3://download.cactus-network.net/install/
+      DEV_S3_URL: s3://download.cactus-network.net/dev/
+      LATEST_DEV_S3_URL: s3://download.cactus-network.net/latest-dev/
+      TORRENT_S3_URL: s3://download.cactus-network.net/torrents/
       TRACKER_URL: udp://tracker.opentrackr.org:1337/announce
 
     steps:
-      - uses: Chia-Network/actions/clean-workspace@main
+      - uses: Cactus-Network/actions/clean-workspace@main
 
-      - uses: Chia-Network/actions/setup-python@main
+      - uses: Cactus-Network/actions/setup-python@main
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: chia-network/actions/create-venv@main
+      - uses: cactus-network/actions/create-venv@main
         id: create-venv
 
-      - uses: chia-network/actions/activate-venv@main
+      - uses: cactus-network/actions/activate-venv@main
         with:
           directories: ${{ steps.create-venv.outputs.activate-venv-directories }}
 
@@ -71,11 +71,11 @@ jobs:
       - name: Download packages
         uses: actions/download-artifact@v4
         with:
-          name: chia-installers-${{ matrix.os.artifact-platform-name }}-${{ matrix.os.file-type.extension }}-${{ matrix.arch.artifact-name }}
+          name: cactus-installers-${{ matrix.os.artifact-platform-name }}-${{ matrix.os.file-type.extension }}-${{ matrix.arch.artifact-name }}
           path: artifacts/
 
       - name: Set Env
-        uses: Chia-Network/actions/setjobenv@main
+        uses: Cactus-Network/actions/setjobenv@main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -91,14 +91,14 @@ jobs:
           if [ -n "$GLUE_API_URL" ]; then HAS_GLUE_SECRET='true' ; fi
           echo HAS_GLUE_SECRET=${HAS_GLUE_SECRET} >> "$GITHUB_OUTPUT"
         env:
-          AWS_SECRET: "${{ secrets.CHIA_AWS_ACCOUNT_ID }}"
+          AWS_SECRET: "${{ secrets.CACTUS_AWS_ACCOUNT_ID }}"
           GLUE_API_URL: "${{ secrets.GLUE_API_URL }}"
 
       - name: Configure AWS credentials
         if: steps.check_secrets.outputs.HAS_AWS_SECRET
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.CHIA_AWS_ACCOUNT_ID }}:role/installer-upload
+          role-to-assume: arn:aws:iam::${{ secrets.CACTUS_AWS_ACCOUNT_ID }}:role/installer-upload
           aws-region: us-west-2
 
       - name: Create Checksums
@@ -118,7 +118,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          py3createtorrent -f -t ${TRACKER_URL} artifacts/${FILE} -o artifacts/${FILE}.torrent --webseed https://download.chia.net/install/${FILE}
+          py3createtorrent -f -t ${TRACKER_URL} artifacts/${FILE} -o artifacts/${FILE}.torrent --webseed https://download.cactus-network.net/install/${FILE}
           gh release upload --repo ${{ github.repository }} $RELEASE_TAG artifacts/${FILE}.torrent
 
       - name: Upload Dev Installer
@@ -149,12 +149,12 @@ jobs:
             artifacts/${FILE}
 
       - name: Mark installer complete
-        uses: Chia-Network/actions/github/glue@main
+        uses: Cactus-Network/actions/github/glue@main
         if: steps.check_secrets.outputs.HAS_GLUE_SECRET && (env.RELEASE == 'true')
         env:
           REPO_SUFFIX: ${{ env.PRE_RELEASE == 'true' && '-prerelease' || '' }}
         with:
-          json_data: '{"chia_ref": "${{ env.RELEASE_TAG }}"}'
+          json_data: '{"cactus_ref": "${{ env.RELEASE_TAG }}"}'
           glue_url: "${{ secrets.GLUE_API_URL }}"
           glue_project: "${{ env.RFC_REPO }}${{ env.REPO_SUFFIX }}/${{ env.RELEASE_TAG }}"
           glue_path: "success/build-${{ matrix.os.glue-name }}-${{ matrix.arch.glue-name }}-${{ matrix.mode.glue-name }}"

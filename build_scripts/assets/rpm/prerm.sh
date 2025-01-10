@@ -3,5 +3,5 @@
 
 set -e
 
-unlink /usr/bin/chia || true
-unlink /usr/bin/chia-blockchain || true
+unlink /usr/bin/cactus || true
+unlink /usr/bin/cactus-blockchain || true

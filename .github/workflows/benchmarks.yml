@@ -51,37 +51,37 @@ jobs:
     needs:
       - setup
     container:
-      image: chianetwork/ubuntu-22.04-builder:latest
+      image: cactusnetwork/ubuntu-22.04-builder:latest
     timeout-minutes: ${{ fromJSON(needs.setup.outputs.timeout) }}
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.10"]
     env:
-      CHIA_ROOT: ${{ github.workspace }}/.chia/mainnet
+      CACTUS_ROOT: ${{ github.workspace }}/.cactus/mainnet
       BLOCKS_AND_PLOTS_VERSION: 0.40.0
 
     steps:
       - name: Clean workspace
-        uses: Chia-Network/actions/clean-workspace@main
+        uses: Cactus-Network/actions/clean-workspace@main
 
       - name: Add safe git directory
-        uses: Chia-Network/actions/git-mark-workspace-safe@main
+        uses: Cactus-Network/actions/git-mark-workspace-safe@main
 
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: chia-network/actions/cache-pip@main
+      - uses: cactus-network/actions/cache-pip@main
         with:
           mode: poetry
 
       - name: Checkout test blocks and plots
         uses: actions/checkout@v4
         with:
-          repository: "Chia-Network/test-cache"
-          path: ".chia"
+          repository: "Cactus-Network/test-cache"
+          path: ".cactus"
           ref: ${{ env.BLOCKS_AND_PLOTS_VERSION }}
           fetch-depth: 1
 
@@ -91,11 +91,11 @@ jobs:
           development: true
           legacy_keyring: true
 
-      - uses: chia-network/actions/activate-venv@main
+      - uses: cactus-network/actions/activate-venv@main
 
       - name: pytest
         run: |
-          pytest -n 0 --capture no -m benchmark -o 'junit_suite_name=benchmarks' --junitxml=junit-data/benchmarks.raw.xml --benchmark-repeats ${{ needs.setup.outputs.repeats }} chia/_tests/
+          pytest -n 0 --capture no -m benchmark -o 'junit_suite_name=benchmarks' --junitxml=junit-data/benchmarks.raw.xml --benchmark-repeats ${{ needs.setup.outputs.repeats }} cactus/_tests/
 
       - name: Format JUnit data and prepare results
         if: always()
@@ -113,4 +113,4 @@ jobs:
       - name: Add benchmark results to workflow summary
         if: always()
         run: |
-          python -m chia._tests.process_junit --type benchmark --xml junit-data/benchmarks.xml --markdown --link-prefix ${{ github.event.repository.html_url }}/blob/${{ github.sha }}/ --link-line-separator \#L >> "$GITHUB_STEP_SUMMARY"
+          python -m cactus._tests.process_junit --type benchmark --xml junit-data/benchmarks.xml --markdown --link-prefix ${{ github.event.repository.html_url }}/blob/${{ github.sha }}/ --link-line-separator \#L >> "$GITHUB_STEP_SUMMARY"

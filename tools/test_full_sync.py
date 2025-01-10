@@ -11,15 +11,15 @@ import aiosqlite
 import click
 import zstd
 
-from chia._tests.util.full_sync import FakePeer, FakeServer, run_sync_test
-from chia.cmds.init_funcs import chia_init
-from chia.consensus.constants import replace_str_to_bytes
-from chia.consensus.default_constants import DEFAULT_CONSTANTS
-from chia.consensus.difficulty_adjustment import get_next_sub_slot_iters_and_difficulty
-from chia.full_node.full_node import FullNode
-from chia.server.ws_connection import WSChiaConnection
-from chia.types.full_block import FullBlock
-from chia.util.config import load_config
+from cactus._tests.util.full_sync import FakePeer, FakeServer, run_sync_test
+from cactus.cmds.init_funcs import cactus_init
+from cactus.consensus.constants import replace_str_to_bytes
+from cactus.consensus.default_constants import DEFAULT_CONSTANTS
+from cactus.consensus.difficulty_adjustment import get_next_sub_slot_iters_and_difficulty
+from cactus.full_node.full_node import FullNode
+from cactus.server.ws_connection import WSCactusConnection
+from cactus.types.full_block import FullBlock
+from cactus.util.config import load_config
 
 
 @click.group()
@@ -121,7 +121,7 @@ async def run_sync_checkpoint(
 ) -> None:
     root_path.mkdir(parents=True, exist_ok=True)
 
-    chia_init(root_path, should_check_keys=False, v1_db=False)
+    cactus_init(root_path, should_check_keys=False, v1_db=False)
     config = load_config(root_path, "config.yaml")
 
     overrides = config["network_overrides"]["constants"][config["selected_network"]]
@@ -135,7 +135,7 @@ async def run_sync_checkpoint(
 
     full_node.set_server(FakeServer())  # type: ignore[arg-type]
     async with full_node.manage():
-        peer: WSChiaConnection = FakePeer()  # type: ignore[assignment]
+        peer: WSCactusConnection = FakePeer()  # type: ignore[assignment]
 
         print()
         height = 0

@@ -10,8 +10,8 @@ import tempfile
 # TODO: publish wheels for these
 excepted_packages = {
     "dnslib",  # pure python
-    "chialisp_loader",
-    "chialisp_puzzles",
+    "cactuslisp_loader",
+    "cactuslisp_puzzles",
     "chia_base",
 }
 

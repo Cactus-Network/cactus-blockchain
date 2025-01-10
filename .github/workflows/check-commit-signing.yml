@@ -26,4 +26,4 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: chia-network/actions/check-commit-signing@main
+      - uses: cactus-network/actions/check-commit-signing@main

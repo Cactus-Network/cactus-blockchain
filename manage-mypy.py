@@ -37,7 +37,7 @@ def split_mypy_failure(line: str) -> List[str]:
 
 def build_exclusion_list(mypy_failures: List[str]) -> List[str]:
     # Create content for `mypy-exclusions.txt` from a list of mypy failures which look like:
-    #     # chia/cmds/wallet_funcs.py:1251: error: Incompatible types in assignment (expression has type "str", variable has type "int")  [assignment] # noqa
+    #     # cactus/cmds/wallet_funcs.py:1251: error: Incompatible types in assignment (expression has type "str", variable has type "int")  [assignment] # noqa
     return sorted({".".join(split_mypy_failure(line)) for line in mypy_failures[:-1]})
 
 
@@ -47,7 +47,7 @@ def main() -> None:
 
 
 @main.command()
-@click.option("--check-exclusions/--no-check-exclusions", show_default=True, envvar="CHIA_MANAGE_MYPY_CHECK_EXCLUSIONS")
+@click.option("--check-exclusions/--no-check-exclusions", show_default=True, envvar="CACTUS_MANAGE_MYPY_CHECK_EXCLUSIONS")
 def build_mypy_ini(check_exclusions: bool = False) -> None:
     if not exclusion_file.exists():
         raise click.ClickException(f"{exclusion_file.name} missing, run `{file_path.name} build-exclusions`")
@@ -80,7 +80,7 @@ def build_mypy_ini(check_exclusions: bool = False) -> None:
     mypy_config_data = (
         here.joinpath("mypy.ini.template")
         .read_text(encoding="utf-8")
-        .replace("[mypy-chia-exclusions]", exclusion_section)
+        .replace("[mypy-cactus-exclusions]", exclusion_section)
     )
     write_file(here.joinpath("mypy.ini"), mypy_config_data)
 

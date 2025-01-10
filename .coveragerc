@@ -4,16 +4,16 @@ disable_warnings=
   module-not-measured
 relative_files=True
 source_pkgs=
-  chia
+  cactus
 omit=
-  chia/_tests/**/config.py
+  cactus/_tests/**/config.py
 concurrency=multiprocessing, thread
 parallel=True
 
 [paths]
 source =
-  chia/
-  .venv/**/site-packages/chia/
+  cactus/
+  .venv/**/site-packages/cactus/
 
 [report]
 precision = 1

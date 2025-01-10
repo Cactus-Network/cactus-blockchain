@@ -3,7 +3,7 @@
 
 set -e
 
-chown -f root:root /opt/chia/chrome-sandbox || true
-chmod -f 4755 /opt/chia/chrome-sandbox || true
-ln -s /opt/chia/resources/app.asar.unpacked/daemon/chia /usr/bin/chia || true
-ln -s /opt/chia/chia-blockchain /usr/bin/chia-blockchain || true
+chown -f root:root /opt/cactus/chrome-sandbox || true
+chmod -f 4755 /opt/cactus/chrome-sandbox || true
+ln -s /opt/cactus/resources/app.asar.unpacked/daemon/cactus /usr/bin/cactus || true
+ln -s /opt/cactus/cactus-blockchain /usr/bin/cactus-blockchain || true

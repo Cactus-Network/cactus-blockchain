@@ -10,7 +10,7 @@ from typing import Any, AsyncIterator, Generic, Optional, Type, TypeVar, Union
 
 import click
 
-from chia.util.db_wrapper import DBWrapper2
+from cactus.util.db_wrapper import DBWrapper2
 
 _T_Enum = TypeVar("_T_Enum", bound=enum.Enum)
 

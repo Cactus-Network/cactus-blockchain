@@ -272,7 +272,7 @@ ignored-classes=optparse.Values,thread._local,_thread._local
 ignored-modules=chiabip158,
                 chiapos,
                 chiavdf,
-                chia_rs,
+                cactus_rs,
                 cryptography,
                 aiohttp,
                 keyring,
@@ -516,7 +516,7 @@ max-statements=50
 min-public-methods=2
 
 # The following functions mutate other functions' signatures and need a E1120 exception
-signature-mutators=chia.rpc.util.tx_endpoint
+signature-mutators=cactus.rpc.util.tx_endpoint
 
 [IMPORTS]
 

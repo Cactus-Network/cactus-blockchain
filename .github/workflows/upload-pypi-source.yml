@@ -73,17 +73,17 @@ jobs:
               matrix: arm
 
     steps:
-      - uses: chia-network/actions/clean-workspace@main
+      - uses: cactus-network/actions/clean-workspace@main
 
       - name: Add safe git directory
-        uses: chia-network/actions/git-mark-workspace-safe@main
+        uses: cactus-network/actions/git-mark-workspace-safe@main
 
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
 
-      - uses: chia-network/actions/setup-python@main
+      - uses: cactus-network/actions/setup-python@main
         with:
           python-version: ${{ matrix.python.major_dot_minor }}
 
@@ -92,7 +92,7 @@ jobs:
           python-version: ${{ matrix.python.major_dot_minor }}
           development: true
 
-      - uses: chia-network/actions/activate-venv@main
+      - uses: cactus-network/actions/activate-venv@main
 
       - name: Check with ${{ matrix.check.name }}
         run: |
@@ -121,29 +121,29 @@ jobs:
           - name: black
             command: black --check --diff .
           - name: flake8
-            command: flake8 benchmarks build_scripts chia tools *.py
+            command: flake8 benchmarks build_scripts cactus tools *.py
           - name: pylint
-            command: pylint benchmarks build_scripts chia tools *.py
+            command: pylint benchmarks build_scripts cactus tools *.py
           - name: generated protocol tests
             command: |
-              python3 -m chia._tests.util.build_network_protocol_files
+              python3 -m cactus._tests.util.build_network_protocol_files
               git diff --exit-code
           - name: poetry
             command: |
               .penv/bin/poetry check
 
     steps:
-      - uses: chia-network/actions/clean-workspace@main
+      - uses: cactus-network/actions/clean-workspace@main
 
       - name: Add safe git directory
-        uses: chia-network/actions/git-mark-workspace-safe@main
+        uses: cactus-network/actions/git-mark-workspace-safe@main
 
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
 
-      - uses: chia-network/actions/setup-python@main
+      - uses: cactus-network/actions/setup-python@main
         with:
           python-version: ${{ matrix.python.major_dot_minor }}
 
@@ -152,7 +152,7 @@ jobs:
           python-version: ${{ matrix.python.major_dot_minor }}
           development: true
 
-      - uses: chia-network/actions/activate-venv@main
+      - uses: cactus-network/actions/activate-venv@main
 
       - name: Check with ${{ matrix.check.name }}
         run: |
@@ -172,7 +172,7 @@ jobs:
 
     steps:
       - name: Add safe git directory
-        uses: chia-network/actions/git-mark-workspace-safe@main
+        uses: cactus-network/actions/git-mark-workspace-safe@main
 
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -180,7 +180,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - uses: Chia-Network/actions/setup-python@main
+      - uses: Cactus-Network/actions/setup-python@main
         name: Install Python
         with:
           python-version: "3.10"
@@ -190,7 +190,7 @@ jobs:
           python-version: ${{ matrix.python.major_dot_minor }}
           development: true
 
-      - uses: chia-network/actions/activate-venv@main
+      - uses: cactus-network/actions/activate-venv@main
 
       - name: Build source distribution
         run: |

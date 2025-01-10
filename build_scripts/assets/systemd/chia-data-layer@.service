@@ -1,12 +1,12 @@
 [Unit]
-Description=Chia Data Layer Service for %i
-Requires=chia-daemon@%i.service
-After=chia-daemon@%i.service
+Description=Cactus Data Layer Service for %i
+Requires=cactus-daemon@%i.service
+After=cactus-daemon@%i.service
 
 [Service]
 Type=simple
-Environment=CHIA_ROOT=/home/%i/.chia/mainnet
-ExecStart=/opt/chia/start_data_layer
+Environment=CACTUS_ROOT=/home/%i/.cactus/mainnet
+ExecStart=/opt/cactus/start_data_layer
 User=%i
 Group=%i
 LimitNOFILE=1048576

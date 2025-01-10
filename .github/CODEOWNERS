@@ -1,5 +1,5 @@
-*	@Chia-Network/required-reviewers
-/.github/**/* @Chia-Network/actions-reviewers
-/PRETTY_GOOD_PRACTICES.md	@altendky @Chia-Network/required-reviewers
-/pylintrc	@altendky @Chia-Network/required-reviewers
-/tests/ether.py @altendky @Chia-Network/required-reviewers
+*	@Cactus-Network/required-reviewers
+/.github/**/* @Cactus-Network/actions-reviewers
+/PRETTY_GOOD_PRACTICES.md	@altendky @Cactus-Network/required-reviewers
+/pylintrc	@altendky @Cactus-Network/required-reviewers
+/tests/ether.py @altendky @Cactus-Network/required-reviewers

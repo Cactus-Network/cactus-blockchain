@@ -3,8 +3,8 @@ name: identify version
 on:
   workflow_call:
     outputs:
-      chia-installer-version:
-        value: ${{ jobs.version.outputs.chia-installer-version }}
+      cactus-installer-version:
+        value: ${{ jobs.version.outputs.cactus-installer-version }}
       tag-type:
         value: ${{ jobs.version.outputs.tag-type }}
 
@@ -14,8 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      chia-dev-version: ${{ steps.version-number.outputs.chia-dev-version }}
-      chia-installer-version: ${{ steps.version-number.outputs.chia-installer-version }}
+      cactus-dev-version: ${{ steps.version-number.outputs.cactus-dev-version }}
+      cactus-installer-version: ${{ steps.version-number.outputs.cactus-installer-version }}
       tag-type: ${{ steps.tag-type.outputs.tag-type }}
 
     steps:
@@ -24,7 +24,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: Chia-Network/actions/git-ssh-to-https@main
+      - uses: Cactus-Network/actions/git-ssh-to-https@main
 
       - name: Check tag type
         id: tag-type
@@ -49,8 +49,8 @@ jobs:
           pip install poetry "poetry-dynamic-versioning[plugin]"
 
           VERSION=$(poetry version -s)
-          echo "chia-installer-version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "cactus-installer-version=${VERSION}" >> "$GITHUB_OUTPUT"
           GIT_SHORT_HASH=$(echo "${GITHUB_SHA}" | cut -c1-8)
-          echo "chia-dev-version=${VERSION}-${GIT_SHORT_HASH}" >> "$GITHUB_OUTPUT"
+          echo "cactus-dev-version=${VERSION}-${GIT_SHORT_HASH}" >> "$GITHUB_OUTPUT"
 
           deactivate

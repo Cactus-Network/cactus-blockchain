@@ -3,7 +3,7 @@
 # PULL IN LICENSES USING NPM - LICENSE CHECKER
 npm install -g license-checker
 
-cd ../chia-blockchain-gui || exit 1
+cd ../cactus-blockchain-gui || exit 1
 
 npm ci
 

@@ -15,12 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set Env
-        uses: Chia-Network/actions/setjobenv@main
+        uses: Cactus-Network/actions/setjobenv@main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger sync test workflow via github-glue
-        uses: Chia-Network/actions/github/glue@main
+        uses: Cactus-Network/actions/github/glue@main
         with:
           json_data: '{"test_ref": "${{ env.RELEASE_TAG }}"}'
           glue_url: "${{ secrets.GLUE_API_URL }}"
@@ -28,7 +28,7 @@ jobs:
           glue_path: "start"
 
       - name: Trigger sync test workflow success via github-glue
-        uses: Chia-Network/actions/github/glue@main
+        uses: Cactus-Network/actions/github/glue@main
         with:
           json_data: '{"test_ref": "${{ env.RELEASE_TAG }}"}'
           glue_url: "${{ secrets.GLUE_API_URL }}"

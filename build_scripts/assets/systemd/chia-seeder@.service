@@ -1,12 +1,12 @@
 [Unit]
-Description=Chia Seeder Service for %i
-Requires=chia-daemon@%i.service
-After=chia-daemon@%i.service
+Description=Cactus Seeder Service for %i
+Requires=cactus-daemon@%i.service
+After=cactus-daemon@%i.service
 
 [Service]
 Type=simple
-Environment=CHIA_ROOT=/home/%i/.chia/mainnet
-ExecStart=/opt/chia/start_seeder
+Environment=CACTUS_ROOT=/home/%i/.cactus/mainnet
+ExecStart=/opt/cactus/start_seeder
 User=%i
 Group=%i
 LimitNOFILE=1048576

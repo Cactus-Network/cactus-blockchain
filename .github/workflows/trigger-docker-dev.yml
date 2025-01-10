@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   trigger:
-    name: Trigger building a new dev tag for the chia-docker image
+    name: Trigger building a new dev tag for the cactus-docker image
     runs-on: ubuntu-latest
     steps:
       - name: Test for secrets access
@@ -36,7 +36,7 @@ jobs:
           GLUE_API_URL: "${{ secrets.GLUE_API_URL }}"
 
       - name: Trigger docker dev workflow via github-glue
-        uses: Chia-Network/actions/github/glue@main
+        uses: Cactus-Network/actions/github/glue@main
         if: steps.check_secrets.outputs.HAS_SECRET
         with:
           json_data: '{"sha":"${{ github.sha }}"}'
@@ -45,7 +45,7 @@ jobs:
           glue_path: "start"
 
       - name: Trigger docker dev success via github-glue
-        uses: Chia-Network/actions/github/glue@main
+        uses: Cactus-Network/actions/github/glue@main
         if: steps.check_secrets.outputs.HAS_SECRET
         with:
           json_data: '{"sha":"${{ github.sha }}"}'

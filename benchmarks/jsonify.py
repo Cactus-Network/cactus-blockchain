@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 from time import perf_counter
 
-from chia._tests.util.test_full_block_utils import get_full_blocks
+from cactus._tests.util.test_full_block_utils import get_full_blocks
 
 random.seed(123456789)
 

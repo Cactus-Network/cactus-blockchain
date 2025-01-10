@@ -1,12 +1,12 @@
 [Unit]
-Description=Chia Wallet Service for %i
-Requires=chia-daemon@%i.service
-After=chia-daemon@%i.service
+Description=Cactus Wallet Service for %i
+Requires=cactus-daemon@%i.service
+After=cactus-daemon@%i.service
 
 [Service]
 Type=simple
-Environment=CHIA_ROOT=/home/%i/.chia/mainnet
-ExecStart=/opt/chia/start_wallet
+Environment=CACTUS_ROOT=/home/%i/.cactus/mainnet
+ExecStart=/opt/cactus/start_wallet
 ExecStartPost=/bin/bash -c '(while ! nc -z -v -w1 localhost 9256 2>/dev/null; do echo "Waiting for the wallet to listen on port 9256..."; sleep 1; done); sleep 1'
 User=%i
 Group=%i

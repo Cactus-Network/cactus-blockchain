@@ -47,15 +47,15 @@ jobs:
       - version
     timeout-minutes: 65
     outputs:
-      chia-installer-version: ${{ steps.version_number.outputs.CHIA_INSTALLER_VERSION }}
+      cactus-installer-version: ${{ steps.version_number.outputs.CACTUS_INSTALLER_VERSION }}
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.10"]
 
     env:
-      CHIA_INSTALLER_VERSION: ${{ needs.version.outputs.chia-installer-version }}
-      POETRY_DYNAMIC_VERSIONING_OVERRIDE: "chia-blockchain=${{ needs.version.outputs.chia-installer-version }}"
+      CACTUS_INSTALLER_VERSION: ${{ needs.version.outputs.cactus-installer-version }}
+      POETRY_DYNAMIC_VERSIONING_OVERRIDE: "cactus-blockchain=${{ needs.version.outputs.cactus-installer-version }}"
       TAG_TYPE: ${{ needs.version.outputs.tag-type }}
 
     steps:
@@ -66,11 +66,11 @@ jobs:
           submodules: recursive
 
       - name: Set Env
-        uses: Chia-Network/actions/setjobenv@main
+        uses: Cactus-Network/actions/setjobenv@main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: Chia-Network/actions/git-ssh-to-https@main
+      - uses: Cactus-Network/actions/git-ssh-to-https@main
 
       - name: Get npm cache directory
         id: npm-cache
@@ -86,11 +86,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - uses: chia-network/actions/cache-pip@main
+      - uses: cactus-network/actions/cache-pip@main
         with:
           mode: poetry
 
-      - uses: Chia-Network/actions/setup-python@main
+      - uses: Cactus-Network/actions/setup-python@main
         name: Install Python ${{ matrix.python-version }}
         with:
           python-version: ${{ matrix.python-version }}
@@ -134,7 +134,7 @@ jobs:
         if: steps.check_secrets.outputs.HAS_SIGNING_SECRET
         shell: cmd
         run: |
-          curl -X GET https://download.chia.net/dc/smtools-windows-x64.msi -o smtools-windows-x64.msi
+          curl -X GET https://download.cactus-network.net/dc/smtools-windows-x64.msi -o smtools-windows-x64.msi
           msiexec /i smtools-windows-x64.msi /quiet /qn
           smksp_registrar.exe list
           smctl.exe keypair ls
@@ -146,10 +146,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
-          LATEST_MADMAX=$(gh api repos/Chia-Network/chia-plotter-madmax/releases/latest --jq 'select(.prerelease == false) | .tag_name')
+          LATEST_MADMAX=$(gh api repos/Cactus-Network/cactus-plotter-madmax/releases/latest --jq 'select(.prerelease == false) | .tag_name')
           mkdir "$GITHUB_WORKSPACE"\\madmax
-          gh release download -R Chia-Network/chia-plotter-madmax "$LATEST_MADMAX" -p 'chia_plot-*.exe' -O "$GITHUB_WORKSPACE"\\madmax\\chia_plot.exe
-          gh release download -R Chia-Network/chia-plotter-madmax "$LATEST_MADMAX" -p 'chia_plot_k34-*.exe' -O "$GITHUB_WORKSPACE"\\madmax\\chia_plot_k34.exe
+          gh release download -R Cactus-Network/cactus-plotter-madmax "$LATEST_MADMAX" -p 'cactus_plot-*.exe' -O "$GITHUB_WORKSPACE"\\madmax\\cactus_plot.exe
+          gh release download -R Cactus-Network/cactus-plotter-madmax "$LATEST_MADMAX" -p 'cactus_plot_k34-*.exe' -O "$GITHUB_WORKSPACE"\\madmax\\cactus_plot_k34.exe
 
       - name: Fetch bladebit versions
         shell: bash
@@ -157,9 +157,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Fetch the latest version of each type
-          LATEST_RELEASE=$(gh api repos/Chia-Network/bladebit/releases/latest --jq 'select(.prerelease == false) | .tag_name')
-          LATEST_BETA=$(gh api repos/Chia-Network/bladebit/releases --jq 'map(select(.prerelease) | select(.tag_name | test("^v[0-9]+\\.[0-9]+\\.[0-9]+-beta[0-9]+$"))) | first | .tag_name')
-          LATEST_RC=$(gh api repos/Chia-Network/bladebit/releases --jq 'map(select(.prerelease) | select(.tag_name | test("^v[0-9]+\\.[0-9]+\\.[0-9]+-rc[0-9]+$"))) | first | .tag_name')
+          LATEST_RELEASE=$(gh api repos/Cactus-Network/bladebit/releases/latest --jq 'select(.prerelease == false) | .tag_name')
+          LATEST_BETA=$(gh api repos/Cactus-Network/bladebit/releases --jq 'map(select(.prerelease) | select(.tag_name | test("^v[0-9]+\\.[0-9]+\\.[0-9]+-beta[0-9]+$"))) | first | .tag_name')
+          LATEST_RC=$(gh api repos/Cactus-Network/bladebit/releases --jq 'map(select(.prerelease) | select(.tag_name | test("^v[0-9]+\\.[0-9]+\\.[0-9]+-rc[0-9]+$"))) | first | .tag_name')
 
           # Compare the versions and choose the newest that matches the requirements
           if [[ "$TAG_TYPE" == "beta" || -z "$TAG_TYPE" ]]; then
@@ -182,7 +182,7 @@ jobs:
           # Download and extract the chosen version
           mkdir "$GITHUB_WORKSPACE\\bladebit"
           cd "$GITHUB_WORKSPACE\\bladebit"
-          gh release download -R Chia-Network/bladebit "$LATEST_VERSION" -p 'bladebit*windows-x86-64.zip'
+          gh release download -R Cactus-Network/bladebit "$LATEST_VERSION" -p 'bladebit*windows-x86-64.zip'
           ls *.zip | xargs -I{} bash -c 'unzip {} && rm {}'
           cd "$OLDPWD"
 
@@ -192,24 +192,24 @@ jobs:
           development: true
           constraints-file-artifact-name: constraints-file-intel
 
-      - uses: chia-network/actions/activate-venv@main
+      - uses: cactus-network/actions/activate-venv@main
 
       - name: Prepare GUI cache
         id: gui-ref
         shell: bash
         run: |
-          gui_ref=$(git submodule status chia-blockchain-gui | sed -e 's/^ //g' -e 's/ chia-blockchain-gui.*$//g')
+          gui_ref=$(git submodule status cactus-blockchain-gui | sed -e 's/^ //g' -e 's/ cactus-blockchain-gui.*$//g')
           echo "${gui_ref}"
           echo "GUI_REF=${gui_ref}" >> "$GITHUB_OUTPUT"
-          echo "rm -rf ./chia-blockchain-gui"
-          rm -rf ./chia-blockchain-gui
+          echo "rm -rf ./cactus-blockchain-gui"
+          rm -rf ./cactus-blockchain-gui
 
       - name: Cache GUI
         uses: actions/cache@v4
         id: cache-gui
         with:
-          path: .\chia-blockchain-gui
-          key: ${{ runner.os }}-chia-blockchain-gui-${{ steps.gui-ref.outputs.GUI_REF }}
+          path: .\cactus-blockchain-gui
+          key: ${{ runner.os }}-cactus-blockchain-gui-${{ steps.gui-ref.outputs.GUI_REF }}
 
       - if: steps.cache-gui.outputs.cache-hit != 'true'
         name: Build GUI
@@ -230,23 +230,23 @@ jobs:
       - name: Upload Installer to artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: chia-installers-windows-exe-intel
-          path: chia-blockchain-gui\release-builds\windows-installer\
+          name: cactus-installers-windows-exe-intel
+          path: cactus-blockchain-gui\release-builds\windows-installer\
 
       - name: Remove Windows exe and installer to exclude from cache
         run: |
-          Remove-Item .\chia-blockchain-gui\packages\gui\dist -Recurse -Force
-          Remove-Item .\chia-blockchain-gui\packages\gui\daemon -Recurse -Force
-          Remove-Item .\chia-blockchain-gui\Chia-win32-x64 -Recurse -Force
-          Remove-Item .\chia-blockchain-gui\release-builds -Recurse -Force
+          Remove-Item .\cactus-blockchain-gui\packages\gui\dist -Recurse -Force
+          Remove-Item .\cactus-blockchain-gui\packages\gui\daemon -Recurse -Force
+          Remove-Item .\cactus-blockchain-gui\Cactus-win32-x64 -Recurse -Force
+          Remove-Item .\cactus-blockchain-gui\release-builds -Recurse -Force
 
   publish:
     name: 📦 Publish Installers
     uses: ./.github/workflows/reflow-publish-installer.yml
     with:
       concurrency-name: windows
-      chia-installer-version: ${{ needs.version.outputs.chia-installer-version }}
-      chia-dev-version: ${{ needs.version.outputs.chia-dev-version }}
+      cactus-installer-version: ${{ needs.version.outputs.cactus-installer-version }}
+      cactus-dev-version: ${{ needs.version.outputs.cactus-dev-version }}
       configuration: ${{ toJSON( matrix.configuration ) }}
     secrets: inherit
     needs:
@@ -271,9 +271,9 @@ jobs:
                   intel: ""
                 names:
                   gui:
-                    file: ChiaSetup-{0}.exe
-                    dev-file: ChiaSetup-{1}.exe
-                    latest-dev-file: ChiaSetup-latest-dev.exe
+                    file: CactusSetup-{0}.exe
+                    dev-file: CactusSetup-{1}.exe
+                    latest-dev-file: CactusSetup-latest-dev.exe
             mode:
               - name: GUI
                 matrix: gui
@@ -326,18 +326,18 @@ jobs:
       INSTALL_PATH: installed/
 
     steps:
-      - uses: Chia-Network/actions/clean-workspace@main
+      - uses: Cactus-Network/actions/clean-workspace@main
 
       - name: Download packages
         uses: actions/download-artifact@v4
         with:
-          name: chia-installers-windows-exe-intel
+          name: cactus-installers-windows-exe-intel
           path: packages
 
       - name: Install package
         run: |
           dir ./packages/
-          $env:INSTALLER_PATH = (Get-ChildItem packages/ChiaSetup-*.exe)
+          $env:INSTALLER_PATH = (Get-ChildItem packages/CactusSetup-*.exe)
           # note that the installer requires the target path use backslashes
           $env:RESOLVED_INSTALL_PATH = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($env:INSTALL_PATH)
           Start-Process -Wait -FilePath $env:INSTALLER_PATH -ArgumentList "/S", ("/D=" + $env:RESOLVED_INSTALL_PATH)
@@ -355,6 +355,6 @@ jobs:
         run: |
           Get-ChildItem -Recurse $env:INSTALL_PATH | Select FullName
 
-      - name: Run chia dev installers test
+      - name: Run cactus dev installers test
         run: |
-          & ($env:INSTALL_PATH + "/resources/app.asar.unpacked/daemon/chia.exe") dev installers test --expected-chia-version "${{ needs.version.outputs.chia-installer-version }}"
+          & ($env:INSTALL_PATH + "/resources/app.asar.unpacked/daemon/cactus.exe") dev installers test --expected-cactus-version "${{ needs.version.outputs.cactus-installer-version }}"

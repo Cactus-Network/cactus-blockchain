@@ -1,5 +1,5 @@
 [mypy]
-files = benchmarks,build_scripts,chia,tools,*.py
+files = benchmarks,build_scripts,cactus,tools,*.py
 ignore_missing_imports = True
 show_error_codes = True
 warn_unused_ignores = True
@@ -17,7 +17,7 @@ no_implicit_reexport = True
 strict_equality = True
 warn_redundant_casts = True
 
-[mypy-chia-exclusions]
+[mypy-cactus-exclusions]
 disable_error_code = annotation-unchecked
 disallow_any_generics = False
 disallow_subclassing_any = False

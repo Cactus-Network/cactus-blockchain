@@ -17,11 +17,11 @@ fi
 # If the env variable NOTARIZE and the username and password variables are
 # set, this will attempt to Notarize the signed DMG
 
-if [ ! "$CHIA_INSTALLER_VERSION" ]; then
-  echo "WARNING: No environment variable CHIA_INSTALLER_VERSION set. Using 0.0.0."
-  CHIA_INSTALLER_VERSION="0.0.0"
+if [ ! "$CACTUS_INSTALLER_VERSION" ]; then
+  echo "WARNING: No environment variable CACTUS_INSTALLER_VERSION set. Using 0.0.0."
+  CACTUS_INSTALLER_VERSION="0.0.0"
 fi
-echo "Chia Installer Version is: $CHIA_INSTALLER_VERSION"
+echo "Cactus Installer Version is: $CACTUS_INSTALLER_VERSION"
 
 echo "Installing npm and electron packagers"
 cd npm_linux || exit 1
@@ -48,14 +48,14 @@ pwd
 bash ./build_license_directory.sh
 
 # Builds CLI only rpm
-CLI_RPM_BASE="chia-blockchain-cli-$CHIA_INSTALLER_VERSION-1.$REDHAT_PLATFORM"
-mkdir -p "dist/$CLI_RPM_BASE/opt/chia"
+CLI_RPM_BASE="cactus-blockchain-cli-$CACTUS_INSTALLER_VERSION-1.$REDHAT_PLATFORM"
+mkdir -p "dist/$CLI_RPM_BASE/opt/cactus"
 mkdir -p "dist/$CLI_RPM_BASE/usr/bin"
 mkdir -p "dist/$CLI_RPM_BASE/etc/systemd/system"
-cp -r dist/daemon/* "dist/$CLI_RPM_BASE/opt/chia/"
+cp -r dist/daemon/* "dist/$CLI_RPM_BASE/opt/cactus/"
 cp assets/systemd/*.service "dist/$CLI_RPM_BASE/etc/systemd/system/"
 
-ln -s ../../opt/chia/chia "dist/$CLI_RPM_BASE/usr/bin/chia"
+ln -s ../../opt/cactus/cactus "dist/$CLI_RPM_BASE/usr/bin/cactus"
 # This is built into the base build image
 # shellcheck disable=SC1091
 . /etc/profile.d/rvm.sh
@@ -69,13 +69,13 @@ export FPM_EDITOR="cat >dist/cli.spec <"
 fpm -s dir -t rpm \
   --edit \
   -C "dist/$CLI_RPM_BASE" \
-  --directories "/opt/chia" \
+  --directories "/opt/cactus" \
   -p "dist/$CLI_RPM_BASE.rpm" \
-  --name chia-blockchain-cli \
+  --name cactus-blockchain-cli \
   --license Apache-2.0 \
-  --version "$CHIA_INSTALLER_VERSION" \
+  --version "$CACTUS_INSTALLER_VERSION" \
   --architecture "$REDHAT_PLATFORM" \
-  --description "Chia is a modern cryptocurrency built from scratch, designed to be efficient, decentralized, and secure." \
+  --description "Cactus is a modern cryptocurrency built from scratch, designed to be efficient, decentralized, and secure." \
   --rpm-tag 'Recommends: libxcrypt-compat' \
   --rpm-tag '%define _build_id_links none' \
   --rpm-tag '%undefine _missing_build_ids_terminate_build' \
@@ -85,13 +85,13 @@ fpm -s dir -t rpm \
   --rpm-compression-level 6 \
   .
 # CLI only rpm done
-cp -r dist/daemon ../chia-blockchain-gui/packages/gui
+cp -r dist/daemon ../cactus-blockchain-gui/packages/gui
 # Change to the gui package
-cd ../chia-blockchain-gui/packages/gui || exit 1
+cd ../cactus-blockchain-gui/packages/gui || exit 1
 
-# sets the version for chia-blockchain in package.json
+# sets the version for cactus-blockchain in package.json
 cp package.json package.json.orig
-jq --arg VER "$CHIA_INSTALLER_VERSION" '.version=$VER' package.json >temp.json && mv temp.json package.json
+jq --arg VER "$CACTUS_INSTALLER_VERSION" '.version=$VER' package.json >temp.json && mv temp.json package.json
 
 export FPM_EDITOR="cat >../../../build_scripts/dist/gui.spec <"
 jq '.rpm.fpm |= . + ["--edit"]' ../../../build_scripts/electron-builder.json >temp.json && mv temp.json ../../../build_scripts/electron-builder.json
@@ -101,16 +101,16 @@ OPT_ARCH="--x64"
 if [ "$REDHAT_PLATFORM" = "arm64" ]; then
   OPT_ARCH="--arm64"
 fi
-PRODUCT_NAME="chia"
+PRODUCT_NAME="cactus"
 echo "${NPM_PATH}/electron-builder" build --linux rpm "${OPT_ARCH}" \
-  --config.extraMetadata.name=chia-blockchain \
-  --config.productName="${PRODUCT_NAME}" --config.linux.desktop.Name="Chia Blockchain" \
-  --config.rpm.packageName="chia-blockchain" \
+  --config.extraMetadata.name=cactus-blockchain \
+  --config.productName="${PRODUCT_NAME}" --config.linux.desktop.Name="Cactus Blockchain" \
+  --config.rpm.packageName="cactus-blockchain" \
   --config ../../../build_scripts/electron-builder.json
 "${NPM_PATH}/electron-builder" build --linux rpm "${OPT_ARCH}" \
-  --config.extraMetadata.name=chia-blockchain \
-  --config.productName="${PRODUCT_NAME}" --config.linux.desktop.Name="Chia Blockchain" \
-  --config.rpm.packageName="chia-blockchain" \
+  --config.extraMetadata.name=cactus-blockchain \
+  --config.productName="${PRODUCT_NAME}" --config.linux.desktop.Name="Cactus Blockchain" \
+  --config.rpm.packageName="cactus-blockchain" \
   --config ../../../build_scripts/electron-builder.json
 LAST_EXIT_CODE=$?
 ls -l dist/linux*-unpacked/resources
@@ -123,8 +123,8 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
   exit $LAST_EXIT_CODE
 fi
 
-GUI_RPM_NAME="chia-blockchain-${CHIA_INSTALLER_VERSION}-1.${REDHAT_PLATFORM}.rpm"
-mv "dist/${PRODUCT_NAME}-${CHIA_INSTALLER_VERSION}.rpm" "../../../build_scripts/dist/${GUI_RPM_NAME}"
+GUI_RPM_NAME="cactus-blockchain-${CACTUS_INSTALLER_VERSION}-1.${REDHAT_PLATFORM}.rpm"
+mv "dist/${PRODUCT_NAME}-${CACTUS_INSTALLER_VERSION}.rpm" "../../../build_scripts/dist/${GUI_RPM_NAME}"
 cd ../../../build_scripts || exit 1
 
 echo "Create final installer"

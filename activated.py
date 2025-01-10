@@ -12,7 +12,7 @@ here = pathlib.Path(__file__).parent.absolute()
 
 
 class Env(enum.Enum):
-    chia = ".venv"
+    cactus = ".venv"
     poetry = ".penv"
 
 
@@ -21,7 +21,7 @@ def main(*args: str) -> int:
         print("Parameters required")
         return 1
 
-    env = Env.chia
+    env = Env.cactus
     if args[0].startswith("--"):
         env = Env[args[0][2:]]
         args = args[1:]
