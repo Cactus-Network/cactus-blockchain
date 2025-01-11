@@ -8,7 +8,7 @@ from cactus.util.ints import uint8, uint16, uint32, uint64, uint128
 
 from .constants import ConsensusConstants
 
-AGG_SIG_DATA = bytes32.fromhex("ccd5bb71183532bff220ba46c268991a3ff07eb358e8255a65c30a2dce0e5fbb")
+AGG_SIG_DATA = bytes32.fromhex("55830f14be472f67c4fc19825ac22ae785204c539bb43169d5ff47a9c7b2ae2a")
 
 DEFAULT_CONSTANTS = ConsensusConstants(
     SLOT_BLOCKS_TARGET=uint32(32),

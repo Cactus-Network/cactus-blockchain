@@ -10,21 +10,7 @@ STABLY_USDS = {
     "symbol": "USDS",
 }
 
-orfinkat = {
-    "asset_id": "9731463686b47572d144d43007480e1a213505918d78436b0f22f51365f9eec1",
-    "name": "orfinkat",
-    "symbol": "CACT",
-}
-
-MONKEY = {
-    "asset_id": "2f23b6d88850cbf0644af602c68ad0fcf3c91ea64b3ea78cb098f736aafbeee1",
-    "name": "Monkey",
-    "symbol": "MONK",
-}
-
 DEFAULT_CATS = {
     CACTUS_CAT["asset_id"]: CACTUS_CAT,
     STABLY_USDS["asset_id"]: STABLY_USDS,
-    orfinkat["asset_id"]: orfinkat,
-    MONKEY["asset_id"]: MONKEY,
 }
