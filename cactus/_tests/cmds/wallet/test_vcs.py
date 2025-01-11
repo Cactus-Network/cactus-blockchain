@@ -60,7 +60,7 @@ def test_vcs_mint(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, Pa
     did_bytes = get_bytes32(1)
     did_id = encode_puzzle_hash(did_bytes, "did:cactus:")
     target_bytes = get_bytes32(2)
-    target_addr = encode_puzzle_hash(target_bytes, "xch")
+    target_addr = encode_puzzle_hash(target_bytes, "cac")
     command_args = [
         "wallet",
         "vcs",
@@ -115,7 +115,7 @@ def test_vcs_get(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, Pat
     assert_list = [
         f"Proofs:\n- {get_bytes32(1).hex()}\n  - proof here",
         f"Launcher ID: {get_bytes32(3).hex()}",
-        f"Inner Address: {encode_puzzle_hash(get_bytes32(3), 'xch')}",
+        f"Inner Address: {encode_puzzle_hash(get_bytes32(3), 'cac')}",
     ]
     run_cli_command_and_assert(capsys, root_dir, command_args, assert_list)
     expected_calls: logType = {"vc_get_list": [(10, 10)]}

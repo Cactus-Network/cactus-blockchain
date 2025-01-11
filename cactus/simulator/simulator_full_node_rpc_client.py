@@ -16,7 +16,7 @@ class SimulatorFullNodeRpcClient(FullNodeRpcClient):
         return [FullBlock.from_json_dict(block) for block in json_blocks]
 
     async def farm_block(self, target_ph: bytes32, number_of_blocks: int = 1, guarantee_tx_block: bool = False) -> int:
-        address = encode_puzzle_hash(target_ph, "txch")
+        address = encode_puzzle_hash(target_ph, "tcac")
         request_args = {"address": address, "blocks": number_of_blocks, "guarantee_tx_block": guarantee_tx_block}
         new_height: int = (await self.fetch("farm_block", request_args))["new_peak_height"]
         return new_height

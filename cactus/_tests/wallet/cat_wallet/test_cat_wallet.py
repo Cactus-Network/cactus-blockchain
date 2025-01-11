@@ -53,10 +53,10 @@ def check_wallets(node: WalletNode) -> int:
 async def test_cat_creation(wallet_environments: WalletTestFramework) -> None:
     full_node_api = wallet_environments.full_node
     wsm = wallet_environments.environments[0].wallet_state_manager
-    wallet = wallet_environments.environments[0].xch_wallet
+    wallet = wallet_environments.environments[0].cac_wallet
 
     wallet_environments.environments[0].wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     test_amount = 100
@@ -78,7 +78,7 @@ async def test_cat_creation(wallet_environments: WalletTestFramework) -> None:
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": 0,
                         "unconfirmed_wallet_balance": -test_amount + -test_fee,
                         "<=#spendable_balance": -test_amount + -test_fee,
@@ -97,7 +97,7 @@ async def test_cat_creation(wallet_environments: WalletTestFramework) -> None:
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -test_amount + -test_fee,
                         "unconfirmed_wallet_balance": 0,
                         ">=#spendable_balance": 0,
@@ -145,7 +145,7 @@ async def test_cat_creation(wallet_environments: WalletTestFramework) -> None:
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": test_amount + test_fee,
                         "unconfirmed_wallet_balance": 0,
                         "<=#spendable_balance": 1,
@@ -162,7 +162,7 @@ async def test_cat_creation(wallet_environments: WalletTestFramework) -> None:
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -test_amount + -test_fee,
                         "unconfirmed_wallet_balance": 0,
                         ">=#spendable_balance": 0,
@@ -199,7 +199,7 @@ async def test_cat_creation(wallet_environments: WalletTestFramework) -> None:
 @pytest.mark.anyio
 async def test_cat_creation_unique_lineage_store(wallet_environments: WalletTestFramework) -> None:
     wsm = wallet_environments.environments[0].wallet_state_manager
-    wallet = wallet_environments.environments[0].xch_wallet
+    wallet = wallet_environments.environments[0].cac_wallet
 
     async with wsm.new_action_scope(wallet_environments.tx_config, push=True) as action_scope:
         cat_wallet_1 = await CATWallet.create_new_cat_wallet(
@@ -243,16 +243,16 @@ async def test_cat_spend(wallet_environments: WalletTestFramework) -> None:
     env_2: WalletEnvironment = wallet_environments.environments[1]
     wallet_node = env_1.node
     wallet_node_2 = env_2.node
-    wallet = env_1.xch_wallet
-    wallet2 = env_2.xch_wallet
+    wallet = env_1.cac_wallet
+    wallet2 = env_2.cac_wallet
     full_node_api = wallet_environments.full_node
 
     env_1.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     env_2.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
@@ -269,7 +269,7 @@ async def test_cat_spend(wallet_environments: WalletTestFramework) -> None:
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "unconfirmed_wallet_balance": -100,
                         "<=#spendable_balance": -100,
                         "<=#max_send_amount": -100,
@@ -289,7 +289,7 @@ async def test_cat_spend(wallet_environments: WalletTestFramework) -> None:
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -100,
                         ">=#spendable_balance": 1,  # any amount increase
                         ">=#max_send_amount": 1,  # any amount increase
@@ -336,7 +336,7 @@ async def test_cat_spend(wallet_environments: WalletTestFramework) -> None:
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "unconfirmed_wallet_balance": -1,
                         "<=#spendable_balance": -1,
                         "<=#max_send_amount": -1,
@@ -354,7 +354,7 @@ async def test_cat_spend(wallet_environments: WalletTestFramework) -> None:
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -1,
                         ">=#spendable_balance": 1,  # any amount increase
                         ">=#max_send_amount": 1,  # any amount increase
@@ -492,10 +492,10 @@ async def test_cat_spend(wallet_environments: WalletTestFramework) -> None:
 @pytest.mark.anyio
 async def test_get_wallet_for_asset_id(wallet_environments: WalletTestFramework) -> None:
     wsm = wallet_environments.environments[0].wallet_state_manager
-    wallet = wallet_environments.environments[0].xch_wallet
+    wallet = wallet_environments.environments[0].cac_wallet
 
     wallet_environments.environments[0].wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
@@ -512,11 +512,11 @@ async def test_get_wallet_for_asset_id(wallet_environments: WalletTestFramework)
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"init": True, "set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"set_remainder": True},
                 },
             ),
@@ -556,15 +556,15 @@ async def test_cat_doesnt_see_eve(wallet_environments: WalletTestFramework) -> N
     env_2: WalletEnvironment = wallet_environments.environments[1]
     wallet_node = env_1.node
     wallet_node_2 = env_2.node
-    wallet = env_1.xch_wallet
-    wallet2 = env_2.xch_wallet
+    wallet = env_1.cac_wallet
+    wallet2 = env_2.cac_wallet
 
     env_1.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     env_2.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
@@ -581,11 +581,11 @@ async def test_cat_doesnt_see_eve(wallet_environments: WalletTestFramework) -> N
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"init": True, "set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {
                         "confirmed_wallet_balance": 100,
                         "unconfirmed_wallet_balance": 0,
@@ -621,7 +621,7 @@ async def test_cat_doesnt_see_eve(wallet_environments: WalletTestFramework) -> N
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "unconfirmed_wallet_balance": -1,
                         "<=#spendable_balance": -1,
                         "<=#max_send_amount": -1,
@@ -639,7 +639,7 @@ async def test_cat_doesnt_see_eve(wallet_environments: WalletTestFramework) -> N
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -1,
                         ">=#spendable_balance": 1,  # any amount increase
                         ">=#max_send_amount": 1,  # any amount increase
@@ -694,7 +694,7 @@ async def test_cat_doesnt_see_eve(wallet_environments: WalletTestFramework) -> N
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "unconfirmed_wallet_balance": -10,
                         "<=#spendable_balance": -10,
                         "<=#max_send_amount": -10,
@@ -704,7 +704,7 @@ async def test_cat_doesnt_see_eve(wallet_environments: WalletTestFramework) -> N
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -10,
                         ">=#spendable_balance": 1,  # any amount increase
                         ">=#max_send_amount": 1,  # any amount increase
@@ -752,20 +752,20 @@ async def test_cat_spend_multiple(wallet_environments: WalletTestFramework) -> N
     wallet_node_0 = env_0.node
     wallet_node_1 = env_1.node
     wallet_node_2 = env_2.node
-    wallet_0 = env_0.xch_wallet
-    wallet_1 = env_1.xch_wallet
-    wallet_2 = env_2.xch_wallet
+    wallet_0 = env_0.cac_wallet
+    wallet_1 = env_1.cac_wallet
+    wallet_2 = env_2.cac_wallet
 
     env_0.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     env_1.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     env_2.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
@@ -782,11 +782,11 @@ async def test_cat_spend_multiple(wallet_environments: WalletTestFramework) -> N
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"init": True, "set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {
                         "confirmed_wallet_balance": 100,
                         "unconfirmed_wallet_balance": 0,
@@ -1070,10 +1070,10 @@ async def test_cat_max_amount_send(wallet_environments: WalletTestFramework) -> 
     # Setup
     env: WalletEnvironment = wallet_environments.environments[0]
     wallet_node = env.node
-    wallet = env.xch_wallet
+    wallet = env.cac_wallet
 
     env.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
@@ -1090,11 +1090,11 @@ async def test_cat_max_amount_send(wallet_environments: WalletTestFramework) -> 
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"init": True, "set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {
                         "confirmed_wallet_balance": 100000,
                         "unconfirmed_wallet_balance": 0,
@@ -1214,15 +1214,15 @@ async def test_cat_hint(wallet_environments: WalletTestFramework) -> None:
     env_2: WalletEnvironment = wallet_environments.environments[1]
     wallet_node_1 = env_1.node
     wallet_node_2 = env_2.node
-    wallet_1 = env_1.xch_wallet
-    wallet_2 = env_2.xch_wallet
+    wallet_1 = env_1.cac_wallet
+    wallet_2 = env_2.cac_wallet
 
     env_1.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     env_2.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
@@ -1241,11 +1241,11 @@ async def test_cat_hint(wallet_environments: WalletTestFramework) -> None:
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"init": True, "set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {
                         "confirmed_wallet_balance": 100,
                         "unconfirmed_wallet_balance": 0,
@@ -1455,10 +1455,10 @@ async def test_cat_change_detection(wallet_environments: WalletTestFramework) ->
     full_node_api = wallet_environments.full_node
     env = wallet_environments.environments[0]
     wsm = env.wallet_state_manager
-    wallet = env.xch_wallet
+    wallet = env.cac_wallet
 
     env.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
@@ -1480,7 +1480,7 @@ async def test_cat_change_detection(wallet_environments: WalletTestFramework) ->
         Program.to(None).get_tree_hash(),
         Program.to(1),
     )
-    addr = encode_puzzle_hash(cat_puzzle.get_tree_hash(), "txch")
+    addr = encode_puzzle_hash(cat_puzzle.get_tree_hash(), "tcac")
     cat_amount_0 = uint64(100)
     cat_amount_1 = uint64(5)
 
@@ -1491,8 +1491,8 @@ async def test_cat_change_detection(wallet_environments: WalletTestFramework) ->
     await wallet_environments.process_pending_states(
         [
             WalletStateTransition(
-                pre_block_balance_updates={"xch": {"set_remainder": True}},
-                post_block_balance_updates={"xch": {"set_remainder": True}},
+                pre_block_balance_updates={"cac": {"set_remainder": True}},
+                post_block_balance_updates={"cac": {"set_remainder": True}},
             )
         ]
     )
@@ -1625,12 +1625,12 @@ async def test_cat_melt_balance(wallet_environments: WalletTestFramework) -> Non
     # We push spend bundles direct to full node in this test because
     # we are testing correct observance independent of local state
     env = wallet_environments.environments[0]
-    wallet = env.xch_wallet
+    wallet = env.cac_wallet
     simulator = wallet_environments.full_node
     wallet_ph = await wallet.get_puzzle_hash(new=False)
 
     env.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
@@ -1675,7 +1675,7 @@ async def test_cat_melt_balance(wallet_environments: WalletTestFramework) -> Non
             WalletStateTransition(
                 pre_block_balance_updates={},
                 post_block_balance_updates={
-                    "xch": {},
+                    "cac": {},
                     "cat": {
                         "init": True,
                         "confirmed_wallet_balance": tx_amount,
@@ -1725,7 +1725,7 @@ async def test_cat_melt_balance(wallet_environments: WalletTestFramework) -> Non
                 WalletStateTransition(
                     pre_block_balance_updates={},
                     post_block_balance_updates={
-                        "xch": {},
+                        "cac": {},
                         "cat": {
                             "confirmed_wallet_balance": -1,
                             "unconfirmed_wallet_balance": -1,

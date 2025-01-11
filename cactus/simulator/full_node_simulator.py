@@ -319,7 +319,7 @@ class FullNodeSimulator(FullNodeAPI):
         """Process the requested number of blocks including farming to the passed puzzle
         hash. Note that the rewards for the last block will not have been processed.
         Consider `.farm_blocks_to_wallet()` or `.farm_rewards_to_wallet()` if the goal
-        is to receive XCH at an address.
+        is to receive CAC at an address.
 
         Arguments:
             count: The number of blocks to process.

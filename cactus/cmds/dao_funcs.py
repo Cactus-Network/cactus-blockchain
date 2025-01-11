@@ -82,7 +82,7 @@ async def create_dao_wallet(
             wallet_id=1, coin_selection_config=DEFAULT_COIN_SELECTION_CONFIG
         )
         if len(conf_coins) < 2:  # pragma: no cover
-            raise ValueError("DAO creation requires at least 2 xch coins in your wallet.")
+            raise ValueError("DAO creation requires at least 2 cac coins in your wallet.")
         res = await wallet_client.create_new_dao_wallet(
             mode="new",
             dao_rules=dao_rules,
@@ -174,11 +174,11 @@ async def get_treasury_balance(wallet_rpc_port: Optional[int], fp: int, wallet_i
             print("The DAO treasury currently has no funds")
             return None
 
-        xch_mojos = get_mojo_per_unit(WalletType.STANDARD_WALLET)
+        cac_mojos = get_mojo_per_unit(WalletType.STANDARD_WALLET)
         cat_mojos = get_mojo_per_unit(WalletType.CAT)
         for asset_id, balance in balances.items():
-            if asset_id == "xch":
-                print(f"XCH: {balance / xch_mojos}")
+            if asset_id == "cac":
+                print(f"CAC: {balance / cac_mojos}")
             else:
                 print(f"{asset_id}: {balance / cat_mojos}")
 
@@ -240,12 +240,12 @@ async def show_proposal(wallet_rpc_port: Optional[int], fp: int, wallet_id: int,
 
         prefix = selected_network_address_prefix(config)
         if ptype == "spend":
-            xch_conds = pd["xch_conditions"]
+            cac_conds = pd["cac_conditions"]
             asset_conds = pd["asset_conditions"]
             print("")
-            if xch_conds:
-                print("Proposal XCH Conditions")
-                for pmt in xch_conds:
+            if cac_conds:
+                print("Proposal CAC Conditions")
+                for pmt in cac_conds:
                     puzzle_hash = encode_puzzle_hash(bytes32.from_hexstr(pmt["puzzle_hash"]), prefix)
                     amount = pmt["amount"]
                     print(f"Address: {puzzle_hash}\nAmount: {amount}\n")
@@ -495,7 +495,7 @@ async def create_spend_proposal(
             timelock_info=condition_valid_times,
         )
 
-        asset_id_name = asset_id if asset_id else "XCH"
+        asset_id_name = asset_id if asset_id else "CAC"
         print(f"Created spend proposal for asset: {asset_id_name}")
         if push:
             print("Successfully created proposal.")

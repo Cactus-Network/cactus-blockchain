@@ -129,15 +129,15 @@ class TestDIDWallet:
         env_2 = wallet_environments.environments[2]
 
         env_0.wallet_aliases = {
-            "xch": 1,
+            "cac": 1,
             "did": 2,
         }
         env_1.wallet_aliases = {
-            "xch": 1,
+            "cac": 1,
             "did": 2,
         }
         env_2.wallet_aliases = {
-            "xch": 1,
+            "cac": 1,
             "did": 2,
         }
 
@@ -146,14 +146,14 @@ class TestDIDWallet:
             wallet_environments.tx_config, push=True
         ) as action_scope:
             did_wallet_0: DIDWallet = await DIDWallet.create_new_did_wallet(
-                env_0.wallet_state_manager, env_0.xch_wallet, uint64(101), action_scope
+                env_0.wallet_state_manager, env_0.cac_wallet, uint64(101), action_scope
             )
 
         await wallet_environments.process_pending_states(
             [
                 WalletStateTransition(
                     pre_block_balance_updates={
-                        "xch": {
+                        "cac": {
                             "unconfirmed_wallet_balance": -101,
                             "<=#spendable_balance": -101,
                             "<=#max_send_amount": -101,
@@ -168,7 +168,7 @@ class TestDIDWallet:
                         },
                     },
                     post_block_balance_updates={
-                        "xch": {
+                        "cac": {
                             "confirmed_wallet_balance": -101,
                             ">=#spendable_balance": 1,
                             ">=#max_send_amount": 1,
@@ -203,7 +203,7 @@ class TestDIDWallet:
             wallet_environments.tx_config, push=True
         ) as action_scope:
             did_wallet_1: DIDWallet = await DIDWallet.create_new_did_wallet(
-                env_1.wallet_state_manager, env_1.xch_wallet, uint64(201), action_scope, backup_ids
+                env_1.wallet_state_manager, env_1.cac_wallet, uint64(201), action_scope, backup_ids
             )
 
         await wallet_environments.process_pending_states(
@@ -214,7 +214,7 @@ class TestDIDWallet:
                 ),
                 WalletStateTransition(
                     pre_block_balance_updates={
-                        "xch": {
+                        "cac": {
                             "unconfirmed_wallet_balance": -201,
                             "<=#spendable_balance": -201,
                             "<=#max_send_amount": -201,
@@ -229,7 +229,7 @@ class TestDIDWallet:
                         },
                     },
                     post_block_balance_updates={
-                        "xch": {
+                        "cac": {
                             "confirmed_wallet_balance": -201,
                             ">=#spendable_balance": 1,
                             ">=#max_send_amount": 1,
@@ -1433,7 +1433,7 @@ class TestDIDWallet:
 async def test_did_coin_records(wallet_environments: WalletTestFramework, monkeypatch: pytest.MonkeyPatch) -> None:
     # Setup
     wallet_node = wallet_environments.environments[0].node
-    wallet = wallet_environments.environments[0].xch_wallet
+    wallet = wallet_environments.environments[0].cac_wallet
 
     # Generate DID wallet
     async with wallet.wallet_state_manager.new_action_scope(DEFAULT_TX_CONFIG, push=True) as action_scope:

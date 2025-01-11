@@ -66,8 +66,8 @@ def test_get_transaction(capsys: object, get_test_cli_clients: Tuple[TestRpcClie
     assert_list = [
         "Transaction 0202020202020202020202020202020202020202020202020202020202020202",
         "Status: In mempool",
-        "Amount sent: 0.000012345678 XCH",
-        "To address: xch1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs0wg4qq",
+        "Amount sent: 0.000012345678 CAC",
+        "To address: cac1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs0wg4qq",
     ]
     v_assert_list = [
         "0x0303030303030303030303030303030303030303030303030303030303030303",
@@ -78,7 +78,7 @@ def test_get_transaction(capsys: object, get_test_cli_clients: Tuple[TestRpcClie
         "Transaction 0202020202020202020202020202020202020202020202020202020202020202",
         "Status: In mempool",
         "Amount sent: 12345.678 test1",
-        "To address: xch1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs0wg4qq",
+        "To address: cac1qyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqs0wg4qq",
     ]
     run_cli_command_and_assert(capsys, root_dir, command_args + [FINGERPRINT_ARG], assert_list)
     run_cli_command_and_assert(capsys, root_dir, command_args + [FINGERPRINT_ARG, "-v"], v_assert_list)
@@ -164,10 +164,10 @@ def test_get_transactions(capsys: object, get_test_cli_clients: Tuple[TestRpcCli
     assert_list = [
         "Transaction 0404040404040404040404040404040404040404040404040404040404040404",
         "Transaction 0505050505050505050505050505050505050505050505050505050505050505",
-        "Amount received: 0.00001234568 XCH",
-        "Amount received in clawback as sender: 0.000012345681 XCH",
-        "To address: xch1qvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvps82kgr2",
-        "To address: xch1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqkxck8d",
+        "Amount received: 0.00001234568 CAC",
+        "Amount received in clawback as sender: 0.000012345681 CAC",
+        "To address: cac1qvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvps82kgr2",
+        "To address: cac1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqkxck8d",
     ]
     v_assert_list = [
         "'amount': 12345680",
@@ -272,7 +272,7 @@ def test_show(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, Path])
     test_rpc_clients.wallet_rpc_client = inst_rpc_client
     command_args = ["wallet", "show", FINGERPRINT_ARG]
     assert_list = [
-        "Cactus Wallet:\n   -Total Balance:         0.001 xch (1000000000 mojo)",
+        "Cactus Wallet:\n   -Total Balance:         0.001 cac (1000000000 mojo)",
         "test2:\n   -Total Balance:         2000000.0  (2000000000 mojo)",
         "   -Asset ID:              dc59bcd60ce5fc9c93a5d3b11875486b03efb53a53da61e453f5cf61a7746860",
         "NFT Wallet:\n   -Total Balance:         1.0",
@@ -379,7 +379,7 @@ def test_send(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, Path])
     inst_rpc_client = SendWalletRpcClient()  # pylint: disable=no-value-for-parameter
     test_rpc_clients.wallet_rpc_client = inst_rpc_client
     # get output with all options but verbose
-    addr = encode_puzzle_hash(get_bytes32(3), "xch")
+    addr = encode_puzzle_hash(get_bytes32(3), "cac")
     command_args = [
         "wallet",
         "send",
@@ -427,7 +427,7 @@ def test_send(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, Path])
             (
                 1,
                 1000000000000,
-                "xch1qvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvps82kgr2",
+                "cac1qvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvps82kgr2",
                 TXConfig(
                     min_coin_amount=uint64(0),
                     max_coin_amount=uint64(10000000000000),
@@ -453,7 +453,7 @@ def test_send(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, Path])
                     reuse_puzhash=True,
                 ),
                 1000,
-                "xch1qvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvps82kgr2",
+                "cac1qvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvps82kgr2",
                 500000000000,
                 ["0x6262626262626262626262626262626262626262626262626262626262626262"],
                 None,
@@ -476,14 +476,14 @@ def test_get_address(capsys: object, get_test_cli_clients: Tuple[TestRpcClients,
         async def get_next_address(self, wallet_id: int, new_address: bool) -> str:
             self.add_to_log("get_next_address", (wallet_id, new_address))
             if new_address:
-                return encode_puzzle_hash(get_bytes32(3), "xch")
-            return encode_puzzle_hash(get_bytes32(4), "xch")
+                return encode_puzzle_hash(get_bytes32(3), "cac")
+            return encode_puzzle_hash(get_bytes32(4), "cac")
 
     inst_rpc_client = GetAddressWalletRpcClient()  # pylint: disable=no-value-for-parameter
     test_rpc_clients.wallet_rpc_client = inst_rpc_client
     # get output with all options but verbose
-    addr1 = encode_puzzle_hash(get_bytes32(3), "xch")
-    addr2 = encode_puzzle_hash(get_bytes32(4), "xch")
+    addr1 = encode_puzzle_hash(get_bytes32(3), "cac")
+    addr2 = encode_puzzle_hash(get_bytes32(4), "cac")
     command_args = [
         "wallet",
         "get_address",
@@ -520,7 +520,7 @@ def test_clawback(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, Pa
                     STD_TX.to_json_dict_convenience(
                         {
                             "selected_network": "mainnet",
-                            "network_overrides": {"config": {"mainnet": {"address_prefix": "xch"}}},
+                            "network_overrides": {"config": {"mainnet": {"address_prefix": "cac"}}},
                         }
                     )
                 ],
@@ -607,7 +607,7 @@ def test_sign_message(capsys: object, get_test_cli_clients: Tuple[TestRpcClients
     # set RPC Client
     inst_rpc_client = TestWalletRpcClient()  # pylint: disable=no-value-for-parameter
     test_rpc_clients.wallet_rpc_client = inst_rpc_client
-    xch_addr = encode_puzzle_hash(get_bytes32(1), "xch")
+    cac_addr = encode_puzzle_hash(get_bytes32(1), "cac")
     message = b"hello world"
     command_args = ["wallet", "sign_message", FINGERPRINT_ARG, f"-m{message.hex()}"]
     # these are various things that should be in the output
@@ -617,9 +617,9 @@ def test_sign_message(capsys: object, get_test_cli_clients: Tuple[TestRpcClients
         f"Signature: {bytes([6] * 576).hex()}",
         f"Signing Mode: {SigningMode.CHIP_0002.value}",
     ]
-    run_cli_command_and_assert(capsys, root_dir, command_args + [f"-a{xch_addr}"], assert_list)
+    run_cli_command_and_assert(capsys, root_dir, command_args + [f"-a{cac_addr}"], assert_list)
     expected_calls: logType = {
-        "sign_message_by_address": [(xch_addr, message.hex())],  # xch std
+        "sign_message_by_address": [(cac_addr, message.hex())],  # cac std
     }
     test_rpc_clients.wallet_rpc_client.check_log(expected_calls)
 
@@ -682,7 +682,7 @@ def test_make_offer_bad_filename(
     request_cat_id = get_bytes32(2)
     request_nft_id = get_bytes32(2)
     request_nft_addr = encode_puzzle_hash(request_nft_id, "nft")
-    # we offer xch and a random cat via wallet id and request a random cat, nft via coin and tail
+    # we offer cac and a random cat via wallet id and request a random cat, nft via coin and tail
     command_args_dir = [
         "wallet",
         "make_offer",
@@ -770,7 +770,7 @@ def test_make_offer(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, 
     request_cat_id = get_bytes32(2)
     request_nft_id = get_bytes32(2)
     request_nft_addr = encode_puzzle_hash(request_nft_id, "nft")
-    # we offer xch and a random cat via wallet id and request a random cat, nft via coin and tail
+    # we offer cac and a random cat via wallet id and request a random cat, nft via coin and tail
     command_args = [
         "wallet",
         "make_offer",
@@ -792,10 +792,10 @@ def test_make_offer(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, 
         "150",
     ]
     assert_list = [
-        "OFFERING:\n  - 10 XCH (10000000000000 mojos)\n  - 100 test3 (100000 mojos)",
+        "OFFERING:\n  - 10 CAC (10000000000000 mojos)\n  - 100 test3 (100000 mojos)",
         "REQUESTING:\n  - 10 test2 (10000 mojos)\n"
         "  - 1 nft1qgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyql4ft (1 mojos)",
-        "Including Fees: 0.5 XCH, 500000000000 mojos",
+        "Including Fees: 0.5 CAC, 500000000000 mojos",
         "Created offer with ID 0202020202020202020202020202020202020202020202020202020202020202",
     ]
     run_cli_command_and_assert(capsys, root_dir, command_args[:-8], ["without --override"])
@@ -808,11 +808,11 @@ def test_make_offer(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, 
             (
                 {
                     "nft1qgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyql4ft": (
-                        "xch1qvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvps82kgr2",
+                        "cac1qvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvpsxqcrqvps82kgr2",
                         1000,
                     )
                 },
-                {"XCH": 10000000000000, "test3": 100000},
+                {"CAC": 10000000000000, "test3": 100000},
             )
         ],
         "create_offer_for_ids": [
@@ -1006,7 +1006,7 @@ def test_take_offer(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, 
     cat2 = bytes32.from_hexstr("dc59bcd60ce5fc9c93a5d3b11875486b03efb53a53da61e453f5cf61a7746860")
     assert_list = [
         "  OFFERED:\n"
-        "    - XCH (Wallet ID: 1): 10.0 (10000000000000 mojos)\n"
+        "    - CAC (Wallet ID: 1): 10.0 (10000000000000 mojos)\n"
         f"    - {cat1.hex()}: 100.0 (100000 mojos)",
         "  REQUESTED:\n"
         f"    - {cat2.hex()}: 10.0 (10000 mojos)\n"
@@ -1103,7 +1103,7 @@ def test_cancel_offer(capsys: object, get_test_cli_clients: Tuple[TestRpcClients
     cat2 = bytes32.from_hexstr("dc59bcd60ce5fc9c93a5d3b11875486b03efb53a53da61e453f5cf61a7746860")
     assert_list = [
         "  OFFERED:\n"
-        "    - XCH (Wallet ID: 1): 10.0 (10000000000000 mojos)\n"
+        "    - CAC (Wallet ID: 1): 10.0 (10000000000000 mojos)\n"
         f"    - {cat1.hex()}: 100.0 (100000 mojos)",
         "  REQUESTED:\n"
         f"    - {cat2.hex()}: 10.0 (10000 mojos)\n"

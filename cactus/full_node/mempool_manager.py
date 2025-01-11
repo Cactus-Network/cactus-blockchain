@@ -38,7 +38,7 @@ from cactus.util.setproctitle import getproctitle, setproctitle
 log = logging.getLogger(__name__)
 
 # mempool items replacing existing ones must increase the total fee at least by
-# this amount. 0.00001 XCH
+# this amount. 0.00001 CAC
 MEMPOOL_MIN_FEE_INCREASE = uint64(10000000)
 
 
@@ -158,7 +158,7 @@ class MempoolManager:
         self.get_coin_records = get_coin_records
 
         # The fee per cost must be above this amount to consider the fee "nonzero", and thus able to kick out other
-        # transactions. This prevents spam. This is equivalent to 0.055 XCH per block, or about 0.00005 XCH for two
+        # transactions. This prevents spam. This is equivalent to 0.055 CAC per block, or about 0.00005 CAC for two
         # spends.
         self.nonzero_fee_minimum_fpc = 5
 

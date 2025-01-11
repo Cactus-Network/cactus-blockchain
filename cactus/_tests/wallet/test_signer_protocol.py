@@ -129,7 +129,7 @@ def test_unsigned_transaction_type() -> None:
 )
 @pytest.mark.anyio
 async def test_p2dohp_wallet_signer_protocol(wallet_environments: WalletTestFramework) -> None:
-    wallet: Wallet = wallet_environments.environments[0].xch_wallet
+    wallet: Wallet = wallet_environments.environments[0].cac_wallet
     wallet_state_manager: WalletStateManager = wallet_environments.environments[0].wallet_state_manager
     wallet_rpc: WalletRpcClient = wallet_environments.environments[0].rpc_client
 
@@ -314,7 +314,7 @@ async def test_p2dohp_wallet_signer_protocol(wallet_environments: WalletTestFram
 )
 @pytest.mark.anyio
 async def test_p2blsdohp_execute_signing_instructions(wallet_environments: WalletTestFramework) -> None:
-    wallet: Wallet = wallet_environments.environments[0].xch_wallet
+    wallet: Wallet = wallet_environments.environments[0].cac_wallet
     root_sk: PrivateKey = wallet.wallet_state_manager.get_master_private_key()
     root_pk: G1Element = root_sk.get_g1()
     root_fingerprint: bytes = root_pk.get_fingerprint().to_bytes(4, "big")
@@ -605,7 +605,7 @@ def test_blind_signer_translation_layer() -> None:
 )
 @pytest.mark.anyio
 async def test_signer_commands(wallet_environments: WalletTestFramework) -> None:
-    wallet: Wallet = wallet_environments.environments[0].xch_wallet
+    wallet: Wallet = wallet_environments.environments[0].cac_wallet
     wallet_state_manager: WalletStateManager = wallet_environments.environments[0].wallet_state_manager
     wallet_rpc: WalletRpcClient = wallet_environments.environments[0].rpc_client
     client_info: WalletClientInfo = WalletClientInfo(

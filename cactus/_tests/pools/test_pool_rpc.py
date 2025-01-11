@@ -463,7 +463,7 @@ class TestPoolWalletRpc:
 
             tr: TransactionRecord = (
                 await client.send_transaction(
-                    1, uint64(100), encode_puzzle_hash(status.p2_singleton_puzzle_hash, "txch"), DEFAULT_TX_CONFIG
+                    1, uint64(100), encode_puzzle_hash(status.p2_singleton_puzzle_hash, "tcac"), DEFAULT_TX_CONFIG
                 )
             ).transaction
 

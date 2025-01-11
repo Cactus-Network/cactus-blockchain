@@ -119,7 +119,7 @@ def dao_add_cmd(
 )
 @click.option(
     "--proposal-minimum",
-    help="The minimum amount (in xch) that a proposal must use to be created",
+    help="The minimum amount (in cac) that a proposal must use to be created",
     type=AmountParamType(),
     default="1",
     show_default=True,
@@ -140,7 +140,7 @@ def dao_add_cmd(
 @options.create_fee()
 @click.option(
     "--fee-for-cat",
-    help="Set the fees for the CAT creation transaction, in XCH.",
+    help="Set the fees for the CAT creation transaction, in CAC.",
     type=TransactionFeeParamType(),
     default="0",
     show_default=True,
@@ -250,7 +250,7 @@ def dao_get_id_cmd(
 @click.option(
     "-a",
     "--amount",
-    help="The amount of funds to send, in XCH or CATs",
+    help="The amount of funds to send, in CAC or CATs",
     type=AmountParamType(),
     required=True,
 )
@@ -745,7 +745,7 @@ def dao_proposal(ctx: click.Context) -> None:
 )
 @click.option(
     "--asset-id",
-    help="The asset id of the funds the proposal will send. Leave blank for xch",
+    help="The asset id of the funds the proposal will send. Leave blank for cac",
     type=str,
     required=False,
     default=None,

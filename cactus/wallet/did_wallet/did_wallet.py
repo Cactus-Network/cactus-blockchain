@@ -634,7 +634,7 @@ class DIDWallet:
         spend_bundle = WalletSpendBundle(list_of_coinspends, G2Element())
         if fee > 0:
             coin_name = coin.name()
-            await self.standard_wallet.create_tandem_xch_tx(
+            await self.standard_wallet.create_tandem_cac_tx(
                 fee,
                 action_scope,
                 extra_conditions=(AssertCoinAnnouncement(asserted_id=coin_name, asserted_msg=coin_name),),
@@ -725,7 +725,7 @@ class DIDWallet:
         spend_bundle = WalletSpendBundle(list_of_coinspends, G2Element())
         if fee > 0:
             coin_name = coin.name()
-            await self.standard_wallet.create_tandem_xch_tx(
+            await self.standard_wallet.create_tandem_cac_tx(
                 fee,
                 action_scope,
                 extra_conditions=(AssertCoinAnnouncement(asserted_id=coin_name, asserted_msg=coin_name),),

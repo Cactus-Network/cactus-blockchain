@@ -80,7 +80,7 @@ def list_cmd(
 @click.option(
     "-a",
     "--target-amount",
-    help="Select coins until this amount (in XCH or CAT) is reached. \
+    help="Select coins until this amount (in CAC or CAT) is reached. \
     Combine all selected coins into one coin, which will have a value of at least target-amount",
     type=AmountParamType(),
     default=None,
@@ -173,7 +173,7 @@ def combine_cmd(
 @click.option(
     "-a",
     "--amount-per-coin",
-    help="The amount of each newly created coin, in XCH or CAT units",
+    help="The amount of each newly created coin, in CAC or CAT units",
     type=AmountParamType(),
     required=True,
 )

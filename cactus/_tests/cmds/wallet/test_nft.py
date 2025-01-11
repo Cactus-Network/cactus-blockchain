@@ -68,7 +68,7 @@ def test_nft_sign_message(capsys: object, get_test_cli_clients: Tuple[TestRpcCli
     ]
     run_cli_command_and_assert(capsys, root_dir, command_args + [f"-i{did_id}"], assert_list)
     expected_calls: logType = {
-        "sign_message_by_id": [(did_id, message.hex())],  # xch std
+        "sign_message_by_id": [(did_id, message.hex())],  # cac std
     }
     test_rpc_clients.wallet_rpc_client.check_log(expected_calls)
 
@@ -133,7 +133,7 @@ def test_nft_mint(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, Pa
             )
 
     inst_rpc_client = NFTCreateRpcClient()  # pylint: disable=no-value-for-parameter
-    target_addr = encode_puzzle_hash(get_bytes32(2), "xch")
+    target_addr = encode_puzzle_hash(get_bytes32(2), "cac")
     test_rpc_clients.wallet_rpc_client = inst_rpc_client
     command_args = [
         "wallet",
@@ -163,7 +163,7 @@ def test_nft_mint(capsys: object, get_test_cli_clients: Tuple[TestRpcClients, Pa
             (
                 4,
                 None,
-                "xch1qgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqzc0j4g",
+                "cac1qgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqzc0j4g",
                 "0x1234",
                 ["https://example.com"],
                 TXConfig(
@@ -277,7 +277,7 @@ def test_nft_transfer(capsys: object, get_test_cli_clients: Tuple[TestRpcClients
 
     inst_rpc_client = NFTTransferRpcClient()  # pylint: disable=no-value-for-parameter
     nft_coin_id = get_bytes32(2).hex()
-    target_address = encode_puzzle_hash(get_bytes32(2), "xch")
+    target_address = encode_puzzle_hash(get_bytes32(2), "cac")
     test_rpc_clients.wallet_rpc_client = inst_rpc_client
     command_args = [
         "wallet",

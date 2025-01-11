@@ -55,16 +55,16 @@ network_overrides: &network_overrides
       SUB_SLOT_ITERS_STARTING: 67108864
   config:
     mainnet:
-      address_prefix: "xch"
+      address_prefix: "cac"
       default_full_node_port: 11444
     testnet0:
-      address_prefix: "txch"
+      address_prefix: "tcac"
       default_full_node_port: 511444
     testnet11:
-      address_prefix: "txch"
+      address_prefix: "tcac"
       default_full_node_port: 511444
     testneta:
-      address_prefix: "txch"
+      address_prefix: "tcac"
       default_full_node_port: 511444
 
 selected_network: &selected_network "mainnet"
@@ -189,7 +189,7 @@ harvester:
 
 pool:
   # Replace this with a real receive address
-  # xch_target_address: txch102gkhhzs60grx7cfnpng5n6rjecr89r86l5s8xux2za8k820cxsq64ssdg
+  # cac_target_address: tcac102gkhhzs60grx7cfnpng5n6rjecr89r86l5s8xux2za8k820cxsq64ssdg
   logging: *logging
   network_overrides: *network_overrides
   selected_network: *selected_network
@@ -205,7 +205,7 @@ farmer:
   pool_public_keys: !!set {}
 
   # Replace this with a real receive address
-  # xch_target_address: txch102gkhhzs60grx7cfnpng5n6rjecr89r86l5s8xux2za8k820cxsq64ssdg
+  # cac_target_address: tcac102gkhhzs60grx7cfnpng5n6rjecr89r86l5s8xux2za8k820cxsq64ssdg
 
   # If True, starts an RPC server at the following port
   start_rpc_server: True
@@ -567,9 +567,9 @@ wallet:
   reset_sync_for_fingerprint: null
 
   # After n received unspent transactions, the spam filter will be enabled, which will filter out received
-  # coins with very small value. Any standard TX under xch_spam_amount is filtered
+  # coins with very small value. Any standard TX under cac_spam_amount is filtered
   spam_filter_after_n_txs: 200
-  xch_spam_amount: 1000000
+  cac_spam_amount: 1000000
   # Enable notifications from parties on chain
   enable_notifications: True
   # The amount someone has to pay you in mojos for you to see their notification

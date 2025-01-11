@@ -8,13 +8,13 @@ from cactus.util.config import selected_network_address_prefix
 
 
 class AddressType(Enum):
-    XCH = "xch"
+    CAC = "cac"
     NFT = "nft"
     DID = "did:cactus:"
 
     def hrp(self, config: Dict[str, Any]) -> str:
-        if self == AddressType.XCH:
-            # Special case to map XCH to the current network's address prefix
+        if self == AddressType.CAC:
+            # Special case to map CAC to the current network's address prefix
             return selected_network_address_prefix(config)
         return str(self.value)
 

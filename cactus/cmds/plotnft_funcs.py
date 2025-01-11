@@ -357,7 +357,7 @@ async def claim_cmd(*, wallet_rpc_port: Optional[int], fingerprint: int, fee: ui
 async def change_payout_instructions(launcher_id: str, address: CliAddress) -> None:
     new_pool_configs: List[PoolWalletConfig] = []
     id_found = False
-    puzzle_hash = address.validate_address_type_get_ph(AddressType.XCH)
+    puzzle_hash = address.validate_address_type_get_ph(AddressType.CAC)
 
     old_configs: List[PoolWalletConfig] = load_pool_config(DEFAULT_ROOT_PATH)
     for pool_config in old_configs:

@@ -28,8 +28,8 @@ Click automatically handles all cases where it is None and all cases where it is
 """
 
 burn_ph = bytes32.from_hexstr("0x000000000000000000000000000000000000000000000000000000000000dead")
-burn_address = encode_puzzle_hash(burn_ph, "xch")
-burn_address_txch = encode_puzzle_hash(burn_ph, "txch")
+burn_address = encode_puzzle_hash(burn_ph, "cac")
+burn_address_tcac = encode_puzzle_hash(burn_ph, "tcac")
 burn_nft_addr = encode_puzzle_hash(burn_ph, "did:cactus:")
 burn_bad_prefix = encode_puzzle_hash(burn_ph, "badprefix")
 overflow_ammt = 18446744073709551616  # max coin + 1
@@ -50,7 +50,7 @@ def test_click_tx_fee_type() -> None:
 
     # TODO: Test MOJO Logic When Implemented
 
-    # Test Decimal / XCH
+    # Test Decimal / CAC
     assert TransactionFeeParamType().convert("0.5", None, None) == uint64(Decimal("0.5") * units["cactus"])
     assert TransactionFeeParamType().convert("0.000000000001", None, None) == uint64(1)
     assert TransactionFeeParamType().convert("0", None, None) == uint64(0)
@@ -83,7 +83,7 @@ def test_click_amount_type() -> None:
 
     # TODO: Test MOJO Logic When Implemented
 
-    # Test Decimal / XCH (we don't test overflow because we don't know the conversion ratio yet)
+    # Test Decimal / CAC (we don't test overflow because we don't know the conversion ratio yet)
     assert AmountParamType().convert("5.25", None, None) == decimal_cli_amount
     assert AmountParamType().convert(overflow_decimal_str, None, None) == large_decimal_amount
     assert AmountParamType().convert("0.000000000001", None, None) == one_mojo_cli_amount
@@ -115,8 +115,8 @@ def test_click_amount_type() -> None:
 
 
 def test_click_address_type() -> None:
-    context = cast(Context, FakeContext(obj={"expected_prefix": "xch"}))  # this makes us not have to use a config file
-    std_cli_address = CliAddress(burn_ph, burn_address, AddressType.XCH)
+    context = cast(Context, FakeContext(obj={"expected_prefix": "cac"}))  # this makes us not have to use a config file
+    std_cli_address = CliAddress(burn_ph, burn_address, AddressType.CAC)
     nft_cli_address = CliAddress(burn_ph, burn_nft_addr, AddressType.DID)
     # Test CliAddress (Generally is not used)
     # assert AddressParamType().convert(std_cli_address, None, context) == std_cli_address
@@ -126,15 +126,15 @@ def test_click_address_type() -> None:
     assert AddressParamType().convert(burn_nft_addr, None, context) == nft_cli_address
 
     # check address type validation
-    assert std_cli_address.validate_address_type(AddressType.XCH) == burn_address
-    assert std_cli_address.validate_address_type_get_ph(AddressType.XCH) == burn_ph
+    assert std_cli_address.validate_address_type(AddressType.CAC) == burn_address
+    assert std_cli_address.validate_address_type_get_ph(AddressType.CAC) == burn_ph
     assert nft_cli_address.validate_address_type(AddressType.DID) == burn_nft_addr
     assert nft_cli_address.validate_address_type_get_ph(AddressType.DID) == burn_ph
     # check error handling
     with pytest.raises(BadParameter):
         AddressParamType().convert("test", None, None)
     with pytest.raises(AttributeError):  # attribute error because the context does not have a real error handler
-        AddressParamType().convert(burn_address_txch, None, context)
+        AddressParamType().convert(burn_address_tcac, None, context)
     with pytest.raises(BadParameter):
         AddressParamType().convert(burn_bad_prefix, None, None)
     # Test Type Failures
@@ -152,11 +152,11 @@ def test_click_address_type_config(root_path_populated_with_config: Path) -> Non
     # set a root path in context.
     context = cast(Context, FakeContext(obj={"root_path": root_path_populated_with_config}))
     # run test that should pass
-    assert AddressParamType().convert(burn_address, None, context) == CliAddress(burn_ph, burn_address, AddressType.XCH)
-    assert context.obj["expected_prefix"] == "xch"  # validate that the prefix was set correctly
-    # use txch address
+    assert AddressParamType().convert(burn_address, None, context) == CliAddress(burn_ph, burn_address, AddressType.CAC)
+    assert context.obj["expected_prefix"] == "cac"  # validate that the prefix was set correctly
+    # use tcac address
     with pytest.raises(AttributeError):  # attribute error because the context does not have a real error handler
-        AddressParamType().convert(burn_address_txch, None, context)
+        AddressParamType().convert(burn_address_tcac, None, context)
 
 
 def test_click_bytes32_type() -> None:

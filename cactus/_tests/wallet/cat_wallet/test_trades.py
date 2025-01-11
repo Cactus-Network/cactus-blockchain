@@ -110,8 +110,8 @@ async def test_cat_trades(
     wallet_node_taker = env_taker.node
     client_maker = env_maker.rpc_client
     client_taker = env_taker.rpc_client
-    wallet_maker = env_maker.xch_wallet
-    wallet_taker = env_taker.xch_wallet
+    wallet_maker = env_maker.cac_wallet
+    wallet_taker = env_taker.cac_wallet
     full_node = wallet_environments.full_node
 
     trusted = len(wallet_node_maker.config["trusted_peers"]) > 0
@@ -125,14 +125,14 @@ async def test_cat_trades(
     if credential_restricted:
         # Aliasing
         env_maker.wallet_aliases = {
-            "xch": 1,
+            "cac": 1,
             "did": 2,
             "cat": 3,
             "vc": 4,
             "new cat": 5,
         }
         env_taker.wallet_aliases = {
-            "xch": 1,
+            "cac": 1,
             "did": 2,
             "new cat": 3,
             "vc": 4,
@@ -209,24 +209,24 @@ async def test_cat_trades(
                 # Balance checking for this scenario is covered in tests/wallet/vc_wallet/test_vc_lifecycle
                 WalletStateTransition(
                     pre_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "did": {"init": True, "set_remainder": True},
                         "cat": {"init": True, "set_remainder": True},
                     },
                     post_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "did": {"set_remainder": True},
                         "cat": {"set_remainder": True},
                     },
                 ),
                 WalletStateTransition(
                     pre_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "did": {"init": True, "set_remainder": True},
                         "new cat": {"init": True, "set_remainder": True},
                     },
                     post_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "did": {"set_remainder": True},
                         "new cat": {"set_remainder": True},
                     },
@@ -250,21 +250,21 @@ async def test_cat_trades(
                 # Balance checking for this scenario is covered in tests/wallet/vc_wallet/test_vc_lifecycle
                 WalletStateTransition(
                     pre_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "vc": {"init": True, "set_remainder": True},
                     },
                     post_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "vc": {"set_remainder": True},
                     },
                 ),
                 WalletStateTransition(
                     pre_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "vc": {"init": True, "set_remainder": True},
                     },
                     post_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "vc": {"set_remainder": True},
                     },
                 ),
@@ -314,12 +314,12 @@ async def test_cat_trades(
     else:
         # Aliasing
         env_maker.wallet_aliases = {
-            "xch": 1,
+            "cac": 1,
             "cat": 2,
             "new cat": 3,
         }
         env_taker.wallet_aliases = {
-            "xch": 1,
+            "cac": 1,
             "new cat": 2,
             "cat": 3,
         }
@@ -352,21 +352,21 @@ async def test_cat_trades(
                 # Balance checking for this scenario is covered in test_cat_wallet
                 WalletStateTransition(
                     pre_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "cat": {"init": True, "set_remainder": True},
                     },
                     post_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "cat": {"set_remainder": True},
                     },
                 ),
                 WalletStateTransition(
                     pre_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "new cat": {"init": True, "set_remainder": True},
                     },
                     post_block_balance_updates={
-                        "xch": {"set_remainder": True},
+                        "cac": {"set_remainder": True},
                         "new cat": {"set_remainder": True},
                     },
                 ),
@@ -509,7 +509,7 @@ async def test_cat_trades(
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "pending_coin_removal_count": 1,
                         "<=#spendable_balance": -2,
                         "<=#max_send_amount": -2,
@@ -518,10 +518,10 @@ async def test_cat_trades(
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "pending_coin_removal_count": -1,
-                        "confirmed_wallet_balance": -2,  # One for offered XCH, one for fee
-                        "unconfirmed_wallet_balance": -2,  # One for offered XCH, one for fee
+                        "confirmed_wallet_balance": -2,  # One for offered CAC, one for fee
+                        "unconfirmed_wallet_balance": -2,  # One for offered CAC, one for fee
                         ">#spendable_balance": 0,
                         ">#max_send_amount": 0,
                     },
@@ -557,11 +557,11 @@ async def test_cat_trades(
             ),
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "pending_coin_removal_count": 1,
                         "<=#spendable_balance": -2,
                         "<=#max_send_amount": -2,
-                        # Unconfirmed balance doesn't change because receiveing 1 XCH and spending 1 in fee
+                        # Unconfirmed balance doesn't change because receiveing 1 CAC and spending 1 in fee
                         "unconfirmed_wallet_balance": 0,
                         ">=#pending_change": 1,  # any amount increase
                     },
@@ -583,12 +583,12 @@ async def test_cat_trades(
                     ),
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "pending_coin_removal_count": -1,
                         "unspent_coin_count": 1,
                         ">#spendable_balance": 0,
                         ">#max_send_amount": 0,
-                        # Confirmed balance doesn't change because receiveing 1 XCH and spending 1 in fee
+                        # Confirmed balance doesn't change because receiveing 1 CAC and spending 1 in fee
                         "confirmed_wallet_balance": 0,
                         "<=#pending_change": 1,  # any amount decrease
                     },
@@ -721,9 +721,9 @@ async def test_cat_trades(
         )
 
     # Testing a precious display bug real quick
-    xch_tx: TransactionRecord = next(tx for tx in action_scope.side_effects.transactions if tx.wallet_id == 1)
-    assert xch_tx.amount == 3
-    assert xch_tx.fee_amount == 1
+    cac_tx: TransactionRecord = next(tx for tx in action_scope.side_effects.transactions if tx.wallet_id == 1)
+    assert cac_tx.amount == 3
+    assert cac_tx.fee_amount == 1
 
     await wallet_environments.process_pending_states(
         [
@@ -738,7 +738,7 @@ async def test_cat_trades(
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": 3,
                         "unconfirmed_wallet_balance": 3,
                         "spendable_balance": 3,
@@ -756,7 +756,7 @@ async def test_cat_trades(
             ),
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "unconfirmed_wallet_balance": -4,  # -3 for offer, -1 for fee
                         "<=#spendable_balance": -4,
                         "<=#max_send_amount": -4,
@@ -784,7 +784,7 @@ async def test_cat_trades(
                     ),
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -4,
                         ">#spendable_balance": 0,
                         ">#max_send_amount": 0,
@@ -1057,7 +1057,7 @@ async def test_cat_trades(
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "pending_coin_removal_count": 1,
                         "<=#spendable_balance": -7,
                         "<=#max_send_amount": -7,
@@ -1066,7 +1066,7 @@ async def test_cat_trades(
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "pending_coin_removal_count": -1,
                         ">#spendable_balance": 0,
                         ">#max_send_amount": 0,
@@ -1125,7 +1125,7 @@ async def test_cat_trades(
             ),
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "unconfirmed_wallet_balance": 7,
                     },
                     "cat": {
@@ -1153,7 +1153,7 @@ async def test_cat_trades(
                     ),
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": 7,
                         "spendable_balance": 7,
                         "max_send_amount": 7,
@@ -1332,7 +1332,7 @@ async def test_cat_trades(
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": 10,
                         "unconfirmed_wallet_balance": 10,
                         "spendable_balance": 10,
@@ -1358,7 +1358,7 @@ async def test_cat_trades(
             ),
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "unconfirmed_wallet_balance": -10,
                         "<=#spendable_balance": -10,
                         "<=#max_send_amount": -10,
@@ -1382,7 +1382,7 @@ async def test_cat_trades(
                     ),
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -10,
                         ">#spendable_balance": 0,
                         ">#max_send_amount": 0,
@@ -1449,7 +1449,7 @@ async def test_cat_trades(
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "pending_coin_removal_count": 2,
                         "<=#spendable_balance": -13,
                         "<=#max_send_amount": -13,
@@ -1465,7 +1465,7 @@ async def test_cat_trades(
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -13,
                         "unconfirmed_wallet_balance": -13,
                         ">=#spendable_balance": 0,
@@ -1501,7 +1501,7 @@ async def test_cat_trades(
             ),
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "unconfirmed_wallet_balance": 13,
                     },
                     "cat": {
@@ -1525,7 +1525,7 @@ async def test_cat_trades(
                     ),
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": 13,
                         "spendable_balance": 13,
                         "max_send_amount": 13,
@@ -1637,24 +1637,24 @@ async def test_trade_cancellation(wallet_environments: WalletTestFramework) -> N
     env_taker = wallet_environments.environments[1]
 
     env_maker.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     env_taker.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
-    xch_to_cat_amount = uint64(100)
+    cac_to_cat_amount = uint64(100)
 
     async with env_maker.wallet_state_manager.new_action_scope(
         wallet_environments.tx_config, push=True
     ) as action_scope:
         cat_wallet_maker = await CATWallet.create_new_cat_wallet(
             env_maker.wallet_state_manager,
-            env_maker.xch_wallet,
+            env_maker.cac_wallet,
             {"identifier": "genesis_by_id"},
-            xch_to_cat_amount,
+            cac_to_cat_amount,
             action_scope,
         )
 
@@ -1663,11 +1663,11 @@ async def test_trade_cancellation(wallet_environments: WalletTestFramework) -> N
             # tests in test_cat_wallet.py
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"init": True, "set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"set_remainder": True},
                 },
             ),
@@ -1676,12 +1676,12 @@ async def test_trade_cancellation(wallet_environments: WalletTestFramework) -> N
     )
 
     cat_for_cactus: OfferSummary = {
-        env_maker.wallet_aliases["xch"]: 1,
+        env_maker.wallet_aliases["cac"]: 1,
         env_maker.wallet_aliases["cat"]: -2,
     }
 
     cactus_for_cat: OfferSummary = {
-        env_maker.wallet_aliases["xch"]: -3,
+        env_maker.wallet_aliases["cac"]: -3,
         env_maker.wallet_aliases["cat"]: 4,
     }
 
@@ -1741,7 +1741,7 @@ async def test_trade_cancellation(wallet_environments: WalletTestFramework) -> N
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "unconfirmed_wallet_balance": -fee,
                         "<=#spendable_balance": -fee,
                         "<=#max_send_amount": -fee,
@@ -1749,14 +1749,14 @@ async def test_trade_cancellation(wallet_environments: WalletTestFramework) -> N
                         ">=#pending_coin_removal_count": 2,
                     },
                     "cat": {
-                        "spendable_balance": -xch_to_cat_amount,
-                        "pending_change": xch_to_cat_amount,
-                        "max_send_amount": -xch_to_cat_amount,
+                        "spendable_balance": -cac_to_cat_amount,
+                        "pending_change": cac_to_cat_amount,
+                        "max_send_amount": -cac_to_cat_amount,
                         "pending_coin_removal_count": 1,
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -fee,
                         ">=#spendable_balance": 0,
                         ">=#max_send_amount": 0,
@@ -1765,9 +1765,9 @@ async def test_trade_cancellation(wallet_environments: WalletTestFramework) -> N
                         "<=#unspent_coin_count": 0,
                     },
                     "cat": {
-                        "spendable_balance": xch_to_cat_amount,
-                        "pending_change": -xch_to_cat_amount,
-                        "max_send_amount": xch_to_cat_amount,
+                        "spendable_balance": cac_to_cat_amount,
+                        "pending_change": -cac_to_cat_amount,
+                        "max_send_amount": cac_to_cat_amount,
                         "pending_coin_removal_count": -1,
                     },
                 },
@@ -1824,16 +1824,16 @@ async def test_trade_cancellation(wallet_environments: WalletTestFramework) -> N
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
-                        "<=#spendable_balance": cactus_for_cat[env_maker.wallet_aliases["xch"]],
-                        "<=#max_send_amount": cactus_for_cat[env_maker.wallet_aliases["xch"]],
+                    "cac": {
+                        "<=#spendable_balance": cactus_for_cat[env_maker.wallet_aliases["cac"]],
+                        "<=#max_send_amount": cactus_for_cat[env_maker.wallet_aliases["cac"]],
                         ">=#pending_change": 1,
                         "pending_coin_removal_count": 1,
                     },
                     "cat": {},
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         ">=#spendable_balance": 1,
                         ">=#max_send_amount": 1,
                         "<=#pending_change": -1,
@@ -1849,7 +1849,7 @@ async def test_trade_cancellation(wallet_environments: WalletTestFramework) -> N
 
     # Now let's test the case where two coins need to be spent in order to cancel
     cactus_and_cat_for_something: OfferSummary = {
-        env_maker.wallet_aliases["xch"]: -5,
+        env_maker.wallet_aliases["cac"]: -5,
         env_maker.wallet_aliases["cat"]: -6,
         bytes32([0] * 32): 1,  # Doesn't matter
     }
@@ -1898,30 +1898,30 @@ async def test_trade_cancellation(wallet_environments: WalletTestFramework) -> N
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
-                        "<=#spendable_balance": cactus_and_cat_for_something[env_maker.wallet_aliases["xch"]],
-                        "<=#max_send_amount": cactus_and_cat_for_something[env_maker.wallet_aliases["xch"]],
+                    "cac": {
+                        "<=#spendable_balance": cactus_and_cat_for_something[env_maker.wallet_aliases["cac"]],
+                        "<=#max_send_amount": cactus_and_cat_for_something[env_maker.wallet_aliases["cac"]],
                         ">=#pending_change": 1,
                         "pending_coin_removal_count": 1,
                     },
                     "cat": {
-                        "spendable_balance": -xch_to_cat_amount,
-                        "pending_change": xch_to_cat_amount,
-                        "max_send_amount": -xch_to_cat_amount,
+                        "spendable_balance": -cac_to_cat_amount,
+                        "pending_change": cac_to_cat_amount,
+                        "max_send_amount": -cac_to_cat_amount,
                         "pending_coin_removal_count": 1,
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         ">=#spendable_balance": 1,
                         ">=#max_send_amount": 1,
                         "<=#pending_change": -1,
                         "pending_coin_removal_count": -1,
                     },
                     "cat": {
-                        "spendable_balance": xch_to_cat_amount,
-                        "pending_change": -xch_to_cat_amount,
-                        "max_send_amount": xch_to_cat_amount,
+                        "spendable_balance": cac_to_cat_amount,
+                        "pending_change": -cac_to_cat_amount,
+                        "max_send_amount": cac_to_cat_amount,
                         "pending_coin_removal_count": -1,
                     },
                 },
@@ -1950,19 +1950,19 @@ async def test_trade_conflict(wallet_environments: WalletTestFramework) -> None:
     env_trader = wallet_environments.environments[2]
 
     env_maker.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     env_taker.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     env_trader.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
-    xch_to_cat_amount = uint64(100)
+    cac_to_cat_amount = uint64(100)
     fee = uint64(10)
 
     async with env_maker.wallet_state_manager.new_action_scope(
@@ -1970,9 +1970,9 @@ async def test_trade_conflict(wallet_environments: WalletTestFramework) -> None:
     ) as action_scope:
         await CATWallet.create_new_cat_wallet(
             env_maker.wallet_state_manager,
-            env_maker.xch_wallet,
+            env_maker.cac_wallet,
             {"identifier": "genesis_by_id"},
-            xch_to_cat_amount,
+            cac_to_cat_amount,
             action_scope,
         )
 
@@ -1981,11 +1981,11 @@ async def test_trade_conflict(wallet_environments: WalletTestFramework) -> None:
             # tests in test_cat_wallet.py
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"init": True, "set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"set_remainder": True},
                 },
             ),
@@ -1994,7 +1994,7 @@ async def test_trade_conflict(wallet_environments: WalletTestFramework) -> None:
     )
 
     cat_for_cactus: OfferSummary = {
-        env_maker.wallet_aliases["xch"]: 1000,
+        env_maker.wallet_aliases["cac"]: 1000,
         env_maker.wallet_aliases["cat"]: -4,
     }
 
@@ -2048,9 +2048,9 @@ async def test_trade_conflict(wallet_environments: WalletTestFramework) -> None:
                     }
                 },
                 post_block_balance_updates={
-                    "xch": {
-                        "unconfirmed_wallet_balance": cat_for_cactus[env_maker.wallet_aliases["xch"]],
-                        "confirmed_wallet_balance": cat_for_cactus[env_maker.wallet_aliases["xch"]],
+                    "cac": {
+                        "unconfirmed_wallet_balance": cat_for_cactus[env_maker.wallet_aliases["cac"]],
+                        "confirmed_wallet_balance": cat_for_cactus[env_maker.wallet_aliases["cac"]],
                         ">=#spendable_balance": 1,
                         ">=#max_send_amount": 1,
                         "pending_change": 0,
@@ -2068,10 +2068,10 @@ async def test_trade_conflict(wallet_environments: WalletTestFramework) -> None:
             ),
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
-                        "unconfirmed_wallet_balance": -cat_for_cactus[env_maker.wallet_aliases["xch"]] - fee,
-                        "<=#spendable_balance": -cat_for_cactus[env_maker.wallet_aliases["xch"]] - fee,
-                        "<=#max_send_amount": -cat_for_cactus[env_maker.wallet_aliases["xch"]] - fee,
+                    "cac": {
+                        "unconfirmed_wallet_balance": -cat_for_cactus[env_maker.wallet_aliases["cac"]] - fee,
+                        "<=#spendable_balance": -cat_for_cactus[env_maker.wallet_aliases["cac"]] - fee,
+                        "<=#max_send_amount": -cat_for_cactus[env_maker.wallet_aliases["cac"]] - fee,
                         ">=#pending_change": 1,
                         "pending_coin_removal_count": 1,
                     },
@@ -2081,8 +2081,8 @@ async def test_trade_conflict(wallet_environments: WalletTestFramework) -> None:
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
-                        "confirmed_wallet_balance": -cat_for_cactus[env_maker.wallet_aliases["xch"]] - fee,
+                    "cac": {
+                        "confirmed_wallet_balance": -cat_for_cactus[env_maker.wallet_aliases["cac"]] - fee,
                         ">=#spendable_balance": 1,
                         ">=#max_send_amount": 1,
                         "<=#pending_change": -1,
@@ -2098,10 +2098,10 @@ async def test_trade_conflict(wallet_environments: WalletTestFramework) -> None:
             ),
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
-                        "unconfirmed_wallet_balance": -cat_for_cactus[env_maker.wallet_aliases["xch"]] - fee,
-                        "<=#spendable_balance": -cat_for_cactus[env_maker.wallet_aliases["xch"]] - fee,
-                        "<=#max_send_amount": -cat_for_cactus[env_maker.wallet_aliases["xch"]] - fee,
+                    "cac": {
+                        "unconfirmed_wallet_balance": -cat_for_cactus[env_maker.wallet_aliases["cac"]] - fee,
+                        "<=#spendable_balance": -cat_for_cactus[env_maker.wallet_aliases["cac"]] - fee,
+                        "<=#max_send_amount": -cat_for_cactus[env_maker.wallet_aliases["cac"]] - fee,
                         ">=#pending_change": 1,
                         "pending_coin_removal_count": 1,
                     },
@@ -2111,10 +2111,10 @@ async def test_trade_conflict(wallet_environments: WalletTestFramework) -> None:
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
-                        "unconfirmed_wallet_balance": cat_for_cactus[env_maker.wallet_aliases["xch"]] + fee,
-                        ">=#spendable_balance": cat_for_cactus[env_maker.wallet_aliases["xch"]] + fee,
-                        ">=#max_send_amount": cat_for_cactus[env_maker.wallet_aliases["xch"]] + fee,
+                    "cac": {
+                        "unconfirmed_wallet_balance": cat_for_cactus[env_maker.wallet_aliases["cac"]] + fee,
+                        ">=#spendable_balance": cat_for_cactus[env_maker.wallet_aliases["cac"]] + fee,
+                        ">=#max_send_amount": cat_for_cactus[env_maker.wallet_aliases["cac"]] + fee,
                         "<=#pending_change": -1,
                         "pending_coin_removal_count": -1,
                     },
@@ -2146,24 +2146,24 @@ async def test_trade_bad_spend(wallet_environments: WalletTestFramework) -> None
     env_taker = wallet_environments.environments[1]
 
     env_maker.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     env_taker.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
-    xch_to_cat_amount = uint64(100)
+    cac_to_cat_amount = uint64(100)
 
     async with env_maker.wallet_state_manager.new_action_scope(
         wallet_environments.tx_config, push=True
     ) as action_scope:
         await CATWallet.create_new_cat_wallet(
             env_maker.wallet_state_manager,
-            env_maker.xch_wallet,
+            env_maker.cac_wallet,
             {"identifier": "genesis_by_id"},
-            xch_to_cat_amount,
+            cac_to_cat_amount,
             action_scope,
         )
 
@@ -2172,11 +2172,11 @@ async def test_trade_bad_spend(wallet_environments: WalletTestFramework) -> None
             # tests in test_cat_wallet.py
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"init": True, "set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"set_remainder": True},
                 },
             ),
@@ -2185,7 +2185,7 @@ async def test_trade_bad_spend(wallet_environments: WalletTestFramework) -> None
     )
 
     cat_for_cactus: OfferSummary = {
-        env_maker.wallet_aliases["xch"]: 1000,
+        env_maker.wallet_aliases["cac"]: 1000,
         env_maker.wallet_aliases["cat"]: -4,
     }
 
@@ -2226,21 +2226,21 @@ async def test_trade_bad_spend(wallet_environments: WalletTestFramework) -> None
             # an issue with production code - quex
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {},
+                    "cac": {},
                     "cat": {},
                 },
             ),
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"init": True, "set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {},
+                    "cac": {},
                     "cat": {},
                 },
             ),
@@ -2268,24 +2268,24 @@ async def test_trade_high_fee(wallet_environments: WalletTestFramework) -> None:
     env_taker = wallet_environments.environments[1]
 
     env_maker.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     env_taker.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
-    xch_to_cat_amount = uint64(100)
+    cac_to_cat_amount = uint64(100)
 
     async with env_maker.wallet_state_manager.new_action_scope(
         wallet_environments.tx_config, push=True
     ) as action_scope:
         await CATWallet.create_new_cat_wallet(
             env_maker.wallet_state_manager,
-            env_maker.xch_wallet,
+            env_maker.cac_wallet,
             {"identifier": "genesis_by_id"},
-            xch_to_cat_amount,
+            cac_to_cat_amount,
             action_scope,
         )
 
@@ -2294,11 +2294,11 @@ async def test_trade_high_fee(wallet_environments: WalletTestFramework) -> None:
             # tests in test_cat_wallet.py
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"init": True, "set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"set_remainder": True},
                 },
             ),
@@ -2307,7 +2307,7 @@ async def test_trade_high_fee(wallet_environments: WalletTestFramework) -> None:
     )
 
     cat_for_cactus: OfferSummary = {
-        env_maker.wallet_aliases["xch"]: 1000,
+        env_maker.wallet_aliases["cac"]: 1000,
         env_maker.wallet_aliases["cat"]: -4,
     }
 
@@ -2342,9 +2342,9 @@ async def test_trade_high_fee(wallet_environments: WalletTestFramework) -> None:
                     }
                 },
                 post_block_balance_updates={
-                    "xch": {
-                        "unconfirmed_wallet_balance": cat_for_cactus[env_maker.wallet_aliases["xch"]],
-                        "confirmed_wallet_balance": cat_for_cactus[env_maker.wallet_aliases["xch"]],
+                    "cac": {
+                        "unconfirmed_wallet_balance": cat_for_cactus[env_maker.wallet_aliases["cac"]],
+                        "confirmed_wallet_balance": cat_for_cactus[env_maker.wallet_aliases["cac"]],
                         ">=#spendable_balance": 1,
                         ">=#max_send_amount": 1,
                         "pending_change": 0,
@@ -2362,10 +2362,10 @@ async def test_trade_high_fee(wallet_environments: WalletTestFramework) -> None:
             ),
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
-                        "unconfirmed_wallet_balance": -cat_for_cactus[env_maker.wallet_aliases["xch"]] - fee,
-                        "<=#spendable_balance": -cat_for_cactus[env_maker.wallet_aliases["xch"]] - fee,
-                        "<=#max_send_amount": -cat_for_cactus[env_maker.wallet_aliases["xch"]] - fee,
+                    "cac": {
+                        "unconfirmed_wallet_balance": -cat_for_cactus[env_maker.wallet_aliases["cac"]] - fee,
+                        "<=#spendable_balance": -cat_for_cactus[env_maker.wallet_aliases["cac"]] - fee,
+                        "<=#max_send_amount": -cat_for_cactus[env_maker.wallet_aliases["cac"]] - fee,
                         ">=#pending_change": 1,
                         "pending_coin_removal_count": 1,
                     },
@@ -2375,8 +2375,8 @@ async def test_trade_high_fee(wallet_environments: WalletTestFramework) -> None:
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
-                        "confirmed_wallet_balance": -cat_for_cactus[env_maker.wallet_aliases["xch"]] - fee,
+                    "cac": {
+                        "confirmed_wallet_balance": -cat_for_cactus[env_maker.wallet_aliases["cac"]] - fee,
                         ">=#spendable_balance": 1,
                         ">=#max_send_amount": 1,
                         "<=#pending_change": -1,
@@ -2413,24 +2413,24 @@ async def test_aggregated_trade_state(wallet_environments: WalletTestFramework) 
     env_taker = wallet_environments.environments[1]
 
     env_maker.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
     env_taker.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "cat": 2,
     }
 
-    xch_to_cat_amount = uint64(100)
+    cac_to_cat_amount = uint64(100)
 
     async with env_maker.wallet_state_manager.new_action_scope(
         wallet_environments.tx_config, push=True
     ) as action_scope:
         await CATWallet.create_new_cat_wallet(
             env_maker.wallet_state_manager,
-            env_maker.xch_wallet,
+            env_maker.cac_wallet,
             {"identifier": "genesis_by_id"},
-            xch_to_cat_amount,
+            cac_to_cat_amount,
             action_scope,
         )
 
@@ -2439,11 +2439,11 @@ async def test_aggregated_trade_state(wallet_environments: WalletTestFramework) 
             # tests in test_cat_wallet.py
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"init": True, "set_remainder": True},
                 },
                 post_block_balance_updates={
-                    "xch": {"set_remainder": True},
+                    "cac": {"set_remainder": True},
                     "cat": {"set_remainder": True},
                 },
             ),
@@ -2452,16 +2452,16 @@ async def test_aggregated_trade_state(wallet_environments: WalletTestFramework) 
     )
 
     cat_for_cactus: OfferSummary = {
-        env_maker.wallet_aliases["xch"]: 2,
+        env_maker.wallet_aliases["cac"]: 2,
         env_maker.wallet_aliases["cat"]: -2,
     }
     cactus_for_cat: OfferSummary = {
-        env_maker.wallet_aliases["xch"]: -1,
+        env_maker.wallet_aliases["cac"]: -1,
         env_maker.wallet_aliases["cat"]: 1,
     }
     combined_summary: OfferSummary = {
-        env_maker.wallet_aliases["xch"]: cat_for_cactus[env_maker.wallet_aliases["xch"]]
-        + cactus_for_cat[env_maker.wallet_aliases["xch"]],
+        env_maker.wallet_aliases["cac"]: cat_for_cactus[env_maker.wallet_aliases["cac"]]
+        + cactus_for_cat[env_maker.wallet_aliases["cac"]],
         env_maker.wallet_aliases["cat"]: cat_for_cactus[env_maker.wallet_aliases["cat"]]
         + cactus_for_cat[env_maker.wallet_aliases["cat"]],
     }
@@ -2510,9 +2510,9 @@ async def test_aggregated_trade_state(wallet_environments: WalletTestFramework) 
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
-                        "<=#spendable_balance": cactus_for_cat[env_maker.wallet_aliases["xch"]],
-                        "<=#max_send_amount": cactus_for_cat[env_maker.wallet_aliases["xch"]],
+                    "cac": {
+                        "<=#spendable_balance": cactus_for_cat[env_maker.wallet_aliases["cac"]],
+                        "<=#max_send_amount": cactus_for_cat[env_maker.wallet_aliases["cac"]],
                         "pending_change": 0,
                         "pending_coin_removal_count": 1,
                     },
@@ -2524,9 +2524,9 @@ async def test_aggregated_trade_state(wallet_environments: WalletTestFramework) 
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
-                        "unconfirmed_wallet_balance": combined_summary[env_maker.wallet_aliases["xch"]],
-                        "confirmed_wallet_balance": combined_summary[env_maker.wallet_aliases["xch"]],
+                    "cac": {
+                        "unconfirmed_wallet_balance": combined_summary[env_maker.wallet_aliases["cac"]],
+                        "confirmed_wallet_balance": combined_summary[env_maker.wallet_aliases["cac"]],
                         ">=#spendable_balance": 1,
                         ">=#max_send_amount": 1,
                         "pending_change": 0,
@@ -2546,10 +2546,10 @@ async def test_aggregated_trade_state(wallet_environments: WalletTestFramework) 
             ),
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
-                        "unconfirmed_wallet_balance": -combined_summary[env_maker.wallet_aliases["xch"]],
-                        "<=#spendable_balance": -combined_summary[env_maker.wallet_aliases["xch"]],
-                        "<=#max_send_amount": -combined_summary[env_maker.wallet_aliases["xch"]],
+                    "cac": {
+                        "unconfirmed_wallet_balance": -combined_summary[env_maker.wallet_aliases["cac"]],
+                        "<=#spendable_balance": -combined_summary[env_maker.wallet_aliases["cac"]],
+                        "<=#max_send_amount": -combined_summary[env_maker.wallet_aliases["cac"]],
                         ">=#pending_change": 1,
                         "pending_coin_removal_count": 1,
                     },
@@ -2559,8 +2559,8 @@ async def test_aggregated_trade_state(wallet_environments: WalletTestFramework) 
                     },
                 },
                 post_block_balance_updates={
-                    "xch": {
-                        "confirmed_wallet_balance": -combined_summary[env_maker.wallet_aliases["xch"]],
+                    "cac": {
+                        "confirmed_wallet_balance": -combined_summary[env_maker.wallet_aliases["cac"]],
                         ">=#spendable_balance": 1,
                         ">=#max_send_amount": 1,
                         "<=#pending_change": -1,

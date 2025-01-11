@@ -38,7 +38,7 @@ def validate_uint64(
     return u_value
 
 
-def validate_decimal_xch(
+def validate_decimal_cac(
     value: str,
     fail_func: Callable[[str, Optional[click.Parameter], Optional[click.Context]], None],
     param: Optional[click.Parameter],
@@ -47,7 +47,7 @@ def validate_decimal_xch(
     try:
         d_value = Decimal(value)
     except InvalidOperation:
-        fail_func("Value must be decimal dotted value in XCH (e.g. 0.00005)", param, ctx)
+        fail_func("Value must be decimal dotted value in CAC (e.g. 0.00005)", param, ctx)
     if d_value.is_signed():
         fail_func("Value can not be negative", param, ctx)
     if d_value % one_decimal_mojo != Decimal(0):  # if there is a remainder, it contains a value smaller than one mojo
@@ -57,10 +57,10 @@ def validate_decimal_xch(
 
 class TransactionFeeParamType(click.ParamType):
     """
-    A Click parameter type for transaction fees, which can be specified in XCH or mojos.
+    A Click parameter type for transaction fees, which can be specified in CAC or mojos.
     """
 
-    name: str = "XCH"  # type name for cli, TODO: Change once the mojo flag is implemented
+    name: str = "CAC"  # type name for cli, TODO: Change once the mojo flag is implemented
     value_limit: Decimal = Decimal("0.5")
 
     def convert(self, value: Any, param: Optional[click.Parameter], ctx: Optional[click.Context]) -> uint64:
@@ -72,7 +72,7 @@ class TransactionFeeParamType(click.ParamType):
         mojos = False  # TODO: Add unit logic
         if mojos:
             return validate_uint64(value, self.fail, param, ctx)
-        d_value = validate_decimal_xch(value, self.fail, param, ctx)
+        d_value = validate_decimal_cac(value, self.fail, param, ctx)
         if not self.value_limit.is_zero() and d_value > self.value_limit:
             self.fail(f"Fee must be in the range 0 to {self.value_limit}", param, ctx)
         try:
@@ -84,7 +84,7 @@ class TransactionFeeParamType(click.ParamType):
 @dataclass(frozen=True)
 class CliAmount:
     """
-    A dataclass for TX / wallet amounts for both XCH and CAT, and of course mojos.
+    A dataclass for TX / wallet amounts for both CAC and CAT, and of course mojos.
     """
 
     mojos: bool
@@ -116,10 +116,10 @@ class CliAmount:
 
 class AmountParamType(click.ParamType):
     """
-    A Click parameter type for TX / wallet amounts for both XCH and CAT, and of course mojos.
+    A Click parameter type for TX / wallet amounts for both CAC and CAT, and of course mojos.
     """
 
-    name: str = "XCH"  # type name for cli, TODO: Change once the mojo flag is implemented
+    name: str = "CAC"  # type name for cli, TODO: Change once the mojo flag is implemented
 
     def convert(self, value: Any, param: Optional[click.Parameter], ctx: Optional[click.Context]) -> CliAmount:
         # suggested by click, but being left in as mojos flag makes default misrepresentation less likely.
@@ -131,7 +131,7 @@ class AmountParamType(click.ParamType):
         if mojos:
             m_value = validate_uint64(value, self.fail, param, ctx)
             return CliAmount(mojos=True, amount=m_value)
-        d_value = validate_decimal_xch(value, self.fail, param, ctx)
+        d_value = validate_decimal_cac(value, self.fail, param, ctx)
         return CliAmount(mojos=False, amount=d_value)
 
 
@@ -171,8 +171,8 @@ class AddressParamType(click.ParamType):
             self.fail("Invalid Type, address must be string.", param, ctx)
         try:
             hrp, b32data = bech32_decode(value)
-            if hrp in ["xch", "txch"]:  # I hate having to load the config here
-                addr_type: AddressType = AddressType.XCH
+            if hrp in ["cac", "tcac"]:  # I hate having to load the config here
+                addr_type: AddressType = AddressType.CAC
                 expected_prefix = ctx.obj.get("expected_prefix") if ctx else None  # attempt to get cached prefix
                 if expected_prefix is None:
                     root_path = ctx.obj["root_path"] if ctx is not None else DEFAULT_ROOT_PATH
@@ -184,7 +184,7 @@ class AddressParamType(click.ParamType):
                 # now that we have the expected prefix, we can validate the address is for the right network
                 if hrp != expected_prefix:
                     self.fail(f"Unexpected Address Prefix: {hrp}, are you sure its for the right network?", param, ctx)
-            else:  # all other address prefixes (Not xch / txch)
+            else:  # all other address prefixes (Not cac / tcac)
                 addr_type = AddressType(hrp)
             return CliAddress(puzzle_hash=decode_puzzle_hash(value), address_type=addr_type, original_address=value)
         except ValueError:

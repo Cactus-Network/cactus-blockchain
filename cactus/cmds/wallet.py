@@ -154,19 +154,19 @@ def get_transactions_cmd(
 @options.create_fingerprint()
 @click.option("-i", "--id", help="Id of the wallet to use", type=int, default=1, show_default=True, required=True)
 @click.option(
-    "-a", "--amount", help="How much cactus to send, in XCH or CAT units", type=AmountParamType(), required=True
+    "-a", "--amount", help="How much cactus to send, in CAC or CAT units", type=AmountParamType(), required=True
 )
 @click.option("-e", "--memo", help="Additional memo for the transaction", type=str, default=None)
 @options.create_fee()
 # TODO: Fix RPC as this should take a puzzle_hash not an address.
-@click.option("-t", "--address", help="Address to send the XCH", type=AddressParamType(), required=True)
+@click.option("-t", "--address", help="Address to send the CAC", type=AddressParamType(), required=True)
 @click.option(
     "-o", "--override", help="Submits transaction without checking for unusual values", is_flag=True, default=False
 )
 @click.option(
     "-ma",
     "--min-coin-amount",
-    help="Ignore coins worth less then this much XCH or CAT units",
+    help="Ignore coins worth less then this much CAC or CAT units",
     type=AmountParamType(),
     required=False,
     default=cli_amount_none,
@@ -174,7 +174,7 @@ def get_transactions_cmd(
 @click.option(
     "-l",
     "--max-coin-amount",
-    help="Ignore coins worth more then this much XCH or CAT units",
+    help="Ignore coins worth more then this much CAC or CAT units",
     type=AmountParamType(),
     required=False,
     default=cli_amount_none,
@@ -311,7 +311,7 @@ def get_address_cmd(wallet_rpc_port: Optional[int], id: int, fingerprint: int, n
     default="",
     required=True,
 )
-@options.create_fee("A fee to add to the offer when it gets taken, in XCH")
+@options.create_fee("A fee to add to the offer when it gets taken, in CAC")
 @click.option(
     "--force",
     help="Force to push the spend bundle even it may be a double spend",
@@ -396,7 +396,7 @@ def address_sign_message(
         sign_message(
             wallet_rpc_port=wallet_rpc_port,
             fp=fingerprint,
-            addr_type=AddressType.XCH,
+            addr_type=AddressType.CAC,
             message=hex_message,
             address=address,
         )
@@ -450,7 +450,7 @@ def add_token_cmd(wallet_rpc_port: Optional[int], asset_id: bytes32, token_name:
     asyncio.run(add_token(wallet_rpc_port, fingerprint, asset_id, token_name))
 
 
-@wallet_cmd.command("make_offer", help="Create an offer of XCH/CATs/NFTs for XCH/CATs/NFTs")
+@wallet_cmd.command("make_offer", help="Create an offer of CAC/CATs/NFTs for CAC/CATs/NFTs")
 @click.option(
     "-wp",
     "--wallet-rpc-port",
@@ -479,7 +479,7 @@ def add_token_cmd(wallet_rpc_port: Optional[int], asset_id: bytes32, token_name:
     required=True,
     type=click.Path(dir_okay=False, writable=True, path_type=pathlib.Path),
 )
-@options.create_fee("A fee to add to the offer when it gets taken, in XCH")
+@options.create_fee("A fee to add to the offer when it gets taken, in CAC")
 @click.option(
     "--reuse",
     help="Reuse existing address for the offer.",
@@ -580,7 +580,7 @@ def get_offers_cmd(
 )
 @options.create_fingerprint()
 @click.option("-e", "--examine-only", help="Print the summary of the offer file but do not take it", is_flag=True)
-@options.create_fee("The fee to use when pushing the completed offer, in XCH")
+@options.create_fee("The fee to use when pushing the completed offer, in CAC")
 # TODO: Reuse is not used
 @click.option(
     "--reuse",
@@ -625,7 +625,7 @@ def take_offer_cmd(
 @options.create_fingerprint()
 @click.option("-id", "--id", help="The offer ID that you wish to cancel", required=True, type=Bytes32ParamType())
 @click.option("--insecure", help="Don't make an on-chain transaction, simply mark the offer as cancelled", is_flag=True)
-@options.create_fee("The fee to use when cancelling the offer securely, in XCH")
+@options.create_fee("The fee to use when cancelling the offer securely, in CAC")
 @tx_out_cmd()
 def cancel_offer_cmd(
     wallet_rpc_port: Optional[int],
@@ -1361,7 +1361,7 @@ def notification_cmd() -> None:
 @click.option(
     "-a",
     "--amount",
-    help="The amount (in XCH) to send to get the notification past the recipient's spam filter",
+    help="The amount (in CAC) to send to get the notification past the recipient's spam filter",
     type=AmountParamType(),
     default=CliAmount(mojos=True, amount=uint64(10000000)),
     required=True,
@@ -1465,7 +1465,7 @@ def vcs_cmd() -> None:  # pragma: no cover
     type=AddressParamType(),
     required=False,
 )
-@options.create_fee("Blockchain fee for mint transaction, in XCH")
+@options.create_fee("Blockchain fee for mint transaction, in CAC")
 @tx_out_cmd()
 def mint_vc_cmd(
     wallet_rpc_port: Optional[int],
@@ -1541,7 +1541,7 @@ def get_vcs_cmd(
     required=False,
 )
 @click.option("-p", "--new-proof-hash", help="The new proof hash to update the VC to", type=str, required=True)
-@options.create_fee("Blockchain fee for update transaction, in XCH")
+@options.create_fee("Blockchain fee for update transaction, in CAC")
 @click.option(
     "--reuse-puzhash/--generate-new-puzhash",
     help="Send the VC back to the same puzzle hash it came from (ignored if --new-puzhash is specified)",
@@ -1642,7 +1642,7 @@ def get_proofs_for_root_cmd(
     type=Bytes32ParamType(),
     required=False,
 )
-@options.create_fee("Blockchain fee for revocation transaction, in XCH")
+@options.create_fee("Blockchain fee for revocation transaction, in CAC")
 @click.option(
     "--reuse-puzhash/--generate-new-puzhash",
     help="Send the VC back to the same puzzle hash it came from (ignored if --new-puzhash is specified)",
@@ -1693,7 +1693,7 @@ def revoke_vc_cmd(
     type=AmountParamType(),
     required=True,
 )
-@options.create_fee("Blockchain fee for approval transaction, in XCH")
+@options.create_fee("Blockchain fee for approval transaction, in CAC")
 @click.option(
     "-ma",
     "--min-coin-amount",

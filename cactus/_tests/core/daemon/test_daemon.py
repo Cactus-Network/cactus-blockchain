@@ -90,7 +90,7 @@ class CactusPlottersBladebitArgsCase:
     plot_type: str
     count: int = 1
     threads: int = 0
-    pool_contract: str = "txch1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    pool_contract: str = "tcac1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     compress: int = 1
     device: int = 0
     hybrid_disk_mode: Optional[int] = None
@@ -597,7 +597,7 @@ async def test_get_network_info(daemon_client_with_config_and_keys: DaemonProxy)
     assert response["data"] == {
         "success": True,
         "network_name": "testnet0",
-        "network_prefix": "txch",
+        "network_prefix": "tcac",
         "genesis_challenge": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     }
 
@@ -611,19 +611,19 @@ async def test_get_network_info(daemon_client_with_config_and_keys: DaemonProxy)
             "wallet_addresses": {
                 G1Element().get_fingerprint(): [
                     {
-                        "address": "xch1dr2sj4jqdt6nj4l32d4f5dk7mrwak3qw5hsykty5lhhd00053y0szaz8zj",
+                        "address": "cac1dr2sj4jqdt6nj4l32d4f5dk7mrwak3qw5hsykty5lhhd00053y0szaz8zj",
                         "hd_path": "m/12381/8444/2/0",
                     }
                 ],
                 test_key_data.fingerprint: [
                     {
-                        "address": "xch1zze67l3jgxuvyaxhjhu7326sezxxve7lgzvq0497ddggzhff7c9s2pdcwh",
+                        "address": "cac1zze67l3jgxuvyaxhjhu7326sezxxve7lgzvq0497ddggzhff7c9s2pdcwh",
                         "hd_path": "m/12381/8444/2/0",
                     },
                 ],
                 test_key_data_2.fingerprint: [
                     {
-                        "address": "xch1fra5h0qnsezrxenjyslyxx7y4l268gq52m0rgenh58vn8f577uzswzvk4v",
+                        "address": "cac1fra5h0qnsezrxenjyslyxx7y4l268gq52m0rgenh58vn8f577uzswzvk4v",
                         "hd_path": "m/12381/8444/2/0",
                     }
                 ],
@@ -638,7 +638,7 @@ async def test_get_network_info(daemon_client_with_config_and_keys: DaemonProxy)
             "wallet_addresses": {
                 test_key_data.fingerprint: [
                     {
-                        "address": "xch1zze67l3jgxuvyaxhjhu7326sezxxve7lgzvq0497ddggzhff7c9s2pdcwh",
+                        "address": "cac1zze67l3jgxuvyaxhjhu7326sezxxve7lgzvq0497ddggzhff7c9s2pdcwh",
                         "hd_path": "m/12381/8444/2/0",
                     },
                 ],
@@ -653,11 +653,11 @@ async def test_get_network_info(daemon_client_with_config_and_keys: DaemonProxy)
             "wallet_addresses": {
                 test_key_data.fingerprint: [
                     {
-                        "address": "xch16jqcaguq27z8xvpu89j7eaqfzn6k89hdrrlm0rffku85n8n7m7sqqmmahh",
+                        "address": "cac16jqcaguq27z8xvpu89j7eaqfzn6k89hdrrlm0rffku85n8n7m7sqqmmahh",
                         "hd_path": "m/12381/8444/2/1",
                     },
                     {
-                        "address": "xch1955vj0gx5tqe7v5tceajn2p4z4pup8d4g2exs0cz4xjqses8ru6qu8zp3y",
+                        "address": "cac1955vj0gx5tqe7v5tceajn2p4z4pup8d4g2exs0cz4xjqses8ru6qu8zp3y",
                         "hd_path": "m/12381/8444/2/2",
                     },
                 ]
@@ -672,7 +672,7 @@ async def test_get_network_info(daemon_client_with_config_and_keys: DaemonProxy)
             "wallet_addresses": {
                 test_key_data.fingerprint: [
                     {
-                        "address": "xch1k996a7h3agygjhqtrf0ycpa7wfd6k5ye2plkf54ukcmdj44gkqkq880l7n",
+                        "address": "cac1k996a7h3agygjhqtrf0ycpa7wfd6k5ye2plkf54ukcmdj44gkqkq880l7n",
                         "hd_path": "m/12381n/8444n/2n/0n",
                     }
                 ]
@@ -704,7 +704,7 @@ async def test_get_network_info(daemon_client_with_config_and_keys: DaemonProxy)
             "wallet_addresses": {
                 test_key_data.fingerprint: [
                     {
-                        "address": "xch1zze67l3jgxuvyaxhjhu7326sezxxve7lgzvq0497ddggzhff7c9s2pdcwh",
+                        "address": "cac1zze67l3jgxuvyaxhjhu7326sezxxve7lgzvq0497ddggzhff7c9s2pdcwh",
                         "hd_path": "m/12381/8444/2/0",
                     },
                 ],

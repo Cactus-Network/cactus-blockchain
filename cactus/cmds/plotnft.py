@@ -52,7 +52,7 @@ def get_login_link_cmd(launcher_id: bytes32) -> None:
 @click.option("-u", "--pool_url", help="HTTPS host:port of the pool to join", type=str, required=False)
 @click.option("-s", "--state", help="Initial state of Plot NFT: local or pool", type=str, required=True)
 @options.create_fee(
-    "Set the fees per transaction, in XCH. Fee is used TWICE: once to create the singleton, once for init."
+    "Set the fees per transaction, in CAC. Fee is used TWICE: once to create the singleton, once for init."
 )
 @click.option(
     "-wp",
@@ -91,7 +91,7 @@ def create_cmd(
 @click.option("-i", "--id", help="ID of the wallet to use", type=int, default=None, show_default=True, required=True)
 @options.create_fingerprint()
 @click.option("-u", "--pool_url", help="HTTPS host:port of the pool to join", type=str, required=True)
-@options.create_fee("Set the fees per transaction, in XCH. Fee is used TWICE: once to leave pool, once to join.")
+@options.create_fee("Set the fees per transaction, in CAC. Fee is used TWICE: once to leave pool, once to join.")
 @click.option(
     "-wp",
     "--wallet-rpc-port",
@@ -123,7 +123,7 @@ def join_cmd(
 @click.option("-y", "--yes", "dont_prompt", help="No prompts", is_flag=True)
 @click.option("-i", "--id", help="ID of the wallet to use", type=int, default=None, show_default=True, required=True)
 @options.create_fingerprint()
-@options.create_fee("Set the fees per transaction, in XCH. Fee is charged TWICE.")
+@options.create_fee("Set the fees per transaction, in CAC. Fee is charged TWICE.")
 @click.option(
     "-wp",
     "--wallet-rpc-port",

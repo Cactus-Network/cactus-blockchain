@@ -17,7 +17,7 @@ from cactus.util.streamable import Streamable, streamable
 class FeeRate(Streamable):
     """
     Represents Fee Rate in mojos divided by CLVM Cost.
-    Performs XCH/mojo conversion.
+    Performs CAC/mojo conversion.
     Similar to 'Fee per cost'.
     """
 

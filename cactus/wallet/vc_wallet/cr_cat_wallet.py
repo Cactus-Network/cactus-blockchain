@@ -426,7 +426,7 @@ class CRCATWallet(CATWallet):
         selected_cat_amount = sum(c.amount for c in cat_coins)
         assert selected_cat_amount >= starting_amount
 
-        # Figure out if we need to absorb/melt some XCH as part of this
+        # Figure out if we need to absorb/melt some CAC as part of this
         regular_cactus_to_claim: int = 0
         if payment_amount > starting_amount:
             # TODO: The no coverage comment is because minting is broken for both this and the standard CAT wallet
@@ -510,7 +510,7 @@ class CRCATWallet(CATWallet):
                 announcement = CreateCoinAnnouncement(std_hash(b"".join([c.name() for c in cat_coins])), coin.name())
                 if need_cactus_transaction:
                     if fee > regular_cactus_to_claim:
-                        await self.create_tandem_xch_tx(
+                        await self.create_tandem_cac_tx(
                             fee,
                             uint64(regular_cactus_to_claim),
                             action_scope,
@@ -521,15 +521,15 @@ class CRCATWallet(CATWallet):
                             conditions=(*extra_conditions, announcement),
                         )
                     elif regular_cactus_to_claim > fee:
-                        xch_announcement = await self.create_tandem_xch_tx(
+                        cac_announcement = await self.create_tandem_cac_tx(
                             fee,
                             uint64(regular_cactus_to_claim),
                             action_scope,
                         )
-                        assert xch_announcement is not None
+                        assert cac_announcement is not None
                         innersol = self.standard_wallet.make_solution(
                             primaries=primaries,
-                            conditions=(*extra_conditions, xch_announcement, announcement),
+                            conditions=(*extra_conditions, cac_announcement, announcement),
                         )
                     else:
                         # TODO: what about when they are equal?
@@ -702,7 +702,7 @@ class CRCATWallet(CATWallet):
                 uint128(min_amount_to_claim),
             )
 
-        # Select the relevant XCH coins
+        # Select the relevant CAC coins
         if fee > 0:
             cactus_coins = await self.standard_wallet.select_coins(
                 fee,
@@ -755,7 +755,7 @@ class CRCATWallet(CATWallet):
 
         # Make the Fee TX
         if fee > 0:
-            await self.create_tandem_xch_tx(
+            await self.create_tandem_cac_tx(
                 fee,
                 uint64(0),
                 action_scope,

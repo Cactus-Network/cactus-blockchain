@@ -110,7 +110,7 @@ async def test_harvester_receive_source_signing_data(
     # validated_partial = False     # Not covered currently. See comment in validate_harvester_request_signatures
 
     finished_validating_data = False
-    farmer_reward_address = decode_puzzle_hash("txch1psqeaw0h244v5sy2r4se8pheyl62n8778zl6t5e7dep0xch9xfkqhx2mej")
+    farmer_reward_address = decode_puzzle_hash("tcac1psqeaw0h244v5sy2r4se8pheyl62n8778zl6t5e7dep0cac9xfkqhx2mej")
 
     async def intercept_harvester_request_signatures(*args: Any) -> Message:
         request: harvester_protocol.RequestSignatures = harvester_protocol.RequestSignatures.from_bytes(args[0])
@@ -356,7 +356,7 @@ def prepare_sp_and_pos_for_fee_test(
         signage_point_index=uint8(0),
         include_source_signature_data=False,
         farmer_reward_address_override=decode_puzzle_hash(
-            "txch1psqeaw0h244v5sy2r4se8pheyl62n8778zl6t5e7dep0xch9xfkqhx2mej"
+            "tcac1psqeaw0h244v5sy2r4se8pheyl62n8778zl6t5e7dep0cac9xfkqhx2mej"
         ),
         fee_info=ProofOfSpaceFeeInfo(
             # Apply threshold offset to make the fee either pass or fail

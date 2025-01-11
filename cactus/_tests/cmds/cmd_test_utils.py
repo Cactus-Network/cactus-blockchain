@@ -241,7 +241,7 @@ class TestWalletRpcClient(TestRpcClient):
 
     async def get_next_address(self, wallet_id: int, new_address: bool) -> str:
         self.add_to_log("get_next_address", (wallet_id, new_address))
-        addr = encode_puzzle_hash(bytes32([self.wallet_index] * 32), "xch")
+        addr = encode_puzzle_hash(bytes32([self.wallet_index] * 32), "cac")
         self.wallet_index += 1
         if self.wallet_index > 254:
             self.wallet_index = 1

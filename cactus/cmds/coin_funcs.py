@@ -248,7 +248,7 @@ async def async_split(
             for tx in transactions:
                 print(f"Transaction sent: {tx.name}")
                 print(f"To get status, use command: cactus wallet get_transaction -f {fingerprint} -tx 0x{tx.name}")
-        dust_threshold = config.get("xch_spam_amount", 1000000)  # min amount per coin in mojo
+        dust_threshold = config.get("cac_spam_amount", 1000000)  # min amount per coin in mojo
         spam_filter_after_n_txs = config.get("spam_filter_after_n_txs", 200)  # how many txs to wait before filtering
         if final_amount_per_coin < dust_threshold and wallet_type == WalletType.STANDARD_WALLET:
             print(

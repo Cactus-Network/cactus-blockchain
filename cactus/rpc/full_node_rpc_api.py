@@ -837,7 +837,7 @@ class FullNodeRpcApi:
         """
 
         tx_cost_estimates = {
-            "send_xch_transaction": 9_401_710,
+            "send_cac_transaction": 9_401_710,
             "cat_spend": 36_382_111,
             "take_offer": 721_393_265,
             "cancel_offer": 212_443_993,

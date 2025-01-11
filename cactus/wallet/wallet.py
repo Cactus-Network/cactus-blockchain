@@ -467,7 +467,7 @@ class Wallet:
                 )
             )
 
-    async def create_tandem_xch_tx(
+    async def create_tandem_cac_tx(
         self,
         fee: uint64,
         action_scope: WalletActionScope,

@@ -61,7 +61,7 @@ class TradeManager:
     """
     This class is a driver for creating and accepting settlement_payments.clsp style offers.
 
-    By default, standard XCH is supported but to support other types of assets you must implement certain functions on
+    By default, standard CAC is supported but to support other types of assets you must implement certain functions on
     the asset's wallet as well as create a driver for its puzzle(s).  Here is a guide to integrating a new types of
     assets with this trade manager:
 
@@ -314,7 +314,7 @@ class TradeManager:
                     announcement_conditions = tuple()
                 async with action_scope.use() as interface:
                     interface.side_effects.selected_coins.append(coin)
-                # This should probably not switch on whether or not we're spending a XCH but it has to for now
+                # This should probably not switch on whether or not we're spending a CAC but it has to for now
                 if wallet.type() == WalletType.STANDARD_WALLET:
                     assert isinstance(wallet, Wallet)
                     if fee_to_pay > coin.amount:
@@ -497,7 +497,7 @@ class TradeManager:
             offer_dict_no_ints: Dict[Optional[bytes32], int] = {}
             for id, amount in offer_dict.items():
                 asset_id: Optional[bytes32] = None
-                # asset_id can either be none if asset is XCH or
+                # asset_id can either be none if asset is CAC or
                 # bytes32 if another asset (e.g. NFT, CAT)
                 if amount > 0:
                     # this is what we are receiving in the trade
@@ -545,7 +545,7 @@ class TradeManager:
                     assert wallet is not None
                     if not callable(getattr(wallet, "get_coins_to_offer", None)):  # ATTENTION: new wallets
                         raise ValueError(f"Cannot offer coins from wallet id {wallet.id()}")
-                    # For the XCH wallet also include the fee amount to the coins we use to pay this offer
+                    # For the CAC wallet also include the fee amount to the coins we use to pay this offer
                     amount_to_select = abs(amount)
                     if wallet.type() == WalletType.STANDARD_WALLET:
                         amount_to_select += fee
@@ -568,7 +568,7 @@ class TradeManager:
 
                 offer_dict_no_ints[asset_id] = amount
 
-                if asset_id is not None and wallet is not None:  # if this asset is not XCH
+                if asset_id is not None and wallet is not None:  # if this asset is not CAC
                     if callable(getattr(wallet, "get_puzzle_info", None)):
                         assert isinstance(wallet, (CATWallet, DataLayerWallet, NFTWallet))
                         puzzle_driver: PuzzleInfo = await wallet.get_puzzle_info(asset_id)
@@ -609,8 +609,8 @@ class TradeManager:
 
             all_transactions: List[TransactionRecord] = []
             fee_left_to_pay: uint64 = fee
-            # The access of the sorted keys here makes sure we create the XCH transaction first to make sure we pay fee
-            # with the XCH side of the offer and don't create an extra fee transaction in other wallets.
+            # The access of the sorted keys here makes sure we create the CAC transaction first to make sure we pay fee
+            # with the CAC side of the offer and don't create an extra fee transaction in other wallets.
             for id in sorted(coins_to_offer.keys(), key=lambda id: id != 1):
                 selected_coins = coins_to_offer[id]
                 if isinstance(id, int):
@@ -620,7 +620,7 @@ class TradeManager:
                 async with self.wallet_state_manager.new_action_scope(
                     action_scope.config.tx_config, push=False
                 ) as inner_action_scope:
-                    # This should probably not switch on whether or not we're spending XCH but it has to for now
+                    # This should probably not switch on whether or not we're spending CAC but it has to for now
                     assert wallet is not None
                     if wallet.type() == WalletType.STANDARD_WALLET:
                         assert isinstance(wallet, Wallet)

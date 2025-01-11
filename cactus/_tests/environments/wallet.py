@@ -96,7 +96,7 @@ class WalletEnvironment:
         return self.service._node.wallet_state_manager
 
     @property
-    def xch_wallet(self) -> Wallet:
+    def cac_wallet(self) -> Wallet:
         return self.service._node.wallet_state_manager.main_wallet
 
     def dealias_wallet_id(self, wallet_id_or_alias: Union[int, str]) -> uint32:

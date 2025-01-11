@@ -269,7 +269,7 @@ class VCWallet:
 
         if fee > 0:
             coin_name = vc_record.vc.coin.name()
-            await self.wallet_state_manager.main_wallet.create_tandem_xch_tx(
+            await self.wallet_state_manager.main_wallet.create_tandem_cac_tx(
                 fee,
                 action_scope,
                 extra_conditions=(AssertCoinAnnouncement(asserted_id=coin_name, asserted_msg=coin_name),),
@@ -393,7 +393,7 @@ class VCWallet:
         vc_announcement: AssertCoinAnnouncement = AssertCoinAnnouncement(asserted_id=vc.coin.name(), asserted_msg=nonce)
 
         if fee > 0:
-            await self.wallet_state_manager.main_wallet.create_tandem_xch_tx(
+            await self.wallet_state_manager.main_wallet.create_tandem_cac_tx(
                 fee, action_scope, extra_conditions=(vc_announcement,)
             )
 

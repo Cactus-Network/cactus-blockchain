@@ -640,7 +640,7 @@ async def test_datalayer_reorgs(wallet_environments: WalletTestFramework) -> Non
 
     # Define wallet aliases
     env.wallet_aliases = {
-        "xch": 1,
+        "cac": 1,
         "dl": 2,
     }
 
@@ -654,7 +654,7 @@ async def test_datalayer_reorgs(wallet_environments: WalletTestFramework) -> Non
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "unconfirmed_wallet_balance": -1,
                         "<=#spendable_balance": -1,  # any amount decrease
                         "<=#max_send_amount": -1,  # any amount decrease
@@ -664,7 +664,7 @@ async def test_datalayer_reorgs(wallet_environments: WalletTestFramework) -> Non
                     "dl": {"init": True},
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -1,
                         ">=#spendable_balance": 1,  # any amount increase
                         ">=#max_send_amount": 1,  # any amount increase
@@ -691,7 +691,7 @@ async def test_datalayer_reorgs(wallet_environments: WalletTestFramework) -> Non
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": 1,  # confirmed balance comes back
                         "<=#spendable_balance": -1,  # any amount decrease
                         "<=#max_send_amount": -1,  # any amount decrease
@@ -701,7 +701,7 @@ async def test_datalayer_reorgs(wallet_environments: WalletTestFramework) -> Non
                     "dl": {"unspent_coin_count": -1},
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "confirmed_wallet_balance": -1,
                         ">=#spendable_balance": 1,  # any amount increase
                         ">=#max_send_amount": 1,  # any amount increase
@@ -722,11 +722,11 @@ async def test_datalayer_reorgs(wallet_environments: WalletTestFramework) -> Non
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {},
+                    "cac": {},
                     "dl": {"pending_coin_removal_count": 1},
                 },
                 post_block_balance_updates={
-                    "xch": {},
+                    "cac": {},
                     "dl": {"pending_coin_removal_count": -1},
                 },
             )
@@ -747,11 +747,11 @@ async def test_datalayer_reorgs(wallet_environments: WalletTestFramework) -> Non
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {},
+                    "cac": {},
                     "dl": {"pending_coin_removal_count": 1},
                 },
                 post_block_balance_updates={
-                    "xch": {},
+                    "cac": {},
                     "dl": {"pending_coin_removal_count": -1},
                 },
             )
@@ -765,7 +765,7 @@ async def test_datalayer_reorgs(wallet_environments: WalletTestFramework) -> Non
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "<=#spendable_balance": -1,  # any amount decrease
                         "<=#max_send_amount": -1,  # any amount decrease
                         ">=#pending_change": 1,  # any amount increase
@@ -774,7 +774,7 @@ async def test_datalayer_reorgs(wallet_environments: WalletTestFramework) -> Non
                     "dl": {},
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         ">=#spendable_balance": 1,  # any amount increase
                         ">=#max_send_amount": 1,  # any amount increase
                         "<=#pending_change": -1,  # any amount decrease
@@ -800,7 +800,7 @@ async def test_datalayer_reorgs(wallet_environments: WalletTestFramework) -> Non
         [
             WalletStateTransition(
                 pre_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         "<=#spendable_balance": -1,  # any amount decrease
                         "<=#max_send_amount": -1,  # any amount decrease
                         ">=#pending_change": 1,  # any amount increase
@@ -809,7 +809,7 @@ async def test_datalayer_reorgs(wallet_environments: WalletTestFramework) -> Non
                     "dl": {"unspent_coin_count": -1},
                 },
                 post_block_balance_updates={
-                    "xch": {
+                    "cac": {
                         ">=#spendable_balance": 1,  # any amount increase
                         ">=#max_send_amount": 1,  # any amount increase
                         "<=#pending_change": -1,  # any amount decrease

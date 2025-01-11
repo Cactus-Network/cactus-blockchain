@@ -368,7 +368,7 @@ class DataLayerWallet:
 
         return launcher_coin.name()
 
-    async def create_tandem_xch_tx(
+    async def create_tandem_cac_tx(
         self,
         fee: uint64,
         announcement_to_assert: AssertAnnouncement,
@@ -586,7 +586,7 @@ class DataLayerWallet:
         )
         assert dl_tx.spend_bundle is not None
         if fee > 0:
-            await self.create_tandem_xch_tx(
+            await self.create_tandem_cac_tx(
                 fee,
                 AssertAnnouncement(True, asserted_origin_id=current_coin.name(), asserted_msg=b"$"),
                 action_scope,

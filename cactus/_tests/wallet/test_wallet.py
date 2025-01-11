@@ -71,7 +71,7 @@ class TestWalletSimulator:
     @pytest.mark.anyio
     async def test_wallet_make_transaction(self, wallet_environments: WalletTestFramework) -> None:
         env = wallet_environments.environments[0]
-        wallet = env.xch_wallet
+        wallet = env.cac_wallet
 
         tx_amount = 10
 
@@ -124,7 +124,7 @@ class TestWalletSimulator:
     @pytest.mark.anyio
     async def test_wallet_reuse_address(self, wallet_environments: WalletTestFramework) -> None:
         env = wallet_environments.environments[0]
-        wallet = env.xch_wallet
+        wallet = env.cac_wallet
 
         tx_amount = 10
 
@@ -182,8 +182,8 @@ class TestWalletSimulator:
     ) -> None:
         env = wallet_environments.environments[0]
         env_1 = wallet_environments.environments[1]
-        wallet = env.xch_wallet
-        wallet_1 = env_1.xch_wallet
+        wallet = env.cac_wallet
+        wallet_1 = env_1.cac_wallet
         wsm = env.wallet_state_manager
         wsm_1 = env_1.wallet_state_manager
 
@@ -332,8 +332,8 @@ class TestWalletSimulator:
         env_2 = wallet_environments.environments[1]
         wsm = env.wallet_state_manager
         wsm_2 = env_2.wallet_state_manager
-        wallet = env.xch_wallet
-        wallet_1 = env_2.xch_wallet
+        wallet = env.cac_wallet
+        wallet_1 = env_2.cac_wallet
         api_0 = env.rpc_api
         api_1 = env_2.rpc_api
 
@@ -476,7 +476,7 @@ class TestWalletSimulator:
     async def test_wallet_clawback_sent_self(self, wallet_environments: WalletTestFramework) -> None:
         env = wallet_environments.environments[0]
         wsm = env.wallet_state_manager
-        wallet = env.xch_wallet
+        wallet = env.cac_wallet
         api_0 = env.rpc_api
 
         tx_amount = 500
@@ -591,8 +591,8 @@ class TestWalletSimulator:
         env_2 = wallet_environments.environments[1]
         wsm = env.wallet_state_manager
         wsm_2 = env_2.wallet_state_manager
-        wallet = env.xch_wallet
-        wallet_1 = env_2.xch_wallet
+        wallet = env.cac_wallet
+        wallet_1 = env_2.cac_wallet
         api_0 = env.rpc_api
         api_1 = env_2.rpc_api
 
@@ -725,8 +725,8 @@ class TestWalletSimulator:
         env_2 = wallet_environments.environments[1]
         wsm = env.wallet_state_manager
         wsm_2 = env_2.wallet_state_manager
-        wallet = env.xch_wallet
-        wallet_1 = env_2.xch_wallet
+        wallet = env.cac_wallet
+        wallet_1 = env_2.cac_wallet
 
         tx_amount = 500
         normal_puzhash = await wallet_1.get_new_puzzlehash()
@@ -909,7 +909,7 @@ class TestWalletSimulator:
     async def test_get_clawback_coins(self, wallet_environments: WalletTestFramework) -> None:
         env = wallet_environments.environments[0]
         wsm = env.wallet_state_manager
-        wallet = env.xch_wallet
+        wallet = env.cac_wallet
 
         tx_amount = 500
         # Transfer to normal wallet
@@ -973,8 +973,8 @@ class TestWalletSimulator:
         env_2 = wallet_environments.environments[1]
         wsm_1 = env_1.wallet_state_manager
         wsm_2 = env_2.wallet_state_manager
-        wallet_1 = env_1.xch_wallet
-        wallet_2 = env_2.xch_wallet
+        wallet_1 = env_1.cac_wallet
+        wallet_2 = env_2.cac_wallet
         api_1 = env_1.rpc_api
 
         wallet_1_puzhash = await wallet_1.get_new_puzzlehash()
@@ -1215,7 +1215,7 @@ class TestWalletSimulator:
     async def test_wallet_coinbase_reorg(self, wallet_environments: WalletTestFramework) -> None:
         full_node_api = wallet_environments.full_node
         env = wallet_environments.environments[0]
-        wallet = env.xch_wallet
+        wallet = env.cac_wallet
 
         peak = full_node_api.full_node.blockchain.get_peak()
         assert peak is not None
@@ -1329,8 +1329,8 @@ class TestWalletSimulator:
     async def test_wallet_make_transaction_hop(self, wallet_environments: WalletTestFramework) -> None:
         env_0 = wallet_environments.environments[0]
         env_1 = wallet_environments.environments[1]
-        wallet_0 = env_0.xch_wallet
-        wallet_1 = env_1.xch_wallet
+        wallet_0 = env_0.cac_wallet
+        wallet_1 = env_1.cac_wallet
 
         tx_amount = 10
         async with wallet_0.wallet_state_manager.new_action_scope(DEFAULT_TX_CONFIG, push=True) as action_scope:
@@ -1431,8 +1431,8 @@ class TestWalletSimulator:
     async def test_wallet_make_transaction_with_fee(self, wallet_environments: WalletTestFramework) -> None:
         env_0 = wallet_environments.environments[0]
         env_1 = wallet_environments.environments[1]
-        wallet_0 = env_0.xch_wallet
-        wallet_1 = env_1.xch_wallet
+        wallet_0 = env_0.cac_wallet
+        wallet_1 = env_1.cac_wallet
 
         tx_amount = 1_750_000_000_000  # ensures we grab both coins
         tx_fee = 10
@@ -1497,8 +1497,8 @@ class TestWalletSimulator:
     async def test_wallet_make_transaction_with_memo(self, wallet_environments: WalletTestFramework) -> None:
         env_0 = wallet_environments.environments[0]
         env_1 = wallet_environments.environments[1]
-        wallet_0 = env_0.xch_wallet
-        wallet_1 = env_1.xch_wallet
+        wallet_0 = env_0.cac_wallet
+        wallet_1 = env_1.cac_wallet
 
         tx_amount = 1_750_000_000_000  # ensures we grab both coins
         tx_fee = 10
@@ -1577,7 +1577,7 @@ class TestWalletSimulator:
     @pytest.mark.anyio
     async def test_wallet_create_hit_max_send_amount(self, wallet_environments: WalletTestFramework) -> None:
         env = wallet_environments.environments[0]
-        wallet = env.xch_wallet
+        wallet = env.cac_wallet
 
         ph = await wallet.get_puzzle_hash(False)
         primaries = [Payment(ph, uint64(1000000000 + i)) for i in range(int(wallet.max_send_quantity) + 1)]
@@ -1659,7 +1659,7 @@ class TestWalletSimulator:
     @pytest.mark.anyio
     async def test_wallet_prevent_fee_theft(self, wallet_environments: WalletTestFramework) -> None:
         env = wallet_environments.environments[0]
-        wallet = env.xch_wallet
+        wallet = env.cac_wallet
 
         tx_amount = 1_750_000_000_000
         tx_fee = 2_000_000_000_000
@@ -1724,8 +1724,8 @@ class TestWalletSimulator:
         env = wallet_environments.environments[0]
         env_2 = wallet_environments.environments[1]
         wsm = env.wallet_state_manager
-        wallet = env.xch_wallet
-        wallet_2 = env_2.xch_wallet
+        wallet = env.cac_wallet
+        wallet_2 = env_2.cac_wallet
 
         # Ensure that we use a coin that we will not reorg out
         tx_amount = 1000
@@ -1879,7 +1879,7 @@ class TestWalletSimulator:
     async def test_address_sliding_window(self, wallet_environments: WalletTestFramework) -> None:
         full_node_api = wallet_environments.full_node
         env = wallet_environments.environments[0]
-        wallet = env.xch_wallet
+        wallet = env.cac_wallet
 
         peak = full_node_api.full_node.blockchain.get_peak_height()
         assert peak is not None
@@ -1969,8 +1969,8 @@ class TestWalletSimulator:
 
         # Test general string
         message = "Hello World"
-        ph = await env.xch_wallet.get_puzzle_hash(False)
-        response = await api_0.sign_message_by_address({"address": encode_puzzle_hash(ph, "xch"), "message": message})
+        ph = await env.cac_wallet.get_puzzle_hash(False)
+        response = await api_0.sign_message_by_address({"address": encode_puzzle_hash(ph, "cac"), "message": message})
         puzzle: Program = Program.to((CHIP_0002_SIGN_MESSAGE_PREFIX, message))
 
         assert AugSchemeMPL.verify(
@@ -1981,7 +1981,7 @@ class TestWalletSimulator:
         # Test hex string
         message = "0123456789ABCDEF"
         response = await api_0.sign_message_by_address(
-            {"address": encode_puzzle_hash(ph, "xch"), "message": message, "is_hex": True}
+            {"address": encode_puzzle_hash(ph, "cac"), "message": message, "is_hex": True}
         )
         puzzle = Program.to((CHIP_0002_SIGN_MESSAGE_PREFIX, bytes.fromhex(message)))
 
@@ -1993,7 +1993,7 @@ class TestWalletSimulator:
         # Test informal input
         message = "0123456789ABCDEF"
         response = await api_0.sign_message_by_address(
-            {"address": encode_puzzle_hash(ph, "xch"), "message": message, "is_hex": "true", "safe_mode": "true"}
+            {"address": encode_puzzle_hash(ph, "cac"), "message": message, "is_hex": "true", "safe_mode": "true"}
         )
         puzzle = Program.to((CHIP_0002_SIGN_MESSAGE_PREFIX, bytes.fromhex(message)))
 
@@ -2005,7 +2005,7 @@ class TestWalletSimulator:
         # Test BLS sign string
         message = "Hello World"
         response = await api_0.sign_message_by_address(
-            {"address": encode_puzzle_hash(ph, "xch"), "message": message, "is_hex": False, "safe_mode": False}
+            {"address": encode_puzzle_hash(ph, "cac"), "message": message, "is_hex": False, "safe_mode": False}
         )
 
         assert AugSchemeMPL.verify(
@@ -2016,7 +2016,7 @@ class TestWalletSimulator:
         # Test BLS sign hex
         message = "0123456789ABCDEF"
         response = await api_0.sign_message_by_address(
-            {"address": encode_puzzle_hash(ph, "xch"), "message": message, "is_hex": True, "safe_mode": False}
+            {"address": encode_puzzle_hash(ph, "cac"), "message": message, "is_hex": True, "safe_mode": False}
         )
 
         assert AugSchemeMPL.verify(
@@ -2034,7 +2034,7 @@ class TestWalletSimulator:
     @pytest.mark.anyio
     async def test_wallet_transaction_options(self, wallet_environments: WalletTestFramework) -> None:
         env = wallet_environments.environments[0]
-        wallet = env.xch_wallet
+        wallet = env.cac_wallet
 
         AMOUNT_TO_SEND = 4000000000000
         async with wallet.wallet_state_manager.new_action_scope(DEFAULT_TX_CONFIG, push=True) as action_scope:

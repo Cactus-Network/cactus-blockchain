@@ -303,7 +303,7 @@ async def test_default_transfer_program(cost_logger: CostLogger) -> None:
         cat_coin = (
             await sim_client.get_coin_records_by_puzzle_hash(FAKE_CAT.get_tree_hash(), include_spent_coins=False)
         )[0].coin
-        xch_coin = (await sim_client.get_coin_records_by_puzzle_hash(ACS_PH, include_spent_coins=False))[0].coin
+        cac_coin = (await sim_client.get_coin_records_by_puzzle_hash(ACS_PH, include_spent_coins=False))[0].coin
 
         ownership_spend = make_spend(
             ownership_coin,
@@ -322,8 +322,8 @@ async def test_default_transfer_program(cost_logger: CostLogger) -> None:
         expected_announcement_data = Program.to(
             (FAKE_LAUNCHER_ID, [[ROYALTY_ADDRESS, 50, [ROYALTY_ADDRESS]]])
         ).get_tree_hash()
-        xch_announcement_spend = make_spend(
-            xch_coin,
+        cac_announcement_spend = make_spend(
+            cac_coin,
             ACS,
             Program.to([[62, expected_announcement_data]]),
         )
@@ -333,7 +333,7 @@ async def test_default_transfer_program(cost_logger: CostLogger) -> None:
         # Make sure every combo except all of them fail
         for i in range(1, 3):
             for announcement_combo in itertools.combinations(
-                [did_announcement_spend, xch_announcement_spend, cat_announcement_spend], i
+                [did_announcement_spend, cac_announcement_spend, cat_announcement_spend], i
             ):
                 result = await sim_client.push_tx(
                     WalletSpendBundle([ownership_spend, *announcement_combo], G2Element())
@@ -342,9 +342,9 @@ async def test_default_transfer_program(cost_logger: CostLogger) -> None:
 
         # Make sure all of them together pass
         full_bundle = cost_logger.add_cost(
-            "Ownership only coin (default NFT1 TP) - one child created + update DID + offer CATs + offer XCH",
+            "Ownership only coin (default NFT1 TP) - one child created + update DID + offer CATs + offer CAC",
             WalletSpendBundle(
-                [ownership_spend, did_announcement_spend, xch_announcement_spend, cat_announcement_spend], G2Element()
+                [ownership_spend, did_announcement_spend, cac_announcement_spend, cat_announcement_spend], G2Element()
             ),
         )
         result = await sim_client.push_tx(full_bundle)

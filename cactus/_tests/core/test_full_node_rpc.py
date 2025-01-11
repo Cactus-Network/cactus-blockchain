@@ -574,7 +574,7 @@ async def test_get_network_info(one_wallet_and_one_simulator_services, self_host
         network_info = await client.fetch("get_network_info", {})
         assert network_info == {
             "network_name": "testnet0",
-            "network_prefix": "txch",
+            "network_prefix": "tcac",
             "genesis_challenge": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             "success": True,
         }

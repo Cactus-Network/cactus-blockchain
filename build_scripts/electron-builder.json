@@ -11,8 +11,8 @@
       "schemes": ["cactus"]
     },
     {
-      "name": "Cactus XCH Address",
-      "schemes": ["xch"]
+      "name": "Cactus CAC Address",
+      "schemes": ["cac"]
     }
   ],
   "win": {

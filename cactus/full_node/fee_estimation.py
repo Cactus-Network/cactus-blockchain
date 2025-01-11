@@ -32,7 +32,7 @@ class MempoolInfo:
     Information from the Mempool needed to estimate fees.
     This information is constant during the lifetime of the FullNode process
     Attributes:
-        max_size_in_cost (uint64): This is the maximum capacity of the mempool, measured in XCH per CLVM Cost
+        max_size_in_cost (uint64): This is the maximum capacity of the mempool, measured in CAC per CLVM Cost
         minimum_fee_per_cost_to_replace (uint64): Smallest FPC that  might be accepted to replace another SpendBundle
         max_block_clvm_cost (uint64): Max allowed cost of a farmed block
     """
@@ -51,7 +51,7 @@ class FeeMempoolInfo:
 
     Attributes:
         mempool_info (MempoolInfo): A `MempoolInfo`, defined above. Parameters of our mempool.
-        current_mempool_cost (uint64):This is the current capacity of the mempool, measured in XCH per CLVM Cost
+        current_mempool_cost (uint64):This is the current capacity of the mempool, measured in CAC per CLVM Cost
         current_mempool_fees (int): Sum of fees for all spends waiting in the Mempool
         time (datetime): Local time this sample was taken
 

@@ -993,7 +993,7 @@ class WalletStateManager:
                     derivation_record = await self.puzzle_store.get_derivation_record_for_puzzle_hash(sender_puzhash)
                 assert derivation_record is not None
                 amount = uint64(amount + coin.amount)
-                # Remove the clawback hint since it is unnecessary for the XCH coin
+                # Remove the clawback hint since it is unnecessary for the CAC coin
                 memos: List[bytes] = [] if len(incoming_tx.memos) == 0 else incoming_tx.memos[0][1][1:]
                 inner_puzzle: Program = self.main_wallet.puzzle_for_pk(derivation_record.pubkey)
                 inner_solution: Program = self.main_wallet.make_solution(
@@ -1021,7 +1021,7 @@ class WalletStateManager:
         spend_bundle = WalletSpendBundle(coin_spends, G2Element())
         if fee > 0:
             async with self.new_action_scope(action_scope.config.tx_config, push=False) as inner_action_scope:
-                await self.main_wallet.create_tandem_xch_tx(
+                await self.main_wallet.create_tandem_cac_tx(
                     fee,
                     inner_action_scope,
                     extra_conditions=(
@@ -1069,14 +1069,14 @@ class WalletStateManager:
             interface.side_effects.transactions.append(tx_record)
 
     async def filter_spam(self, new_coin_state: List[CoinState]) -> List[CoinState]:
-        xch_spam_amount = self.config.get("xch_spam_amount", 1000000)
+        cac_spam_amount = self.config.get("cac_spam_amount", 1000000)
 
         # No need to filter anything if the filter is set to 1 or 0 mojos
-        if xch_spam_amount <= 1:
+        if cac_spam_amount <= 1:
             return new_coin_state
 
         spam_filter_after_n_txs = self.config.get("spam_filter_after_n_txs", 200)
-        small_unspent_count = await self.coin_store.count_small_unspent(xch_spam_amount)
+        small_unspent_count = await self.coin_store.count_small_unspent(cac_spam_amount)
 
         # if small_unspent_count > spam_filter_after_n_txs:
         filtered_cs: List[CoinState] = []
@@ -1087,7 +1087,7 @@ class WalletStateManager:
             if (
                 cs.created_height is not None
                 and cs.spent_height is None
-                and cs.coin.amount < xch_spam_amount
+                and cs.coin.amount < cac_spam_amount
                 and (cs.coin.puzzle_hash in is_standard_wallet_phs or await self.is_standard_wallet_tx(cs))
             ):
                 is_standard_wallet_phs.add(cs.coin.puzzle_hash)

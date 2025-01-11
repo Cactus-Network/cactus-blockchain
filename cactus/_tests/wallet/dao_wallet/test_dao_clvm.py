@@ -609,7 +609,7 @@ def test_spend_p2_singleton() -> None:
     ]
 
     # Solution Values
-    xch_parent_amt_list = [[b"x" * 32, 10], [b"y" * 32, 100]]
+    cac_parent_amt_list = [[b"x" * 32, 10], [b"y" * 32, 100]]
     cat_parent_amt_list = [
         [cat_tail_1, [["b" * 32, 100], [b"c" * 32, 400]]],
         [cat_tail_2, [[b"e" * 32, 100], [b"f" * 32, 400]]],
@@ -623,7 +623,7 @@ def test_spend_p2_singleton() -> None:
     )
 
     # Solution
-    spend_p2_sol = Program.to([xch_parent_amt_list, cat_parent_amt_list, treasury_inner_puzhash])
+    spend_p2_sol = Program.to([cac_parent_amt_list, cat_parent_amt_list, treasury_inner_puzhash])
 
     conds = spend_p2_puz.run(spend_p2_sol)
     assert conds
@@ -634,7 +634,7 @@ def test_spend_p2_singleton() -> None:
         [cat_tail_1, [[51, b"q" * 32, 123], [51, b"w" * 32, 321]]],
         [cat_tail_2, [[51, b"e" * 32, 123], [51, b"r" * 32, 321]]],
     ]
-    xch_parent_amt_list = []
+    cac_parent_amt_list = []
     cat_parent_amt_list = [
         [cat_tail_1, [[b"b" * 32, 100], [b"c" * 32, 400]]],
         [cat_tail_2, [[b"e" * 32, 100], [b"f" * 32, 400]]],
@@ -647,7 +647,7 @@ def test_spend_p2_singleton() -> None:
     )
 
     # Solution
-    spend_p2_sol = Program.to([xch_parent_amt_list, cat_parent_amt_list, treasury_inner_puzhash])
+    spend_p2_sol = Program.to([cac_parent_amt_list, cat_parent_amt_list, treasury_inner_puzhash])
     conds = spend_p2_puz.run(spend_p2_sol)
     assert conds
 
@@ -657,7 +657,7 @@ def test_spend_p2_singleton() -> None:
         [cat_tail_2, [[b"e" * 32, 100], [b"f" * 32, 400], [b"f" * 32, 400], [b"e" * 32, 100]]],
     ]
 
-    spend_p2_sol = Program.to([xch_parent_amt_list, cat_parent_amt_list, treasury_inner_puzhash])
+    spend_p2_sol = Program.to([cac_parent_amt_list, cat_parent_amt_list, treasury_inner_puzhash])
     dupe_conds = spend_p2_puz.run(spend_p2_sol)
     assert dupe_conds == conds
 

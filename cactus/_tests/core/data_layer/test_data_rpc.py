@@ -2159,7 +2159,7 @@ async def test_issue_15955_deadlock(
     bt.change_config(new_config=config)
 
     async with init_data_layer(wallet_rpc_port=wallet_rpc_port, bt=bt, db_path=tmp_path) as data_layer:
-        # get some xch
+        # get some cac
         await full_node_api.farm_blocks_to_wallet(count=1, wallet=wallet)
         await full_node_api.wait_for_wallet_synced(wallet_node)
 

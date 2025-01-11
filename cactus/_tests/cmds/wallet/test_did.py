@@ -92,7 +92,7 @@ def test_did_sign_message(capsys: object, get_test_cli_clients: Tuple[TestRpcCli
     ]
     run_cli_command_and_assert(capsys, root_dir, command_args + [f"-i{did_id}"], assert_list)
     expected_calls: logType = {
-        "sign_message_by_id": [(did_id, message.hex())],  # xch std
+        "sign_message_by_id": [(did_id, message.hex())],  # cac std
     }
     test_rpc_clients.wallet_rpc_client.check_log(expected_calls)
 
@@ -153,7 +153,7 @@ def test_did_get_details(capsys: object, get_test_cli_clients: Tuple[TestRpcClie
             response = {
                 "did_id": encode_puzzle_hash(get_bytes32(2), "did:cactus:"),
                 "latest_coin": get_bytes32(3).hex(),
-                "p2_address": encode_puzzle_hash(get_bytes32(4), "xch"),
+                "p2_address": encode_puzzle_hash(get_bytes32(4), "cac"),
                 "public_key": bytes48([5] * 48).hex(),
                 "launcher_id": get_bytes32(6).hex(),
                 "metadata": "did metadata",
@@ -173,7 +173,7 @@ def test_did_get_details(capsys: object, get_test_cli_clients: Tuple[TestRpcClie
     assert_list = [
         f"DID:                    {encode_puzzle_hash(get_bytes32(2), 'did:cactus:')}",
         f"Coin ID:                {get_bytes32(3).hex()}",
-        "Inner P2 Address:       xch1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqkxck8d",
+        "Inner P2 Address:       cac1qszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqgpqyqszqkxck8d",
         f"Public Key:             {bytes48([5] * 48).hex()}",
         f"Launcher ID:            {get_bytes32(6).hex()}",
         "DID Metadata:           did metadata",
@@ -360,7 +360,7 @@ def test_did_transfer(capsys: object, get_test_cli_clients: Tuple[TestRpcClients
     inst_rpc_client = DidTransferRpcClient()  # pylint: disable=no-value-for-parameter
     test_rpc_clients.wallet_rpc_client = inst_rpc_client
     w_id = 3
-    t_address = encode_puzzle_hash(get_bytes32(1), "xch")
+    t_address = encode_puzzle_hash(get_bytes32(1), "cac")
     command_args = [
         "wallet",
         "did",

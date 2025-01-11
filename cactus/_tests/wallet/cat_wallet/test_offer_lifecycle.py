@@ -43,7 +43,7 @@ def str_to_cat_hash(tail_str: str) -> bytes32:
     return construct_cat_puzzle(CAT_MOD, str_to_tail_hash(tail_str), acs).get_tree_hash()
 
 
-# This method takes a dictionary of strings mapping to amounts and generates the appropriate CAT/XCH coins
+# This method takes a dictionary of strings mapping to amounts and generates the appropriate CAT/CAC coins
 async def generate_coins(
     sim: SpendSim, sim_client: SimClient, requested_coins: Dict[Optional[str], List[int]]
 ) -> Dict[Optional[str], List[Coin]]:
@@ -177,7 +177,7 @@ async def test_complex_offer(cost_logger: CostLogger) -> None:
         }
         driver_dict_as_infos = {key.hex(): value.info for key, value in driver_dict.items()}
 
-        # Create an XCH Offer for RED
+        # Create an CAC Offer for RED
         cactus_requested_payments: Dict[Optional[bytes32], List[Payment]] = {
             str_to_tail_hash("red"): [Payment(acs_ph, uint64(100), [b"memo"]), Payment(acs_ph, uint64(200), [b"memo"])]
         }
@@ -187,7 +187,7 @@ async def test_complex_offer(cost_logger: CostLogger) -> None:
         cactus_offer = Offer(cactus_notarized_payments, cactus_secured_bundle, driver_dict)
         assert not cactus_offer.is_valid()
 
-        # Create a RED Offer for XCH
+        # Create a RED Offer for CAC
         red_coins_1 = red_coins[0:1]
         red_coins_2 = red_coins[1:]
         red_requested_payments: Dict[Optional[bytes32], List[Payment]] = {
@@ -218,7 +218,7 @@ async def test_complex_offer(cost_logger: CostLogger) -> None:
         assert new_offer.get_requested_amounts() == {None: 700, str_to_tail_hash("red"): 300}
         assert new_offer.is_valid()
 
-        # Create yet another offer of BLUE for XCH and RED
+        # Create yet another offer of BLUE for CAC and RED
         blue_requested_payments: Dict[Optional[bytes32], List[Payment]] = {
             None: [Payment(acs_ph, uint64(200), [b"blue memo"])],
             str_to_tail_hash("red"): [Payment(acs_ph, uint64(50), [b"blue memo"])],
@@ -238,13 +238,13 @@ async def test_complex_offer(cost_logger: CostLogger) -> None:
         }
         assert new_offer.get_requested_amounts() == {None: 900, str_to_tail_hash("red"): 350}
         assert new_offer.summary() == (
-            {"xch": 1000, str_to_tail_hash("red").hex(): 350, str_to_tail_hash("blue").hex(): 2000},
-            {"xch": 900, str_to_tail_hash("red").hex(): 350},
+            {"cac": 1000, str_to_tail_hash("red").hex(): 350, str_to_tail_hash("blue").hex(): 2000},
+            {"cac": 900, str_to_tail_hash("red").hex(): 350},
             driver_dict_as_infos,
             ConditionValidTimes(),
         )
         assert new_offer.get_pending_amounts() == {
-            "xch": 1200,
+            "cac": 1200,
             str_to_tail_hash("red").hex(): 350,
             str_to_tail_hash("blue").hex(): 3000,
         }

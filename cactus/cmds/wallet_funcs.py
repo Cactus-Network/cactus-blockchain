@@ -472,7 +472,7 @@ async def make_offer(
                                         },
                                     }
                                     royalty_asset_dict[name] = (
-                                        encode_puzzle_hash(info.royalty_puzzle_hash, AddressType.XCH.hrp(config)),
+                                        encode_puzzle_hash(info.royalty_puzzle_hash, AddressType.CAC.hrp(config)),
                                         info.royalty_percentage,
                                     )
                         else:
@@ -482,7 +482,7 @@ async def make_offer(
                     except ValueError:
                         id = uint32(int(name))
                         if id == 1:
-                            name = "XCH"
+                            name = "CAC"
                             unit = units["cactus"]
                         else:
                             name = await wallet_client.get_cat_name(id)
@@ -513,7 +513,7 @@ async def make_offer(
 
                 if fee > 0:
                     print()
-                    print(f"Including Fees: {Decimal(fee) / units['cactus']} XCH, {fee} mojos")
+                    print(f"Including Fees: {Decimal(fee) / units['cactus']} CAC, {fee} mojos")
 
                 if royalty_asset_dict != {}:
                     royalty_summary: Dict[Any, List[Dict[str, Any]]] = await wallet_client.nft_calculate_royalties(
@@ -525,7 +525,7 @@ async def make_offer(
                     for nft_id, summaries in royalty_summary.items():
                         print(f"  - For {nft_id}:")
                         for summary in summaries:
-                            divisor = units["cactus"] if summary["asset"] == "XCH" else units["cat"]
+                            divisor = units["cactus"] if summary["asset"] == "CAC" else units["cat"]
                             converted_amount = Decimal(summary["amount"]) / divisor
                             total_amounts_requested.setdefault(summary["asset"], fungible_asset_dict[summary["asset"]])
                             total_amounts_requested[summary["asset"]] += summary["amount"]
@@ -536,7 +536,7 @@ async def make_offer(
                     print()
                     print("Total Amounts Offered:")
                     for asset, requested_amount in total_amounts_requested.items():
-                        divisor = units["cactus"] if asset == "XCH" else units["cat"]
+                        divisor = units["cactus"] if asset == "CAC" else units["cat"]
                         converted_amount = Decimal(requested_amount) / divisor
                         print(f"  - {converted_amount} {asset} ({requested_amount} mojos)")
 
@@ -574,15 +574,15 @@ def timestamp_to_time(timestamp: int) -> str:
 
 
 async def print_offer_summary(
-    cat_name_resolver: CATNameResolver, sum_dict: Dict[str, int], has_fee: bool = False, network_xch: str = "XCH"
+    cat_name_resolver: CATNameResolver, sum_dict: Dict[str, int], has_fee: bool = False, network_cac: str = "CAC"
 ) -> None:
     for asset_id, amount in sum_dict.items():
         description: str = ""
         unit: int = units["cactus"]
-        wid: str = "1" if asset_id == "xch" else ""
+        wid: str = "1" if asset_id == "cac" else ""
         mojo_amount: int = int(Decimal(amount))
-        name: str = network_xch
-        if asset_id != "xch":
+        name: str = network_cac
+        if asset_id != "cac":
             name = asset_id
             if asset_id == "unknown":
                 name = "Unknown"
@@ -634,7 +634,7 @@ async def print_trade_record(record: TradeRecord, wallet_client: WalletRpcClient
         await print_offer_summary(cat_name_resolver, requested)
         print("Pending Outbound Balances:")
         await print_offer_summary(cat_name_resolver, outbound_balances, has_fee=(fees > 0))
-        print(f"Included Fees: {fees / units['cactus']} XCH, {fees} mojos")
+        print(f"Included Fees: {fees / units['cactus']} CAC, {fees} mojos")
         print("Timelock information:")
         if record.valid_times.min_time is not None:
             print("  - Not valid until " f"{format_timestamp_with_timezone(record.valid_times.min_time)}")
@@ -723,12 +723,12 @@ async def take_offer(
 
         offered, requested, _, _ = offer.summary()
         cat_name_resolver = wallet_client.cat_asset_id_to_name
-        network_xch = AddressType.XCH.hrp(config).upper()
+        network_cac = AddressType.CAC.hrp(config).upper()
         print("Summary:")
         print("  OFFERED:")
-        await print_offer_summary(cat_name_resolver, offered, network_xch=network_xch)
+        await print_offer_summary(cat_name_resolver, offered, network_cac=network_cac)
         print("  REQUESTED:")
-        await print_offer_summary(cat_name_resolver, requested, network_xch=network_xch)
+        await print_offer_summary(cat_name_resolver, requested, network_cac=network_cac)
 
         print()
 
@@ -737,18 +737,18 @@ async def take_offer(
             if royalty_asset_id.hex() in offered:
                 percentage, address = await get_nft_royalty_percentage_and_address(royalty_asset_id, wallet_client)
                 royalty_asset_dict[encode_puzzle_hash(royalty_asset_id, AddressType.NFT.hrp(config))] = (
-                    encode_puzzle_hash(address, AddressType.XCH.hrp(config)),
+                    encode_puzzle_hash(address, AddressType.CAC.hrp(config)),
                     percentage,
                 )
 
         if royalty_asset_dict != {}:
             fungible_asset_dict: Dict[Any, uint64] = {}
             for fungible_asset_id in fungible_assets_from_offer(offer):
-                fungible_asset_id_str = fungible_asset_id.hex() if fungible_asset_id is not None else "xch"
+                fungible_asset_id_str = fungible_asset_id.hex() if fungible_asset_id is not None else "cac"
                 if fungible_asset_id_str in requested:
                     nft_royalty_currency: str = "Unknown CAT"
                     if fungible_asset_id is None:
-                        nft_royalty_currency = network_xch
+                        nft_royalty_currency = network_cac
                     else:
                         result = await wallet_client.cat_asset_id_to_name(fungible_asset_id)
                         if result is not None:
@@ -764,7 +764,7 @@ async def take_offer(
                 for nft_id, summaries in royalty_summary.items():
                     print(f"  - For {nft_id}:")
                     for summary in summaries:
-                        divisor = units["cactus"] if summary["asset"] == network_xch else units["cat"]
+                        divisor = units["cactus"] if summary["asset"] == network_cac else units["cat"]
                         converted_amount = Decimal(summary["amount"]) / divisor
                         total_amounts_requested.setdefault(summary["asset"], fungible_asset_dict[summary["asset"]])
                         total_amounts_requested[summary["asset"]] += summary["amount"]
@@ -775,11 +775,11 @@ async def take_offer(
                 print()
                 print("Total Amounts Requested:")
                 for asset, amount in total_amounts_requested.items():
-                    divisor = units["cactus"] if asset == network_xch else units["cat"]
+                    divisor = units["cactus"] if asset == network_cac else units["cat"]
                     converted_amount = Decimal(amount) / divisor
                     print(f"  - {converted_amount} {asset} ({amount} mojos)")
 
-        print(f"Included Fees: {Decimal(offer.fees()) / units['cactus']} {network_xch}, {offer.fees()} mojos")
+        print(f"Included Fees: {Decimal(offer.fees()) / units['cactus']} {network_cac}, {offer.fees()} mojos")
 
         if not examine_only:
             print()
@@ -1156,8 +1156,8 @@ async def mint_nft(
     condition_valid_times: ConditionValidTimes,
 ) -> List[TransactionRecord]:
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
-        royalty_address = royalty_cli_address.validate_address_type(AddressType.XCH) if royalty_cli_address else None
-        target_address = target_cli_address.validate_address_type(AddressType.XCH) if target_cli_address else None
+        royalty_address = royalty_cli_address.validate_address_type(AddressType.CAC) if royalty_cli_address else None
+        target_address = target_cli_address.validate_address_type(AddressType.CAC) if target_cli_address else None
         try:
             response = await wallet_client.get_nft_wallet_did(wallet_id)
             wallet_did = response["did_id"]
@@ -1267,7 +1267,7 @@ async def transfer_nft(
 ) -> List[TransactionRecord]:
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
         try:
-            target_address = target_cli_address.validate_address_type(AddressType.XCH)
+            target_address = target_cli_address.validate_address_type(AddressType.CAC)
             response = await wallet_client.transfer_nft(
                 wallet_id,
                 nft_coin_id,
@@ -1512,9 +1512,9 @@ async def sign_message(
     nft_id: Optional[CliAddress] = None,
 ) -> None:
     async with get_wallet_client(wallet_rpc_port, fp) as (wallet_client, fingerprint, config):
-        if addr_type == AddressType.XCH:
+        if addr_type == AddressType.CAC:
             if address is None:
-                print("Address is required for XCH address type.")
+                print("Address is required for CAC address type.")
                 return
             pubkey, signature, signing_mode = await wallet_client.sign_message_by_address(
                 address.original_address, message
@@ -1583,7 +1583,7 @@ async def mint_vc(
         res = await wallet_client.vc_mint(
             did.validate_address_type_get_ph(AddressType.DID),
             CMDTXConfigLoader().to_tx_config(units["cactus"], config, fingerprint),
-            target_address.validate_address_type_get_ph(AddressType.XCH) if target_address else None,
+            target_address.validate_address_type_get_ph(AddressType.CAC) if target_address else None,
             fee,
             push=push,
             timelock_info=condition_valid_times,
@@ -1597,7 +1597,7 @@ async def mint_vc(
             print_transaction(
                 tx,
                 verbose=False,
-                name="XCH",
+                name="CAC",
                 address_prefix=selected_network_address_prefix(config),
                 mojo_per_unit=get_mojo_per_unit(wallet_type=WalletType.STANDARD_WALLET),
             )
@@ -1662,7 +1662,7 @@ async def spend_vc(
             print_transaction(
                 tx,
                 verbose=False,
-                name="XCH",
+                name="CAC",
                 address_prefix=selected_network_address_prefix(config),
                 mojo_per_unit=get_mojo_per_unit(wallet_type=WalletType.STANDARD_WALLET),
             )
@@ -1737,7 +1737,7 @@ async def revoke_vc(
             print_transaction(
                 tx,
                 verbose=False,
-                name="XCH",
+                name="CAC",
                 address_prefix=selected_network_address_prefix(config),
                 mojo_per_unit=get_mojo_per_unit(wallet_type=WalletType.STANDARD_WALLET),
             )

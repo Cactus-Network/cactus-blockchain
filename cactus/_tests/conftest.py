@@ -705,10 +705,10 @@ async def two_wallet_nodes_services(
 
 @pytest.fixture(scope="function")
 async def two_wallet_nodes_custom_spam_filtering(
-    spam_filter_after_n_txs, xch_spam_amount, blockchain_constants: ConsensusConstants
+    spam_filter_after_n_txs, cac_spam_amount, blockchain_constants: ConsensusConstants
 ):
     async with setup_simulators_and_wallets(
-        1, 2, blockchain_constants, spam_filter_after_n_txs, xch_spam_amount
+        1, 2, blockchain_constants, spam_filter_after_n_txs, cac_spam_amount
     ) as new:
         yield make_old_setup_simulators_and_wallets(new=new)
 

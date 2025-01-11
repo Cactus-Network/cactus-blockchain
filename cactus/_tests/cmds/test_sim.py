@@ -15,8 +15,8 @@ mnemonic = (  # ignore any secret warnings
     "organ skin design salt history awesome"
 )
 fingerprint = 2640131813
-std_farming_address = "txch1mh4qanzyawn3v4uphgaj2cg6hrjazwyp0sx653fhn9apg6mfajlqtj0ztp"
-burn_address = "txch1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqm6ksh7qddh"  # 0x0...dead
+std_farming_address = "tcac1mh4qanzyawn3v4uphgaj2cg6hrjazwyp0sx653fhn9apg6mfajlqtj0ztp"
+burn_address = "tcac1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqm6ksh7qddh"  # 0x0...dead
 
 SIMULATOR_ROOT_PATH.mkdir(parents=True, exist_ok=True)  # this simplifies code later
 
@@ -118,7 +118,7 @@ def _test_sim_status(runner: CliRunner, address: str, simulator_name: str) -> No
         "Network: simulator0" in result.output and "Current Blockchain Status: Full Node Synced" in result.output
     )  # default
     assert "Height:          1" in result.output  # default
-    assert f"Current Farming address: {address}, with a balance of: 21000000.0 TXCH." in result.output  # default
+    assert f"Current Farming address: {address}, with a balance of: 21000000.0 TCAC." in result.output  # default
 
     assert (
         f"Address: {address} has a balance of: 21000000000000000000 mojo, with a total of: 2 transactions."

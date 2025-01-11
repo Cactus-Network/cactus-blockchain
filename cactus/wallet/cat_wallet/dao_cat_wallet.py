@@ -453,7 +453,7 @@ class DAOCATWallet:
         spend_bundle = unsigned_spend_bundle_for_spendable_cats(CAT_MOD, spendable_cat_list)
 
         if fee > 0:  # pragma: no cover
-            await self.standard_wallet.create_tandem_xch_tx(
+            await self.standard_wallet.create_tandem_cac_tx(
                 fee,
                 action_scope,
             )
@@ -558,7 +558,7 @@ class DAOCATWallet:
         spend_bundle = unsigned_spend_bundle_for_spendable_cats(CAT_MOD, spendable_cat_list)
 
         if fee > 0:  # pragma: no cover
-            await self.standard_wallet.create_tandem_xch_tx(fee, action_scope=action_scope)
+            await self.standard_wallet.create_tandem_cac_tx(fee, action_scope=action_scope)
 
         return spend_bundle
 

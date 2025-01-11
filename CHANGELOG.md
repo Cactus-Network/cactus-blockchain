@@ -299,7 +299,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 - Fixed (again) Datalayer download banning
 - Improved timelord skip peak logic.
 - Used click.Path for make_offer command filename (fixes #10920)
-- Handle when xch_target_address in config doesn't decode correctly (fixes #16995)
+- Handle when cac_target_address in config doesn't decode correctly (fixes #16995)
 - Delete unconfirmed Clawback TX
 - tighten up the check for duplicate UnfinishedBlocks before requesting that block
 - Optimized Datalayer `get_key_by_node`
@@ -403,7 +403,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 - extend measured sizes for plot check with value for larger K sizes (thanks @neurosis69)
 - Add a few missing type annotations
 - Log string header_hash on long validation warnings
-- Fix sorted for dictionary keys of both bytes/xch
+- Fix sorted for dictionary keys of both bytes/cac
 - Fixed an issue where `cactus wallet did transfer` command mistreats the type of `fee`
 - Fix signage point message for remote harvesters with large numbers of pools
 - undo BlockRecord cache insert, when DB fails
@@ -528,7 +528,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 - Update `cactus_rs` to `0.2.13`
 - Update `clvm_tools` to `0.4.7`
 - Update `aiohttp` to `3.9.1` (fixes a WebSocket bug introduced in 3.9.0)
-- Change `cactus show keys --show-mnemonic-seed` to also show farmer private key (thanks xchdata1)
+- Change `cactus show keys --show-mnemonic-seed` to also show farmer private key (thanks cacdata1)
 - Adjust ban times when unable to download properly DL DAT files
 - return `List[TransactionRecord]` from nft bulk mint functions
 - DL: delete full files when subscribed to a datastore per config
@@ -572,7 +572,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 - Remove CAT1 UX guards
 - Dedup offer cancellation logic
 - upgrade electron-builder to 24.6.3 and Lerna to 7.1.3
-- Simplify get_max_send_amount for XCH and CATs
+- Simplify get_max_send_amount for CAC and CATs
 - Added wallet id showing when using the 'cactus plotnft show' (thanks @d1m1trus)
 - Introduce TXConfig and CoinSelectionConfig
 - Print JSON for all DL commands
@@ -609,7 +609,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 - Add self revocation path to VC wallet
 - Support calling get_routes via wss
 - Make sure reuse_puzhash works for nft1 offers
-- Fix comment typo (thanks @xchdata1)
+- Fix comment typo (thanks @cacdata1)
 - type mismatch for last_time_farmed (thanks @dkackman)
 - fix waiting for co-routines in plotters_util.py
 - wallet: Fix and improve untrusted race caching
@@ -620,7 +620,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 - max_coin_amount should default to None in wallet send command
 - Add extra_conditions to special offer making
 - bump `cactus_rs` to include bugfix for new `AGG_SIG\*` conditions in mempool mode
-- Fix `cactus farm summary` aborting early if no local full node present (fixes #16164) (thanks @xchdata1)
+- Fix `cactus farm summary` aborting early if no local full node present (fixes #16164) (thanks @cacdata1)
 - fix typo in PendingTxCache
 - rename `cactus data add_missing_files` `-f`/`--foldername` to `-d`/`--directory`
 - Wallet workaround for python issue 97641 and update anyio for issue 589
@@ -776,7 +776,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 - Improve help text for deprecated `cactus show` commands. Thanks (@notpeter)
 - Have the simulator not rely on `cactus_root` as originally implemented.
 - Fork infrastructure
-- Update `--fee` options to indicate units are in XCH
+- Update `--fee` options to indicate units are in CAC
 - Made the CLI instructions for `--fix-ssl-permissions` more user friendly
 - Check all peers when subscribing/tracking to new DL singleton
 - Updated `chiavdf` to `1.0.9`
@@ -786,7 +786,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 - Fix `cactus wallet make_offer` short-option collision on `-r` (Fixes #14874) (Thanks @yyolk)
 - Fix `GENERATOR_MOD2` to have the same cost as `GENERATOR_MOD`
 - Subscribe to the change children of CATs
-- Offer shows network's XCH like TXCH on `testnet10` (Fixes #13393) (Thanks @yyolk)
+- Offer shows network's CAC like TCAC on `testnet10` (Fixes #13393) (Thanks @yyolk)
 - Move `WalletPeers` init to the end of `_start_with_fingerprint` (Fixes #15142)
 - Fix coin state sorting
 - Refactor mutiproc prevalidation
@@ -886,7 +886,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 - `Rate limiting` log messages are themselves rate limited
 - Notified GUI when wallets are removed
 - Optimized counting of NFTs during removal by leveraging SQLite
-- Offer CLI command help now shows `--fee` units as XCH
+- Offer CLI command help now shows `--fee` units as CAC
 - Optimized offer code by limiting `additions` recomputation
 - `cactus_rs` updated to 0.2.4
 - Improve the help text for the `cactus peer` and `cactus peer -a` commands
@@ -1013,7 +1013,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 - Add coin id and address to NFT Details screen in GUI
 - New GUI prefs location under `CACTUS_ROOT`
 - Removed SkyNFT references
-- Add GUI memo field when sending XCH
+- Add GUI memo field when sending CAC
 - Update to Electron 20.3.5
 
 ### Fixed
@@ -1184,7 +1184,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 ### Added
 
 - DataLayer
-- XCH Spam Filter
+- CAC Spam Filter
 - GUI Settings `Auto-Login` toggle (GUI only)
 - GUI Settings section for `DataLayer`
   - `Enable DataLayer` toggle
@@ -1600,7 +1600,7 @@ There is a known issue where harvesters will not reconnect to the farmer automat
 
 ### Added
 
-- Added checks to ensure wallet address prefixes are either `xch` or `txch`.
+- Added checks to ensure wallet address prefixes are either `cac` or `tcac`.
 - Added a better TLS1.3 check to handle cases where python is using a non-openssl TLS library.
 
 ### Changed
@@ -2309,7 +2309,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Added
 
-- This is the first production release of the Cactus Blockchain. This can be installed and will wait for the green flag that will be dropped at approximately 7AM PDST (14:00 UTC) on Friday March 19, 2021. All farming rewards from that point forward will be considered valid and valuable XCH. There is a six week lock on all transactions. During those six weeks farmers will be earning their farming rewards but those rewards can not be spent.
+- This is the first production release of the Cactus Blockchain. This can be installed and will wait for the green flag that will be dropped at approximately 7AM PDST (14:00 UTC) on Friday March 19, 2021. All farming rewards from that point forward will be considered valid and valuable CAC. There is a six week lock on all transactions. During those six weeks farmers will be earning their farming rewards but those rewards can not be spent.
 - Initial difficulty will be set for 100PB. This may mean the initial epoch may be slow. Mainnet difficulty resets are targeted for 24 hours so this difficulty will adjust to the actual space brought online in 24 to 48 hours after launch.
 - Transactions are not enabled in the 1.0.0 version and will be soft forked in during the six week period via a 1.1.0 release.
 - There will also be a 1.0.1 release after the green flag process is complete to simplify install for new users by removing the green flag alert. In the interim there will be new testnet releases using the 1.1bx version scheme.
@@ -2349,7 +2349,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Added
 
-- This is a hard fork/breaking change from RC6/7. TXCH Coins will **not** be moved forward but your plots and keys and parts of your configuration do. When you install this version before 10AM PDST on 3/16/2021 it will load up, start finding peers, and otherwise wait for the flag drop at that time to start farming. This is likely to be the last dress rehearsal for mainnet launch. Our [3/15/2021 blog post](https://www.cactus-network.net/2021/03/15/mainnet-update.html) has more details on the current mainnet launch plan.
+- This is a hard fork/breaking change from RC6/7. TCAC Coins will **not** be moved forward but your plots and keys and parts of your configuration do. When you install this version before 10AM PDST on 3/16/2021 it will load up, start finding peers, and otherwise wait for the flag drop at that time to start farming. This is likely to be the last dress rehearsal for mainnet launch. Our [3/15/2021 blog post](https://www.cactus-network.net/2021/03/15/mainnet-update.html) has more details on the current mainnet launch plan.
 - The GUI now has a tooltip that directs users to the explanation of the plot filter.
 - The GUI now has a tooltip to explain the "Disable bitfield plotting" option. Thanks @shaneo257 for the idea.
 - The GUI now has a tooltip to explain Hierarchical Deterministic keys next to Receive Address on the Wallet page.
@@ -2360,7 +2360,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - Harvester now catches another error class and continues to harvest. Thanks to @xorinox for this PR.
 - We now use a smaller weight proof sample size to ease the load on smaller machines when syncing.
 - Starting the GUI from Linux will now also error out if `npm run build` is run outside the venv. Huge thanks to @dkackman for that PR.
-- `cactus farm summary` will now display TXCH or XCH as appropriate.
+- `cactus farm summary` will now display TCAC or CAC as appropriate.
 - We added more time to our API timeouts and improved logging around times outs.
 
 ### Fixed
@@ -2399,7 +2399,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Added
 
-- This is a hard fork/breaking change from RC5. TXCH Coins will **not** be moved forward but your plots and keys and parts of your configuration do. We will be testing the final mainnet release strategy with the launch of RC6. For the test, those who are comfortable running the dev branch will update and start up their farms. All harvesters and plots will load and until the green flag drops, peers will be gossiped so your farm can establish good network connectivity. When the flag drops, each node will pull down the signed genesis challenge and start farming. Block 1 will be broadcast to anyone who hasn't seen the flag drop yet. The only difference for mainnet is that there will be 1.0 installers and a main branch release more than 24 hours before the real green flag.
+- This is a hard fork/breaking change from RC5. TCAC Coins will **not** be moved forward but your plots and keys and parts of your configuration do. We will be testing the final mainnet release strategy with the launch of RC6. For the test, those who are comfortable running the dev branch will update and start up their farms. All harvesters and plots will load and until the green flag drops, peers will be gossiped so your farm can establish good network connectivity. When the flag drops, each node will pull down the signed genesis challenge and start farming. Block 1 will be broadcast to anyone who hasn't seen the flag drop yet. The only difference for mainnet is that there will be 1.0 installers and a main branch release more than 24 hours before the real green flag.
 - There is now basic plot queueing functionality in the GUI. By default, plotting works as it has in the past. However you can now name a queue in Step 2 Advanced Options. Chose something like `first`. Everything you add to the `first` queue will start up like it has in the past but now you can go through the steps again and create a queue named `second` and it will immediately start plotting as if it is unaware of and parallel with `first`. A great use case is that you would set `first` to plot 5 plots sequentially and then you'd set `second` to plot 5 sequentially and that would give you two parallel queues of 5 plot's each. We will be returning to plotting speed and UI soon. Thanks @jespino for this clever work around for now.
 - There is now an option on the Farm page to manage your farming rewards receive addresses. This makes it easy to send your farming rewards to an offline wallet. This also checks your existing rewards addresses and warns if you do not have the matching private key. That is expected if you are using an offline wallet of course.
 - Functionally has been added to the farmer rpc including checking and changing your farming rewards target addresses.
@@ -2437,21 +2437,21 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ## Fixed
 
-- The Farm page will now no longer get stuck at 50 TXCH farmed.
+- The Farm page will now no longer get stuck at 50 TCAC farmed.
 - `cactus farm` has had multiple bugs and spelling issues addressed. Thanks to @alfonsoperez, @soulmerge and @olivernyc for your contributions.
 - `cactus wallet` had various bugs.
 - Various weight proof improvements.
 - Some users on Big Sur could not plot from the GUI as the log window would be stuck on "Loading."
 - We believe we have fixed the chain stall/confused Timelord bug from ~ 13:00 UTC 3/10/21. We've added additional recovery logic as well.
 - Logs from receiving a duplicate compacted Proof of Time are much more human friendly.
-- We believe that the install/migrate process was bringing forward bad farming rewards receive addresses. We have attempted to stop that by only migrating RC3 and newer configurations. You can make sure you are not effected by using the Manage Farming Rewards tool mentioned above or putting a known good wallet receive address in both `xch_target_address` sections of config.yaml.
+- We believe that the install/migrate process was bringing forward bad farming rewards receive addresses. We have attempted to stop that by only migrating RC3 and newer configurations. You can make sure you are not effected by using the Manage Farming Rewards tool mentioned above or putting a known good wallet receive address in both `cac_target_address` sections of config.yaml.
 - Wallet cached transactions incorrectly in some cases.
 
 ## 1.0rc5 aka Release Candidate 5 - 2021-03-04
 
 ### Added
 
-- The RC5 release is a new breaking change/hard fork blockchain. Plots and keys from previous chains will work fine on RC5 but balances of TXCH will not come forward.
+- The RC5 release is a new breaking change/hard fork blockchain. Plots and keys from previous chains will work fine on RC5 but balances of TCAC will not come forward.
 - We now support a "green flag" chain launch process. A new version of the software will poll download.cactus-network.net/notify/ for a signed json file that will be the genesis block of the chain for that version. This will allow unattended start at mainnet.
 - Bluebox Timelords are back. These are Timelords most anyone can run. They search through the historical chain and find large proofs of times and compact them down to their smallest representation. This significantly speeds up syncing for newly started nodes. Currently this is only supported on Linux and MacOS x86_64 but we will expand that. Any desktop or server of any age will be fast enough to be a useful Bluebox Timelord.
 - Thanks to @jespino there is now `cactus farm summary`. You can now get almost exactly the same farming information on the CLI as the GUI.
@@ -2502,7 +2502,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Added
 
-- RC3 is a new chain to support the last major cactuslisp changes. TXCH from the RC1/2 chain do not come forward to this chain but plots and keys continue to work as usual.
+- RC3 is a new chain to support the last major cactuslisp changes. TCAC from the RC1/2 chain do not come forward to this chain but plots and keys continue to work as usual.
 - We have lowered the transaction lock to the first 5000 blocks to facilitate testing. We also started this chain at a lower difficulty.
 - A new RPC api: /push_tx. Using this RPC, you can spend custom cactuslisp programs. You need to make a SpendBundle, which includes the puzzle reveal (cactuslisp), a solution (cactuslisp) and a signature.
 - You can now use the RPC apis to query the mempool.
@@ -2573,7 +2573,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - Sub blocks renamed to blocks, and blocks renamed to transaction blocks, everywhere. This effects the RPC, now
   all fields that referred to sub blocks are changed to blocks.
 - Base difficulty and weight have increased, so difficulty of "5" in the rc1 testnet will be equivalent to "21990232555520" in the previous testnet.
-- 'cactus wallet send' now takes in TXCH or XCH as units instead of mojos.
+- 'cactus wallet send' now takes in TCAC or CAC as units instead of mojos.
 - Transactions have been further sped up.
 - The blockchain database has more careful validation.
 - The GUI is now using bech32m.
@@ -2588,7 +2588,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Added
 
-- The Beta 27 chain is a hard fork. All TXCH from previous releases has been reset on this chain. Your keys and plots of k=32 or larger continue to work just fine on this new chain.
+- The Beta 27 chain is a hard fork. All TCAC from previous releases has been reset on this chain. Your keys and plots of k=32 or larger continue to work just fine on this new chain.
 - We now use the rust version of clvm, clvm_rs, in preference to validate transactions. We have additionally published binary wheels or clvm_rs for all four platforms and all three supported python versions. The rust version is approximately 50 times faster than the python version used to validate on chain transactions in previous versions.
 - We have moved to compressed quadratic forms for VDFs. Using compressed representation of quadratic forms reduces their serialized size from 130 to 100 bytes (for forms with 1024-bit discriminant). This shrinks the size of VDF outputs and VDF proofs, and it's a breaking change as the compressed representation is not compatible with the older uncompressed (a, b) representation. Compressed forms are also used in calls to chiavdf and in timelord's communication with VDF clients. The form compression algorithm is based on ["Trustless Groups of Unknown Order with Hyperelliptic Curves"](https://eprint.iacr.org/2020/196) by Samuel Dobson, Steven D. Galbraith and Benjamin Smith.
 - Last Attempted Proof on the Farm tab of the GUI now shows hours:minutes:seconds instead of just hours:minutes. This makes it much easier to see that your farmer is responding to recent challenges at a glance.
@@ -2602,7 +2602,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 ### Changed
 
 - We are moving away from the terms sub blocks and blocks in our new consensus. What used to be called sub blocks will now just be blocks. Some blocks are now also transaction blocks. This is simpler both in the code and to reason about. Not all the code or UI may have caught up yet.
-- This release has the final mainnet rewards schedule. During the first three years, each block winner will win 2 TXCH/XCH per block for a total of 9216 TXCH per day from 4608 challenges per day.
+- This release has the final mainnet rewards schedule. During the first three years, each block winner will win 2 TCAC/CAC per block for a total of 9216 TCAC per day from 4608 challenges per day.
 - Smart transactions now use an announcement instead of 'coin consumed' or lock methods.
 - The GUI is now in a separate submodule repository from cactus-blockchain, [cactus-blockchain-gui](https://github.com/Cactus-Network/cactus-blockchain-gui). The installers and install scripts have been updated and it continues to follow the same install steps. Note that the GUI directory will now be `cactus-blockchain-gui`. The workflow for this may be "touch and go" for people who use the git install methods over the short term.
 - Very large coin counts are now supported.
@@ -2620,7 +2620,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - The GUI was incorrectly reporting the time frame that the netspace estimate it displays utilizes. It is technically 312.5 minutes, on average, over the trailing 1000 sub blocks.
 - Coloured coins were not working in the new consensus.
 - Some Haswell processors do not have certain AVX extensions and therefor would not run.
-- The cli wallet, `cactus wallet`, was incorrectly displaying TXCH balances as if they were Coloured Coins.
+- The cli wallet, `cactus wallet`, was incorrectly displaying TCAC balances as if they were Coloured Coins.
 - We addressed [CVE-2020-28477](https://nvd.nist.gov/vuln/detail/CVE-2020-28477) in the GUI.
 - We made changes to CI to hopefully not repeat our skipped releases from the previous release cycle.
 
@@ -2635,7 +2635,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Changed
 
-- Significant improvements have been made to how the full node handles the mempool. This generally cuts CPU usage of node by 2x or more. Part of this increase is that we have temporarily limited the size of transactions. If you want to test sending a transaction you should keep the value of your transaction below 20 TXCH as new consensus will cause you to use a lot of inputs. This will be returned to the expected level as soon as the integration of [clvm rust](https://github.com/Cactus-Network/clvm_rs) is complete.
+- Significant improvements have been made to how the full node handles the mempool. This generally cuts CPU usage of node by 2x or more. Part of this increase is that we have temporarily limited the size of transactions. If you want to test sending a transaction you should keep the value of your transaction below 20 TCAC as new consensus will cause you to use a lot of inputs. This will be returned to the expected level as soon as the integration of [clvm rust](https://github.com/Cactus-Network/clvm_rs) is complete.
 - We have changed the way TLS between nodes and between cactus services work. Each node now has two certificate authorities. One is a public, shared CA that signs the TLS certificates that every node uses to connect to other nodes on 11444 or 511444. You now also have a self generated private CA that must sign e.g. farmer and harvester's certificates. To run a remote harvester you need a new harvester key that is then signed by your private CA. We know this is not easy for remote harvester in this release but will address it quickly.
 - We have changed the way we compile the proof of space plotter and added one additional optimization. On many modern processors this will mean that using the plotter with the `-e` flag will be 2-3% faster than the Beta 17 plotter on the same CPU. We have found this to be very sensitive to different CPUs but are now confident that, at worst, the Beta 24 plotter with `-e` will be the same speed as Beta 17 if not slightly faster on the same hardware. Huge thanks to @xorinox for meticulously tracking down and testing this.
 - If a peer is not responsive during sync, node will disconnect it.
@@ -2773,14 +2773,14 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 ### Added
 
-- Welcome to the new consensus. This release is an all but a full re-write of the blockchain in under 30 days. There is now only one tip of the blockchain but we went from two chains to three. Block times are now a little under a minute but there are a couple of sub blocks between each transaction block. A block is also itself a special kind of sub block and each sub block rewards the farmer who won it 1 TXCH. Sub blocks come, on average, about every 17 to 18 seconds.
-- Starting with this Beta, there are 4608 opportunities per day for a farmer to win 1 TXCH compared to Beta 18 where there were 288 opportunities per day for a farmer to win 16 TXCH.
+- Welcome to the new consensus. This release is an all but a full re-write of the blockchain in under 30 days. There is now only one tip of the blockchain but we went from two chains to three. Block times are now a little under a minute but there are a couple of sub blocks between each transaction block. A block is also itself a special kind of sub block and each sub block rewards the farmer who won it 1 TCAC. Sub blocks come, on average, about every 17 to 18 seconds.
+- Starting with this Beta, there are 4608 opportunities per day for a farmer to win 1 TCAC compared to Beta 18 where there were 288 opportunities per day for a farmer to win 16 TCAC.
 - There is a lot more information and explanation of the new consensus algorithm in the New Consensus Working Document linked from [cactus-network.net](https://cactus-network.net/). Among the improvements this gives the Cactus blockchain are a much higher security level against all attacks, more frequent transaction blocks that have less time variation between them and are then buried under confirmations (sub blocks also count towards re-org security) much more quickly.
-- New consensus means this is a very hard fork. All of your TXCH from Beta 17/18 will be gone. Your plots and keys will work just fine however. You will have to sync to the new chain.
+- New consensus means this is a very hard fork. All of your TCAC from Beta 17/18 will be gone. Your plots and keys will work just fine however. You will have to sync to the new chain.
 - You now have to sync 16 times more "blocks" for every 5 minutes of historical time so syncing is slower than it was on the old chain. We're aware of this and will be speeding it up and addressing blockchain database growth in the nest couple of releases.
-- Prior to this Beta 19, we had block times that targeted 5 minutes and rewarded 16 TXCH to one farmer. Moving forward we have epoch times that target 10 minutes and reward 32 TXCH to 32 farmers about every 17-18 seconds over that period. This has subtle naming and UI impacts in various places.
+- Prior to this Beta 19, we had block times that targeted 5 minutes and rewarded 16 TCAC to one farmer. Moving forward we have epoch times that target 10 minutes and reward 32 TCAC to 32 farmers about every 17-18 seconds over that period. This has subtle naming and UI impacts in various places.
 - Total transaction throughput is still targeted at 2.1x Bitcoin's throughput per hour but you will get more confirmations on a transaction much faster. This release has the errata that it doesn't limit transaction block size correctly.
-- For testing purposes this chain is quickly halving block rewards. By the time you're reading this and using the chain, farmers and pools will be receiving less than 1 TXCH for each block won as if it were 15-20 years from now. Block rewards are given in two components, 7/8's to the pool key and 1/8 to the farmer. The farmer also receives any transaction fees from the block.
+- For testing purposes this chain is quickly halving block rewards. By the time you're reading this and using the chain, farmers and pools will be receiving less than 1 TCAC for each block won as if it were 15-20 years from now. Block rewards are given in two components, 7/8's to the pool key and 1/8 to the farmer. The farmer also receives any transaction fees from the block.
 - You can now plot in parallel using the GUI. A known limitation is that you can't yet specify that you want 4 sets of two parallel plots. Each parallel plot added starts immediately parallel. We will continue to improve this.
 - The GUI now warns if you attempt to create a plot smaller than k=32.
 - Added Chinese language localization (zh-cn). A big thank you to @goomario for their pull request!
@@ -2794,7 +2794,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - The Plot tab on the GUI is now the Plots tab. It starts out with a much more friendly new user wizard and otherwise keeps all of your farming plots listed here. Use the "+ ADD A PLOT" button in the top right to plot your second or later plot.
 - The new plots page offers advanced plotting options in the various "Show Advanced Options" fold outs.
 - The plotter supports the new bitfield back propagation method and the old method from Beta 17. To choose the old method add a `-e` to the command line or choose "Disable bitfield plotting" in "Show Advanced Options" of the Plots tab. Bitfield back propagation writes about 13% less total writes and can be faster on some slower hard drive temp spaces. For now, SSD temp space will likely plot faster with bitfield back propagation disabled. We will be returning to speed enhancements to the plotter as we approach and pass our mainnet launch.
-- The Farm tab in the GUI is significantly enhanced. Here you have a dashboard overview of your farm and your activity in response to challenges blockchain challnegs, how long it will take you - on average - to win a block, and how much TXCH you've won so far. Harvester and Full Node connections have moved to Advanced Options.
+- The Farm tab in the GUI is significantly enhanced. Here you have a dashboard overview of your farm and your activity in response to challenges blockchain challnegs, how long it will take you - on average - to win a block, and how much TCAC you've won so far. Harvester and Full Node connections have moved to Advanced Options.
 - Harvester and farmer will start when the GUI starts instead of waiting for key selection if there are already keys available. This means you will start farming on reboot if you have the Cactus application set to launch on start.
 - Testnet is now running at the primary port of 511444. Update your routers appropriately. This opens 11444 for mainnet.
 - All networking code has been refactored and mostly moved to websockets.
@@ -3119,7 +3119,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 
 - Minor changes have been made across the repositories to better support
   compiling on OpenBSD. HT @n1000.
-- Changed XCH units to TXCH units for testnet.
+- Changed CAC units to TCAC units for testnet.
 - A push to a branch will cancel all ci runs still running for that branch.
 - Ci's now cache pip and npm caches between runs.
 - Improve test speed with smaller discriminants, less blocks, less keys, and
@@ -3269,7 +3269,7 @@ Batch process weight proof epochs in groups of 900 to fit below May 2020 sqlite 
 - We have implemented a workaround for the `cactus start` issues some were having upon crash or reboot. We will be rebuilding start and stop to be robust across platforms.
 - This release re-includes `cactus-start-harvester`.
 - Coloured coins now have a prefix to help identify them. When sending transactions, the new prefix is incompatible with older clients.
-- The user interface now refers to cactus coins with their correct currency code of XCH.
+- The user interface now refers to cactus coins with their correct currency code of CAC.
 - The next release will now be in the dev branch instead of the e.g. beta-1.5. Additionally we are enforcing linear merge into dev and prefer rebase merges or partial squash merges of particularly chatty commit histories.
 - Building the sub reposities (chiapos, chiavdf, blslibrary) now requires CMake 3.14+.
 

@@ -558,7 +558,7 @@ class CATWallet:
     async def get_lineage_proof_for_coin(self, coin: Coin) -> Optional[LineageProof]:
         return await self.lineage_store.get_lineage_proof(coin.parent_coin_info)
 
-    async def create_tandem_xch_tx(
+    async def create_tandem_cac_tx(
         self,
         fee: uint64,
         amount_to_claim: uint64,
@@ -651,7 +651,7 @@ class CATWallet:
         selected_cat_amount = sum(c.amount for c in cat_coins)
         assert selected_cat_amount >= starting_amount
 
-        # Figure out if we need to absorb/melt some XCH as part of this
+        # Figure out if we need to absorb/melt some CAC as part of this
         regular_cactus_to_claim: int = 0
         if payment_amount > starting_amount:
             fee = uint64(fee + payment_amount - starting_amount)
@@ -702,7 +702,7 @@ class CATWallet:
                 announcement = CreateCoinAnnouncement(std_hash(b"".join([c.name() for c in cat_coins])), coin.name())
                 if need_cactus_transaction:
                     if fee > regular_cactus_to_claim:
-                        await self.create_tandem_xch_tx(
+                        await self.create_tandem_cac_tx(
                             fee,
                             uint64(regular_cactus_to_claim),
                             action_scope,
@@ -713,15 +713,15 @@ class CATWallet:
                             conditions=(*extra_conditions, announcement),
                         )
                     elif regular_cactus_to_claim > fee:  # pragma: no cover
-                        xch_announcement = await self.create_tandem_xch_tx(
+                        cac_announcement = await self.create_tandem_cac_tx(
                             fee,
                             uint64(regular_cactus_to_claim),
                             action_scope,
                         )
-                        assert xch_announcement is not None
+                        assert cac_announcement is not None
                         innersol = self.standard_wallet.make_solution(
                             primaries=primaries,
-                            conditions=(*extra_conditions, xch_announcement, announcement),
+                            conditions=(*extra_conditions, cac_announcement, announcement),
                         )
                     else:
                         # TODO: what about when they are equal?
