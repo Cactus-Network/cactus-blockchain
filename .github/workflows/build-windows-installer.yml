@@ -66,11 +66,11 @@ jobs:
           submodules: recursive
 
       - name: Set Env
-        uses: Cactus-Network/actions/setjobenv@main
+        uses: Cactus-Network/cactus-blockchain/actions/setjobenv@main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: Cactus-Network/actions/git-ssh-to-https@main
+      - uses: Cactus-Network/cactus-blockchain/git-ssh-to-https@main
 
       - name: Get npm cache directory
         id: npm-cache
@@ -86,11 +86,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - uses: cactus-network/actions/cache-pip@main
+      - uses: cactus-blockchain/actions/cache-pip@main
         with:
           mode: poetry
 
-      - uses: Cactus-Network/actions/setup-python@main
+      - uses: Cactus-Network/cactus-blockchain/setup-python@main
         name: Install Python ${{ matrix.python-version }}
         with:
           python-version: ${{ matrix.python-version }}
@@ -326,7 +326,7 @@ jobs:
       INSTALL_PATH: installed/
 
     steps:
-      - uses: Cactus-Network/actions/clean-workspace@main
+      - uses: Cactus-Network/cactus-blockchain/clean-workspace@main
 
       - name: Download packages
         uses: actions/download-artifact@v4
