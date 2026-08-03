@@ -1,351 +1,79 @@
 name: 📦🚀 Build Installer - Linux DEB
 
 on:
-  workflow_dispatch:
-    inputs:
-      release_type:
-        description: "Tagged release testing scenario"
-        required: false
-        type: choice
-        default: ""
-        options:
-          - ""
-          - 9.9.9-b1
-          - 9.9.9-rc1
-          - 9.9.9
   push:
-    paths-ignore:
-      - "**.md"
-    branches:
-      - "long_lived/**"
-      - main
-      - "release/**"
-  release:
-    types: [published]
-  pull_request:
-    paths-ignore:
-      - "**.md"
-    branches:
-      - "**"
+    tags: ["**"]
+    branches: ["main", "chia-2.7.3-port"]
+  workflow_dispatch:
 
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('{0}-{1}', github.workflow_ref, github.event.pull_request.number) || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  id-token: write
   contents: write
 
 jobs:
-  version:
-    uses: ./.github/workflows/reflow-version.yml
-    with:
-      release_type: ${{ inputs.release_type }}
-
   build:
-    name: Build ${{ matrix.os.arch }}
+    name: Build DEB (${{ matrix.os.arch }})
     runs-on: ${{ matrix.os.runs-on }}
-    needs:
-      - version
-    container: cactusnetwork/ubuntu-22.04-builder:python312
-    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12"]
         os:
           - runs-on: ubuntu-latest
             arch: amd64
-            madmax-suffix: "x86-64"
-            bladebit-suffix: "ubuntu-x86-64.tar.gz"
-            arch-artifact-name: intel
           - runs-on: ubuntu-24.04-arm
             arch: arm64
-            madmax-suffix: "arm64"
-            bladebit-suffix: "ubuntu-arm64.tar.gz"
-            arch-artifact-name: arm
-
-    env:
-      CACTUS_INSTALLER_VERSION: ${{ needs.version.outputs.cactus-installer-version }}
-      CACTUS_SEMVER_VERSION: ${{ needs.version.outputs.cactus-semver-version }}
-      POETRY_DYNAMIC_VERSIONING_OVERRIDE: "cactus-blockchain=${{ needs.version.outputs.cactus-installer-version }}"
-      TAG_TYPE: ${{ needs.version.outputs.tag-type }}
-
     steps:
-      - uses: Cactus-Network/actions/clean-workspace@main
-
-      - name: Add safe git directory
-        uses: Cactus-Network/actions/git-mark-workspace-safe@main
-
-      - name: Checkout Code
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # dynamic version needs tags
           submodules: recursive
 
-      - uses: Cactus-Network/actions/git-ssh-to-https@main
-
-      - name: Cleanup any leftovers that exist from previous runs
-        run: bash build_scripts/clean-runner.sh || true
-
-      - name: Set Env
-        uses: Cactus-Network/actions/setjobenv@main
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Node per .nvmrc in GUI
-        uses: actions/setup-node@v6.4.0
+      - uses: actions/setup-python@v5
         with:
-          node-version-file: cactus-blockchain-gui/.nvmrc
+          python-version: "3.12"
 
-      - name: Get latest madmax plotter
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install cactus-blockchain
+        uses: ./.github/actions/install
+        with:
+          python-version: "3.12"
+          development: "true"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          LATEST_MADMAX=$(gh api repos/Cactus-Network/cactus-plotter-madmax/releases/latest --jq 'select(.prerelease == false) | .tag_name')
-          mkdir "$GITHUB_WORKSPACE"/madmax
-          gh release download -R Cactus-Network/cactus-plotter-madmax "$LATEST_MADMAX" -p 'cactus_plot-*-${{ matrix.os.madmax-suffix }}' -O "$GITHUB_WORKSPACE"/madmax/cactus_plot
-          gh release download -R Cactus-Network/cactus-plotter-madmax "$LATEST_MADMAX" -p 'cactus_plot_k34-*-${{ matrix.os.madmax-suffix }}' -O "$GITHUB_WORKSPACE"/madmax/cactus_plot_k34
-          chmod +x "$GITHUB_WORKSPACE"/madmax/cactus_plot
-          chmod +x "$GITHUB_WORKSPACE"/madmax/cactus_plot_k34
+          PIP_EXTRA_INDEX_URL: https://pypi.chia.net/simple/
 
-      - name: Fetch bladebit versions
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set installer version
         run: |
-          # Fetch the latest version of each type
-          LATEST_RELEASE=$(gh api repos/Cactus-Network/bladebit/releases/latest --jq 'select(.prerelease == false) | .tag_name')
-          LATEST_BETA=$(gh api repos/Cactus-Network/bladebit/releases --jq 'map(select(.prerelease) | select(.tag_name | test("^v[0-9]+\\.[0-9]+\\.[0-9]+-beta[0-9]+$"))) | first | .tag_name')
-          LATEST_RC=$(gh api repos/Cactus-Network/bladebit/releases --jq 'map(select(.prerelease) | select(.tag_name | test("^v[0-9]+\\.[0-9]+\\.[0-9]+-rc[0-9]+$"))) | first | .tag_name')
-
-          # Compare the versions and choose the newest that matches the requirements
-          if [[ "$TAG_TYPE" == "beta" || -z "$TAG_TYPE" ]]; then
-            # For beta or dev builds (indicated by the absence of a tag), use the latest version available
-            LATEST_VERSION=$(printf "%s\n%s\n%s\n" "$LATEST_RELEASE" "$LATEST_BETA" "$LATEST_RC" | sed '/-/!s/$/_/' | sort -V | sed 's/_$//' | tail -n 1)
-          elif [[ "$TAG_TYPE" == "rc" ]]; then
-            # For RC builds, use the latest RC or full release if it's newer
-            LATEST_VERSION=$(printf "%s\n%s\n" "$LATEST_RELEASE" "$LATEST_RC" | sed '/-/!s/$/_/' | sort -V | sed 's/_$//' | tail -n 1)
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "CACTUS_INSTALLER_VERSION=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
           else
-            # For full releases, use the latest full release
-            LATEST_VERSION="$LATEST_RELEASE"
+            echo "CACTUS_INSTALLER_VERSION=0.0.0" >> "$GITHUB_ENV"
           fi
-          echo "LATEST_VERSION=$LATEST_VERSION" >> "$GITHUB_ENV"
 
-      - name: Get latest bladebit plotter
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build GUI
         run: |
-          # Download and extract the chosen version
-          mkdir "$GITHUB_WORKSPACE"/bladebit
-          cd "$GITHUB_WORKSPACE"/bladebit
-          gh release download -R Cactus-Network/bladebit "$LATEST_VERSION" -p 'bladebit*-${{ matrix.os.bladebit-suffix }}'
-          find . -maxdepth 1 -name '*.tar.gz' -print0 | xargs -0 -I{} bash -c 'tar -xzf {} && rm {}'
-          find . -maxdepth 1 -name 'bladebit*' -print0 | xargs -0 -I{} chmod +x {}
-          cd "$OLDPWD"
-
-      - uses: ./.github/actions/install
-        with:
-          python-version: ${{ matrix.python-version }}
-          development: true
-          constraints-file-artifact-name: constraints-file-${{ matrix.os.arch-artifact-name }}
-
-      - uses: cactus-network/actions/activate-venv@main
-
-      - name: Prepare GUI cache
-        id: gui-ref
-        run: |
-          gui_ref=$(git submodule status cactus-blockchain-gui | sed -e 's/^ //g' -e 's/ cactus-blockchain-gui.*$//g')
-          echo "${gui_ref}"
-          echo "GUI_REF=${gui_ref}" >> "$GITHUB_OUTPUT"
-          echo "rm -rf ./cactus-blockchain-gui"
-          rm -rf ./cactus-blockchain-gui
-
-      - name: Cache GUI
-        uses: actions/cache@v5
-        id: cache-gui
-        with:
-          path: ./cactus-blockchain-gui
-          key: ${{ runner.os }}-${{ matrix.os.arch }}-cactus-blockchain-gui-${{ steps.gui-ref.outputs.GUI_REF }}
-
-      - if: steps.cache-gui.outputs.cache-hit != 'true'
-        name: Build GUI
-        continue-on-error: false
-        run: |
-          cd ./build_scripts
+          . ./venv/bin/activate
+          cd build_scripts
           bash build_linux_deb-1-gui.sh
 
-      - name: Build .deb package
+      - name: Build installer
         run: |
-          ldd --version
-          cd ./build_scripts
-          sh build_linux_deb-2-installer.sh ${{ matrix.os.arch }}
+          . ./venv/bin/activate
+          cd build_scripts
+          bash build_linux_deb-2-installer.sh ${{ matrix.os.arch }}
 
-      - name: Upload Linux artifacts
-        uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v4
         with:
-          name: cactus-installers-linux-deb-${{ matrix.os.arch-artifact-name }}
+          name: cactus-installers-deb-${{ matrix.os.arch }}
           path: build_scripts/final_installer/
 
-      - name: Remove working files to exclude from cache
-        run: |
-          rm -rf ./cactus-blockchain-gui/packages/gui/daemon
-
-  publish:
-    name: 📦 Publish Installers
-    uses: ./.github/workflows/reflow-publish-installer.yml
-    with:
-      concurrency-name: deb
-      cactus-installer-version: ${{ needs.version.outputs.cactus-installer-version }}
-      cactus-dev-version: ${{ needs.version.outputs.cactus-dev-version }}
-      configuration: ${{ toJSON( matrix.configuration ) }}
-    secrets: inherit
-    needs:
-      - version
-      - build
-    strategy:
-      fail-fast: false
-      matrix:
-        configuration:
-          - python-version: ["3.12"]
-            os:
-              - matrix: debian
-                file-type:
-                  name: DEB
-                  extension: deb
-                glue-name: deb
-                artifact-platform-name: linux
-                file-arch-name:
-                  arm: arm64
-                  intel: amd64
-                file-suffix:
-                  arm: ""
-                  intel: ""
-                names:
-                  cli:
-                    file: cactus-blockchain-cli_{0}-1_{2}.deb
-                    dev-file: cactus-blockchain-cli_{1}-1_{2}.deb
-                    latest-dev-file: cactus-blockchain-cli_{2}_latest_dev.deb
-                  gui:
-                    file: cactus-blockchain_{0}_{2}.deb
-                    dev-file: cactus-blockchain_{1}_{2}.deb
-                    latest-dev-file: cactus-blockchain_{2}_latest_dev.deb
-            mode:
-              - name: GUI
-                matrix: gui
-                glue-name: gui
-              - name: CLI
-                matrix: cli
-                glue-name: cli
-            arch:
-              - name: ARM64
-                matrix: arm
-                artifact-name: arm
-                glue-name: arm
-              - name: Intel
-                matrix: intel
-                artifact-name: intel
-                glue-name: intel
-
-  test:
-    name: Test ${{ matrix.distribution.name }} ${{ matrix.mode.name }} ${{ matrix.arch.name }}
-    runs-on: ${{ matrix.os.runs-on[matrix.arch.matrix] }}
-    needs:
-      - version
-      - build
-    container: ${{ matrix.distribution.url }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - runs-on:
-              arm: [ubuntu-24.04-arm]
-              intel: [ubuntu-latest]
-        distribution:
-          - name: debian:bookworm
-            type: debian
-            # https://packages.debian.org/bookworm/python/python3 (3.11)
-            url: "docker://debian:bookworm"
-          - name: debian:trixie
-            type: debian
-            # https://packages.debian.org/trixie/python/python3 (3.13)
-            url: "docker://debian:trixie"
-          - name: ubuntu:jammy (22.04)
-            type: ubuntu
-            # https://packages.ubuntu.com/jammy/python3 (22.04, 3.10)
-            url: "docker://ubuntu:jammy"
-          - name: ubuntu:noble (24.04)
-            type: ubuntu
-            # https://packages.ubuntu.com/noble/python3 (24.04, 3.12)
-            url: "docker://ubuntu:noble"
-        mode:
-          - name: GUI
-            file: cactus-blockchain_*.deb
-            package: cactus-blockchain
-          - name: CLI
-            file: cactus-blockchain-cli_*.deb
-            package: cactus-blockchain-cli
-        arch:
-          - name: ARM64
-            matrix: arm
-            artifact-name: arm
-          - name: Intel
-            matrix: intel
-            artifact-name: intel
-
-    env:
-      DEBIAN_FRONTEND: noninteractive
-
-    steps:
-      - uses: Cactus-Network/actions/clean-workspace@main
-
-      - name: Download packages
-        uses: actions/download-artifact@v8
-        id: download
+      - name: Attach to release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
         with:
-          name: cactus-installers-linux-deb-${{ matrix.arch.artifact-name }}
-          path: packages
-
-      - name: Update apt repos
-        run: |
-          apt-get update --yes
-
-      - name: Install package
-        run: |
-          ls -l "${{ steps.download.outputs.download-path }}"
-          apt-get install --yes libnuma1 "${{ steps.download.outputs.download-path }}"/${{ matrix.mode.file }}
-
-      - name: List /opt/cactus contents
-        run: |
-          find /opt/cactus
-
-      - name: Run cactus dev installers test
-        run: |
-          cactus dev installers test --expected-cactus-version "${{ needs.version.outputs.cactus-installer-version }}"
-
-      - name: Verify /opt/cactus present
-        run: |
-          if [ ! -e /opt/cactus ]
-          then
-            ls -l /opt
-            false
-          fi
-
-      - name: Check permissions of /opt/cactus/chrome-sandbox
-        shell: bash
-        if: matrix.mode.name == 'GUI'
-        run: |
-          [ "$(stat -c %a:%G:%U /opt/cactus/chrome-sandbox)" == "4755:root:root" ]
-
-      - name: Remove package
-        run: |
-          apt-get remove --yes ${{ matrix.mode.package }}
-
-      - name: Verify /opt/cactus not present
-        run: |
-          if [ -e /opt/cactus ]
-          then
-            ls -lR /opt/cactus
-            false
-          fi
+          files: build_scripts/final_installer/*
