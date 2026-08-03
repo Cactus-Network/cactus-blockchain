@@ -4,7 +4,7 @@ import io
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
-from chia_rs import MEMPOOL_MODE, run_cactus_program, tree_hash
+from chia_rs import MEMPOOL_MODE, run_chia_program, tree_hash
 from chia_rs.sized_bytes import bytes32
 from clvm.CLVMObject import CLVMStorage
 from clvm.EvalError import EvalError
@@ -59,7 +59,7 @@ class Program(SExp):
         # the first argument is the buffer we want to parse. This effectively
         # leverages the rust parser and LazyNode, making it a lot faster to
         # parse serialized programs into a python compatible structure
-        _cost, ret = run_cactus_program(
+        _cost, ret = run_chia_program(
             b"\x01",
             blob,
             50,
@@ -143,7 +143,7 @@ class Program(SExp):
 
     def _run(self, max_cost: int, flags: int, args: Any) -> tuple[int, Program]:
         prog_args = Program.to(args)
-        cost, r = run_cactus_program(self.as_bin(), prog_args.as_bin(), max_cost, flags)
+        cost, r = run_chia_program(self.as_bin(), prog_args.as_bin(), max_cost, flags)
         return cost, Program.to(r)
 
     def run_with_cost(self, max_cost: int, args: Any, flags=DEFAULT_FLAGS) -> tuple[int, Program]:
