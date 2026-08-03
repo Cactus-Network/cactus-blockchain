@@ -3,17 +3,17 @@ from __future__ import annotations
 import re
 
 import pytest
-from cactus_rs import AugSchemeMPL, G1Element, G2Element, PrivateKey
+from chia_rs import AugSchemeMPL, CoinSpend, G1Element, G2Element, PrivateKey
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint32, uint64
 
 from cactus.consensus.default_constants import DEFAULT_CONSTANTS
 from cactus.types.blockchain_format.coin import Coin
 from cactus.types.blockchain_format.program import Program
 from cactus.types.blockchain_format.serialized_program import SerializedProgram
-from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.types.coin_spend import CoinSpend, make_spend
+from cactus.types.coin_spend import make_spend
 from cactus.types.condition_opcodes import ConditionOpcode
 from cactus.util.db_wrapper import DBWrapper2, manage_connection
-from cactus.util.ints import uint32, uint64
 from cactus.wallet.derivation_record import DerivationRecord
 from cactus.wallet.derive_keys import master_sk_to_wallet_sk, master_sk_to_wallet_sk_unhardened
 from cactus.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import (
@@ -45,13 +45,13 @@ msg2: bytes = b"msg2"
 
 additional_data: bytes32 = bytes32(DEFAULT_CONSTANTS.AGG_SIG_ME_ADDITIONAL_DATA)
 
-coin: Coin = Coin(bytes32([0] * 32), bytes32([0] * 32), uint64(0))
+coin: Coin = Coin(bytes32.zeros, bytes32.zeros, uint64(0))
 puzzle = SerializedProgram.from_bytes(b"\x01")
-solution_h = SerializedProgram.from_program(
-    Program.to([[ConditionOpcode.AGG_SIG_UNSAFE, pk1_h, msg1], [ConditionOpcode.AGG_SIG_ME, pk2_h_synth, msg2]])
+solution_h = Program.to(
+    [[ConditionOpcode.AGG_SIG_UNSAFE, pk1_h, msg1], [ConditionOpcode.AGG_SIG_ME, pk2_h_synth, msg2]]
 )
-solution_u = SerializedProgram.from_program(
-    Program.to([[ConditionOpcode.AGG_SIG_UNSAFE, pk1_u, msg1], [ConditionOpcode.AGG_SIG_ME, pk2_u_synth, msg2]])
+solution_u = Program.to(
+    [[ConditionOpcode.AGG_SIG_UNSAFE, pk1_u, msg1], [ConditionOpcode.AGG_SIG_ME, pk2_u_synth, msg2]]
 )
 spend_h: CoinSpend = make_spend(
     coin,
@@ -90,7 +90,7 @@ async def test_wsm_sign_transaction() -> None:
                 [
                     DerivationRecord(
                         uint32(1),
-                        bytes32([0] * 32),
+                        bytes32.zeros,
                         pk1_h,
                         WalletType.STANDARD_WALLET,
                         uint32(1),
@@ -129,7 +129,7 @@ async def test_wsm_sign_transaction() -> None:
                 [
                     DerivationRecord(
                         uint32(1),
-                        bytes32([0] * 32),
+                        bytes32.zeros,
                         pk1_u,
                         WalletType.STANDARD_WALLET,
                         uint32(1),

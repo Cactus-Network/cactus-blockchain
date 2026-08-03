@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Dict, Generator, Iterable, KeysView
+from collections.abc import Generator, Iterable, KeysView
 
-SERVICES_FOR_GROUP: Dict[str, list[str]] = {
+SERVICES_FOR_GROUP: dict[str, list[str]] = {
     "all": [
         "cactus_harvester",
         "cactus_timelord_launcher",

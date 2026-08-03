@@ -26,7 +26,8 @@ permissions:
 
 jobs:
   mypy:
-    name: ${{ matrix.os.emoji }} ${{ matrix.check.name }} - ${{ matrix.os.name }} ${{ matrix.arch.name }} ${{ matrix.python.major_dot_minor }}
+    if: github.repository_owner == 'Cactus-Network'
+    name: ${{ matrix.os.emoji }} ${{ matrix.arch.emoji }} ${{ matrix.check.name }} - ${{ matrix.os.name }} ${{ matrix.python.major_dot_minor }}
     runs-on: ${{ matrix.os.runs-on[matrix.arch.matrix] }}
     timeout-minutes: 20
     strategy:
@@ -38,13 +39,13 @@ jobs:
             emoji: 🐧
             runs-on:
               intel: ubuntu-latest
-              arm: [linux, arm64]
+              arm: ubuntu-24.04-arm
           - name: macOS
             matrix: macos
             emoji: 🍎
             runs-on:
-              intel: macos-13
-              arm: macos-13-arm64
+              intel: macos-15-intel
+              arm: macos-15
           - name: Windows
             matrix: windows
             emoji: 🪟
@@ -52,14 +53,17 @@ jobs:
               intel: windows-latest
         arch:
           - name: ARM64
+            emoji: 💪
             matrix: arm
           - name: Intel
+            emoji: 🌀
             matrix: intel
         python:
-          - major_dot_minor: "3.9"
           - major_dot_minor: "3.10"
           - major_dot_minor: "3.11"
           - major_dot_minor: "3.12"
+          - major_dot_minor: "3.13"
+          - major_dot_minor: "3.14"
         check:
           - name: mypy
             command: |
@@ -71,6 +75,11 @@ jobs:
               matrix: windows
             arch:
               matrix: arm
+          # Back to self hosted mac intel runners, which we have very few of
+          - os:
+              matrix: macos
+            arch:
+              matrix: intel
 
     steps:
       - uses: cactus-network/actions/clean-workspace@main
@@ -78,7 +87,7 @@ jobs:
       - name: Add safe git directory
         uses: cactus-network/actions/git-mark-workspace-safe@main
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: recursive
@@ -99,6 +108,7 @@ jobs:
           ${{ matrix.check.command }}
 
   check:
+    if: github.repository_owner == 'Cactus-Network'
     name: ${{ matrix.os.emoji }} ${{ matrix.check.name }} - ${{ matrix.os.name }} ${{ matrix.arch.name }} ${{ matrix.python.major_dot_minor }}
     runs-on: ${{ matrix.os.runs-on[matrix.arch.matrix] }}
     timeout-minutes: 20
@@ -111,19 +121,15 @@ jobs:
             emoji: 🐧
             runs-on:
               intel: ubuntu-latest
-              arm: [linux, arm64]
+              arm: ubuntu-24.04-arm
         arch:
           - name: Intel
             matrix: intel
         python:
-          - major_dot_minor: "3.10"
+          - major_dot_minor: "3.12"
         check:
-          - name: black
-            command: black --check --diff .
-          - name: flake8
-            command: flake8 benchmarks build_scripts cactus tools *.py
-          - name: pylint
-            command: pylint benchmarks build_scripts cactus tools *.py
+          - name: ruff
+            command: ruff format --check --diff .
           - name: generated protocol tests
             command: |
               python3 -m cactus._tests.util.build_network_protocol_files
@@ -131,6 +137,15 @@ jobs:
           - name: poetry
             command: |
               .penv/bin/poetry check
+          - name: actionlint
+            command: |
+              bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+              echo ==== shellcheck version
+              shellcheck --version
+              echo ==== actionlint version
+              ./actionlint --version
+              echo ==== running actionlint
+              ./actionlint -color -shellcheck shellcheck
 
     steps:
       - uses: cactus-network/actions/clean-workspace@main
@@ -138,7 +153,7 @@ jobs:
       - name: Add safe git directory
         uses: cactus-network/actions/git-mark-workspace-safe@main
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: recursive
@@ -159,6 +174,7 @@ jobs:
           ${{ matrix.check.command }}
 
   upload_source_dist:
+    if: github.repository_owner == 'Cactus-Network'
     name: Lint and Upload source distribution
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
@@ -167,7 +183,8 @@ jobs:
       - check
     strategy:
       matrix:
-        python-version: [3.10]
+        python:
+          - major_dot_minor: "3.12"
         os: [ubuntu-latest]
 
     steps:
@@ -175,7 +192,7 @@ jobs:
         uses: cactus-network/actions/git-mark-workspace-safe@main
 
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: recursive
@@ -183,7 +200,7 @@ jobs:
       - uses: Cactus-Network/actions/setup-python@main
         name: Install Python
         with:
-          python-version: "3.10"
+          python-version: ${{ matrix.python.major_dot_minor }}
 
       - uses: ./.github/actions/install
         with:
@@ -197,7 +214,7 @@ jobs:
           python -m build --outdir dist .
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: ./dist

@@ -3,8 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import IntEnum
 
-from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.util.ints import uint16, uint64
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint16, uint64
+
 from cactus.util.streamable import Streamable, streamable
 from cactus.wallet.wallet_puzzle_store import WalletPuzzleStore
 

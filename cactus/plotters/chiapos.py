@@ -10,15 +10,16 @@ import importlib.metadata
 import logging
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 from cactus.plotting.create_plots import create_plots, resolve_plot_keys
-from cactus.plotting.util import Params, add_plot_directory, validate_plot_size
+from cactus.plotting.util import Params, validate_plot_size
+from cactus.util.harvester_config import add_plot_directory
 
 log = logging.getLogger(__name__)
 
 
-def get_chiapos_install_info() -> Optional[Dict[str, Any]]:
+def get_chiapos_install_info() -> dict[str, Any] | None:
     chiapos_version = importlib.metadata.version("chiapos")
     return {"display_name": "Cactus Proof of Space", "version": chiapos_version, "installed": True}
 

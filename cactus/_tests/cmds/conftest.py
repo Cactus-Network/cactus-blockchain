@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator, Tuple
 
 import pytest
 
@@ -11,7 +11,7 @@ from cactus.util.config import create_default_cactus_config
 
 
 @pytest.fixture(scope="module")  # every file has its own config generated, just to be safe
-def get_test_cli_clients() -> Iterator[Tuple[TestRpcClients, Path]]:
+def get_test_cli_clients() -> Iterator[tuple[TestRpcClients, Path]]:
     # we cant use the normal config fixture because it only supports function scope.
     with tempfile.TemporaryDirectory() as tmp_path:
         root_path: Path = Path(tmp_path) / "cactus_root"
@@ -19,5 +19,6 @@ def get_test_cli_clients() -> Iterator[Tuple[TestRpcClients, Path]]:
         create_default_cactus_config(root_path)
         # ^ this is basically the generate config fixture.
         global_test_rpc_clients = TestRpcClients()
-        create_service_and_wallet_client_generators(global_test_rpc_clients, root_path)
-        yield global_test_rpc_clients, root_path
+        with pytest.MonkeyPatch.context() as mp:
+            create_service_and_wallet_client_generators(global_test_rpc_clients, root_path, mp)
+            yield global_test_rpc_clients, root_path

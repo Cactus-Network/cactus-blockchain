@@ -4,15 +4,13 @@ from __future__ import annotations
 from secrets import token_bytes
 
 import pytest
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint32, uint64
 
 from cactus._tests.util.db_connection import DBConnection
 from cactus.types.blockchain_format.coin import Coin
 from cactus.types.blockchain_format.program import Program
-from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.types.coin_spend import make_spend
-from cactus.util.ints import uint32, uint64
-
-# from cactus.wallet.dao_wallet.dao_wallet import DAOInfo, DAOWallet
 from cactus.wallet.lineage_proof import LineageProof
 from cactus.wallet.singleton import create_singleton_puzzle
 from cactus.wallet.singleton_record import SingletonRecord

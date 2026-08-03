@@ -3,14 +3,23 @@ from __future__ import annotations
 import asyncio
 import logging
 import random
-from typing import Any, List, Optional, Set, Tuple, Union
+from typing import Any
 
-from cactus_rs import compute_merkle_set_root, confirm_included_already_hashed, confirm_not_included_already_hashed
+from chia_rs import (
+    CoinSpend,
+    CoinState,
+    HeaderBlock,
+    RespondToPhUpdates,
+    compute_merkle_set_root,
+    confirm_included_already_hashed,
+    confirm_not_included_already_hashed,
+)
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint32
 
 from cactus.full_node.full_node_api import FullNodeAPI
 from cactus.protocols.shared_protocol import Capability
 from cactus.protocols.wallet_protocol import (
-    CoinState,
     RegisterForCoinUpdates,
     RegisterForPhUpdates,
     RejectAdditionsRequest,
@@ -28,14 +37,11 @@ from cactus.protocols.wallet_protocol import (
     RespondPuzzleSolution,
     RespondRemovals,
     RespondToCoinUpdates,
-    RespondToPhUpdates,
 )
 from cactus.server.ws_connection import WSCactusConnection
 from cactus.types.blockchain_format.coin import Coin, hash_coin_ids
-from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.types.coin_spend import CoinSpend, make_spend
-from cactus.types.header_block import HeaderBlock
-from cactus.util.ints import uint32
+from cactus.types.coin_spend import make_spend
+from cactus.util.task_referencer import create_referenced_task
 from cactus.wallet.util.peer_request_cache import PeerRequestCache
 
 log = logging.getLogger(__name__)
@@ -46,48 +52,50 @@ class PeerRequestException(Exception):
 
 
 async def subscribe_to_phs(
-    puzzle_hashes: List[bytes32],
+    puzzle_hashes: list[bytes32],
     peer: WSCactusConnection,
     min_height: int,
-) -> List[CoinState]:
+    priority: int = 0,
+) -> list[CoinState]:
     """
     Tells full nodes that we are interested in puzzle hashes, and returns the response.
     """
     msg = RegisterForPhUpdates(puzzle_hashes, uint32(max(min_height, uint32(0))))
-    all_coins_state: Optional[RespondToPhUpdates] = await peer.call_api(
-        FullNodeAPI.register_interest_in_puzzle_hash, msg, timeout=300
+    all_coins_state: RespondToPhUpdates | None = await peer.call_api(
+        FullNodeAPI.register_for_ph_updates, msg, timeout=300, priority=priority
     )
     if all_coins_state is None:
-        raise ValueError(f"None response from peer {peer.peer_info.host} for register_interest_in_puzzle_hash")
+        raise ValueError(f"None response from peer {peer.peer_info.host} for register_for_ph_updates")
     return all_coins_state.coin_states
 
 
 async def subscribe_to_coin_updates(
-    coin_names: List[bytes32],
+    coin_names: list[bytes32],
     peer: WSCactusConnection,
     min_height: int,
-) -> List[CoinState]:
+    priority: int = 0,
+) -> list[CoinState]:
     """
     Tells full nodes that we are interested in coin ids, and returns the response.
     """
     msg = RegisterForCoinUpdates(coin_names, uint32(max(0, min_height)))
-    all_coins_state: Optional[RespondToCoinUpdates] = await peer.call_api(
-        FullNodeAPI.register_interest_in_coin, msg, timeout=300
+    all_coins_state: RespondToCoinUpdates | None = await peer.call_api(
+        FullNodeAPI.register_for_coin_updates, msg, timeout=300, priority=priority
     )
 
     if all_coins_state is None:
-        raise ValueError(f"None response from peer {peer.peer_info.host} for register_interest_in_coin")
+        raise ValueError(f"None response from peer {peer.peer_info.host} for register_for_coin_updates")
     return all_coins_state.coin_states
 
 
 def validate_additions(
-    coins: List[Tuple[bytes32, List[Coin]]],
-    proofs: Optional[List[Tuple[bytes32, bytes, Optional[bytes]]]],
+    coins: list[tuple[bytes32, list[Coin]]],
+    proofs: list[tuple[bytes32, bytes, bytes | None]] | None,
     root: bytes32,
 ) -> bool:
     if proofs is None:
         # Verify root
-        additions_merkle_items: List[bytes32] = []
+        additions_merkle_items: list[bytes32] = []
 
         # Addition Merkle set contains puzzlehash and hash of all coins with that puzzlehash
         for puzzle_hash, coins_l in coins:
@@ -98,52 +106,29 @@ def validate_additions(
         if root != additions_root:
             return False
     else:
-        for i in range(len(coins)):
-            assert coins[i][0] == proofs[i][0]
-            coin_list_1: List[Coin] = coins[i][1]
-            puzzle_hash_proof: Optional[bytes] = proofs[i][1]
-            coin_list_proof: Optional[bytes] = proofs[i][2]
-            if len(coin_list_1) == 0:
+        if len(coins) != len(proofs):
+            return False
+        for (coin_ph, coin_list), (proof_ph, puzzle_hash_proof, coin_list_proof) in zip(coins, proofs):
+            if coin_ph != proof_ph:
+                return False
+            if len(coin_list) == 0:
                 # Verify exclusion proof for puzzle hash
-                assert puzzle_hash_proof is not None
-                not_included = confirm_not_included_already_hashed(
-                    root,
-                    coins[i][0],
-                    puzzle_hash_proof,
-                )
-                if not_included is False:
+                if not confirm_not_included_already_hashed(root, coin_ph, puzzle_hash_proof):
                     return False
-            else:
-                try:
-                    # Verify inclusion proof for coin list
-                    assert coin_list_proof is not None
-                    included = confirm_included_already_hashed(
-                        root,
-                        hash_coin_ids([c.name() for c in coin_list_1]),
-                        coin_list_proof,
-                    )
-                    if included is False:
-                        return False
-                except AssertionError:
-                    return False
-                try:
-                    # Verify inclusion proof for puzzle hash
-                    assert puzzle_hash_proof is not None
-                    included = confirm_included_already_hashed(
-                        root,
-                        coins[i][0],
-                        puzzle_hash_proof,
-                    )
-                    if included is False:
-                        return False
-                except AssertionError:
-                    return False
-
+                continue
+            if coin_list_proof is None:
+                return False
+            # Verify inclusion proof for coin list
+            if not confirm_included_already_hashed(root, hash_coin_ids([c.name() for c in coin_list]), coin_list_proof):
+                return False
+            # Verify inclusion proof for puzzle hash
+            if not confirm_included_already_hashed(root, coin_ph, puzzle_hash_proof):
+                return False
     return True
 
 
 def validate_removals(
-    coins: List[Tuple[bytes32, Optional[Coin]]], proofs: Optional[List[Tuple[bytes32, bytes]]], root: bytes32
+    coins: list[tuple[bytes32, Coin | None]], proofs: list[tuple[bytes32, bytes]] | None, root: bytes32
 ) -> bool:
     if proofs is None:
         # If there are no proofs, it means all removals were returned in the response.
@@ -189,14 +174,23 @@ def validate_removals(
 
 async def request_and_validate_removals(
     peer: WSCactusConnection, height: uint32, header_hash: bytes32, coin_name: bytes32, removals_root: bytes32
-) -> bool:
+) -> bool | None:
+    """
+    Returns None on failure to obtain removals, otherwise it returns True or
+    False depending on the outcome of validation.
+    """
     removals_request = RequestRemovals(height, header_hash, [coin_name])
 
-    removals_res: Optional[Union[RespondRemovals, RejectRemovalsRequest]] = await peer.call_api(
+    removals_res: RespondRemovals | RejectRemovalsRequest | None = await peer.call_api(
         FullNodeAPI.request_removals, removals_request
     )
     if removals_res is None or isinstance(removals_res, RejectRemovalsRequest):
-        return False
+        log.info(
+            f"Failed to obtain removals for height {height} header hash {header_hash} "
+            f"coin name {coin_name} from peer {peer.peer_node_id} / {peer.peer_info.host} "
+            f"version {peer.version} response: {removals_res}"
+        )
+        return None
     return validate_removals(removals_res.coins, removals_res.proofs, removals_root)
 
 
@@ -207,15 +201,20 @@ async def request_and_validate_additions(
     header_hash: bytes32,
     puzzle_hash: bytes32,
     additions_root: bytes32,
-) -> bool:
+) -> bool | None:
     if peer_request_cache.in_additions_in_block(header_hash, puzzle_hash):
         return True
     additions_request = RequestAdditions(height, header_hash, [puzzle_hash])
-    additions_res: Optional[Union[RespondAdditions, RejectAdditionsRequest]] = await peer.call_api(
+    additions_res: RespondAdditions | RejectAdditionsRequest | None = await peer.call_api(
         FullNodeAPI.request_additions, additions_request
     )
     if additions_res is None or isinstance(additions_res, RejectAdditionsRequest):
-        return False
+        log.info(
+            f"Failed to obtain additions for height {height} header hash {header_hash} "
+            f"puzzle hash {puzzle_hash} from peer {peer.peer_node_id} / {peer.peer_info.host} "
+            f"version {peer.version} response: {additions_res}"
+        )
+        return None
     result: bool = validate_additions(
         additions_res.coins,
         additions_res.proofs,
@@ -235,7 +234,7 @@ def last_change_height_cs(cs: CoinState) -> uint32:
     return uint32(0)
 
 
-def sort_coin_states(coin_states: Set[CoinState]) -> List[CoinState]:
+def sort_coin_states(coin_states: set[CoinState]) -> list[CoinState]:
     return sorted(
         coin_states,
         key=lambda coin_state: (
@@ -247,14 +246,16 @@ def sort_coin_states(coin_states: Set[CoinState]) -> List[CoinState]:
 
 
 async def request_header_blocks(
-    peer: WSCactusConnection, start_height: uint32, end_height: uint32
-) -> Optional[List[HeaderBlock]]:
+    peer: WSCactusConnection, start_height: uint32, end_height: uint32, priority: int = 0
+) -> list[HeaderBlock] | None:
     if Capability.BLOCK_HEADERS in peer.peer_capabilities:
         response = await peer.call_api(
-            FullNodeAPI.request_block_headers, RequestBlockHeaders(start_height, end_height, False)
+            FullNodeAPI.request_block_headers, RequestBlockHeaders(start_height, end_height, False), priority=priority
         )
     else:
-        response = await peer.call_api(FullNodeAPI.request_header_blocks, RequestHeaderBlocks(start_height, end_height))
+        response = await peer.call_api(
+            FullNodeAPI.request_header_blocks, RequestHeaderBlocks(start_height, end_height), priority=priority
+        )
     if response is None or isinstance(response, (RejectBlockHeaders, RejectHeaderBlocks)):
         return None
     assert isinstance(response, (RespondHeaderBlocks, RespondBlockHeaders))
@@ -262,10 +263,11 @@ async def request_header_blocks(
 
 
 async def _fetch_header_blocks_inner(
-    all_peers: List[Tuple[WSCactusConnection, bool]],
+    all_peers: list[tuple[WSCactusConnection, bool]],
     request_start: uint32,
     request_end: uint32,
-) -> Optional[Union[RespondHeaderBlocks, RespondBlockHeaders]]:
+    priority: int = 0,
+) -> RespondHeaderBlocks | RespondBlockHeaders | None:
     # We will modify this list, don't modify passed parameters.
     bytes_api_peers = [peer for peer in all_peers if Capability.BLOCK_HEADERS in peer[0].peer_capabilities]
     other_peers = [peer for peer in all_peers if Capability.BLOCK_HEADERS not in peer[0].peer_capabilities]
@@ -275,11 +277,15 @@ async def _fetch_header_blocks_inner(
     for peer, is_trusted in bytes_api_peers + other_peers:
         if Capability.BLOCK_HEADERS in peer.peer_capabilities:
             response = await peer.call_api(
-                FullNodeAPI.request_block_headers, RequestBlockHeaders(request_start, request_end, False)
+                FullNodeAPI.request_block_headers,
+                RequestBlockHeaders(request_start, request_end, False),
+                priority=priority,
             )
         else:
             response = await peer.call_api(
-                FullNodeAPI.request_header_blocks, RequestHeaderBlocks(request_start, request_end)
+                FullNodeAPI.request_header_blocks,
+                RequestHeaderBlocks(request_start, request_end),
+                priority=priority,
             )
 
         if isinstance(response, (RespondHeaderBlocks, RespondBlockHeaders)):
@@ -298,25 +304,26 @@ async def fetch_header_blocks_in_range(
     start: uint32,
     end: uint32,
     peer_request_cache: PeerRequestCache,
-    all_peers: List[Tuple[WSCactusConnection, bool]],
-) -> Optional[List[HeaderBlock]]:
-    blocks: List[HeaderBlock] = []
+    all_peers: list[tuple[WSCactusConnection, bool]],
+    priority: int = 0,
+) -> list[HeaderBlock] | None:
+    blocks: list[HeaderBlock] = []
     for i in range(start - (start % 32), end + 1, 32):
         request_start = min(uint32(i), end)
         request_end = min(uint32(i + 31), end)
-        res_h_blocks_task: Optional[asyncio.Task[Any]] = peer_request_cache.get_block_request(
-            request_start, request_end
-        )
+        res_h_blocks_task: asyncio.Task[Any] | None = peer_request_cache.get_block_request(request_start, request_end)
 
         if res_h_blocks_task is not None:
             log.debug(f"Using cache for: {start}-{end}")
             if res_h_blocks_task.done():
-                res_h_blocks: Optional[Union[RespondBlockHeaders, RespondHeaderBlocks]] = res_h_blocks_task.result()
+                res_h_blocks: RespondBlockHeaders | RespondHeaderBlocks | None = res_h_blocks_task.result()
             else:
                 res_h_blocks = await res_h_blocks_task
         else:
             log.debug(f"Fetching: {start}-{end}")
-            res_h_blocks_task = asyncio.create_task(_fetch_header_blocks_inner(all_peers, request_start, request_end))
+            res_h_blocks_task = create_referenced_task(
+                _fetch_header_blocks_inner(all_peers, request_start, request_end, priority=priority)
+            )
             peer_request_cache.add_to_block_requests(request_start, request_end, res_h_blocks_task)
             res_h_blocks = await res_h_blocks_task
         if res_h_blocks is None:
@@ -332,8 +339,11 @@ async def fetch_coin_spend(height: uint32, coin: Coin, peer: WSCactusConnection)
     )
     if solution_response is None or not isinstance(solution_response, RespondPuzzleSolution):
         raise PeerRequestException(f"Was not able to obtain solution {solution_response}")
-    assert solution_response.response.puzzle.get_tree_hash() == coin.puzzle_hash
-    assert solution_response.response.coin_name == coin.name()
+    coin_id = coin.name()
+    if solution_response.response.puzzle.get_tree_hash() != coin.puzzle_hash:
+        raise PeerRequestException(f"Peer returned wrong puzzle hash for coin {coin_id}")
+    if solution_response.response.coin_name != coin_id:
+        raise PeerRequestException(f"Peer returned wrong coin name in puzzle solution for coin {coin_id}")
 
     return make_spend(
         coin,

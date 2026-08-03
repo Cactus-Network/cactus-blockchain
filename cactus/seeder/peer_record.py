@@ -4,7 +4,8 @@ import math
 import time
 from dataclasses import dataclass
 
-from cactus.util.ints import uint32, uint64
+from chia_rs.sized_ints import uint32, uint64
+
 from cactus.util.streamable import Streamable, streamable
 
 

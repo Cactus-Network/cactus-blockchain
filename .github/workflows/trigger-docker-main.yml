@@ -17,6 +17,7 @@ permissions:
 
 jobs:
   trigger:
+    if: github.repository_owner == 'Cactus-Network'
     name: Trigger building a new `main` tag for the cactus-docker image
     runs-on: ubuntu-latest
     steps:

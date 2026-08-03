@@ -20,10 +20,8 @@ keyring_datas = copy_metadata("keyring")[0]
 
 version_data = [
     copy_metadata(name)[0]
-    for name in ["chia-blockchain", "chiapos"]
+    for name in ["cactus-blockchain", "chiapos"]
 ]
-
-block_cipher = None
 
 SERVERS = [
     "data_layer",
@@ -41,25 +39,26 @@ else:
     hidden_imports_for_windows = []
 
 hiddenimports = [
-    *collect_submodules("chia"),
+    *collect_submodules("cactus"),
+    *collect_submodules("bitstring"),
     *keyring_imports,
     *hidden_imports_for_windows,
 ]
 
 binaries = []
 
-if os.path.exists(f"{ROOT}/madmax/chia_plot"):
+if os.path.exists(f"{ROOT}/madmax/cactus_plot"):
     binaries.extend([
         (
-            f"{ROOT}/madmax/chia_plot",
+            f"{ROOT}/madmax/cactus_plot",
             "madmax"
         )
     ])
 
-if os.path.exists(f"{ROOT}/madmax/chia_plot_k34",):
+if os.path.exists(f"{ROOT}/madmax/cactus_plot_k34",):
     binaries.extend([
         (
-            f"{ROOT}/madmax/chia_plot_k34",
+            f"{ROOT}/madmax/cactus_plot_k34",
             "madmax"
         )
     ])
@@ -81,7 +80,7 @@ if os.path.exists(f"{ROOT}/bladebit/bladebit_cuda"):
     ])
 
 if THIS_IS_WINDOWS:
-    chia_mod = importlib.import_module("chia")
+    cactus_mod = importlib.import_module("cactus")
     dll_paths = pathlib.Path(sysconfig.get_path("platlib")) / "*.dll"
 
     binaries = [
@@ -98,11 +97,11 @@ if THIS_IS_WINDOWS:
             ".",
         ),
         (
-            f"{ROOT}\\madmax\\chia_plot.exe",
+            f"{ROOT}\\madmax\\cactus_plot.exe",
             "madmax"
         ),
         (
-            f"{ROOT}\\madmax\\chia_plot_k34.exe",
+            f"{ROOT}\\madmax\\cactus_plot_k34.exe",
             "madmax"
         ),
         (
@@ -118,12 +117,11 @@ if THIS_IS_WINDOWS:
 
 datas = []
 
-datas.append((f"{ROOT}/chia/util/english.txt", "chia/util"))
-datas.append((f"{ROOT}/chia/util/initial-config.yaml", "chia/util"))
-for path in sorted({path.parent for path in ROOT.joinpath("chia").rglob("*.hex")}):
+datas.append((f"{ROOT}/cactus/util/english.txt", "cactus/util"))
+datas.append((f"{ROOT}/cactus/util/initial-config.yaml", "cactus/util"))
+for path in sorted({path.parent for path in ROOT.joinpath("cactus").rglob("*.hex")}):
     datas.append((f"{path}/*.hex", path.relative_to(ROOT)))
-datas.append((f"{ROOT}/chia/ssl/*", "chia/ssl"))
-datas.append((f"{ROOT}/mozilla-ca/*", "mozilla-ca"))
+datas.append((f"{ROOT}/cactus/ssl/*", "cactus/ssl"))
 datas.extend(version_data)
 
 pathex = []
@@ -141,11 +139,10 @@ def add_binary(name, path_to_script, collect_args):
         excludes=[],
         win_no_prefer_redirects=False,
         win_private_assemblies=False,
-        cipher=block_cipher,
         noarchive=False,
     )
 
-    binary_pyz = PYZ(analysis.pure, analysis.zipped_data, cipher=block_cipher)
+    binary_pyz = PYZ(analysis.pure, analysis.zipped_data)
 
     binary_exe = EXE(
         binary_pyz,
@@ -170,17 +167,18 @@ def add_binary(name, path_to_script, collect_args):
 
 COLLECT_ARGS = []
 
-add_binary("chia", f"{ROOT}/chia/cmds/chia.py", COLLECT_ARGS)
-add_binary("daemon", f"{ROOT}/chia/daemon/server.py", COLLECT_ARGS)
+add_binary("cactus", f"{ROOT}/cactus/cmds/cactus.py", COLLECT_ARGS)
+add_binary("daemon", f"{ROOT}/cactus/daemon/server.py", COLLECT_ARGS)
 
 for server in SERVERS:
-    add_binary(f"start_{server}", f"{ROOT}/chia/server/start_{server}.py", COLLECT_ARGS)
+    add_binary(f"start_{server}", f"{ROOT}/cactus/{server}/start_{server}.py", COLLECT_ARGS)
 
-add_binary("start_crawler", f"{ROOT}/chia/seeder/start_crawler.py", COLLECT_ARGS)
-add_binary("start_seeder", f"{ROOT}/chia/seeder/dns_server.py", COLLECT_ARGS)
-add_binary("start_data_layer_http", f"{ROOT}/chia/data_layer/data_layer_server.py", COLLECT_ARGS)
-add_binary("start_data_layer_s3_plugin", f"{ROOT}/chia/data_layer/s3_plugin_service.py", COLLECT_ARGS)
-add_binary("timelord_launcher", f"{ROOT}/chia/timelord/timelord_launcher.py", COLLECT_ARGS)
+add_binary("start_crawler", f"{ROOT}/cactus/seeder/start_crawler.py", COLLECT_ARGS)
+add_binary("start_seeder", f"{ROOT}/cactus/seeder/dns_server.py", COLLECT_ARGS)
+add_binary("start_data_layer_http", f"{ROOT}/cactus/data_layer/data_layer_server.py", COLLECT_ARGS)
+add_binary("start_data_layer_s3_plugin", f"{ROOT}/cactus/data_layer/s3_plugin_service.py", COLLECT_ARGS)
+add_binary("timelord_launcher", f"{ROOT}/cactus/timelord/timelord_launcher.py", COLLECT_ARGS)
+add_binary(f"start_simulator", f"{ROOT}/cactus/simulator/start_simulator.py", COLLECT_ARGS)
 
 COLLECT_KWARGS = dict(
     strip=False,

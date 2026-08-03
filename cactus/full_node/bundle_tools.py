@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from cactus_rs import solution_generator, solution_generator_backrefs
+from chia_rs import SpendBundle, solution_generator, solution_generator_backrefs
 
 from cactus.types.blockchain_format.serialized_program import SerializedProgram
 from cactus.types.generator_types import BlockGenerator
-from cactus.types.spend_bundle import SpendBundle
 
 
 def simple_solution_generator(bundle: SpendBundle) -> BlockGenerator:

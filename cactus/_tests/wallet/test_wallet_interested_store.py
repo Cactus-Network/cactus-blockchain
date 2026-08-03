@@ -3,11 +3,11 @@ from __future__ import annotations
 import random
 
 import pytest
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint64
 
 from cactus._tests.util.db_connection import DBConnection
 from cactus.types.blockchain_format.coin import Coin
-from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.util.ints import uint64
 from cactus.wallet.wallet_interested_store import WalletInterestedStore
 
 

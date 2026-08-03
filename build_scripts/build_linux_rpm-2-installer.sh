@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -o errexit
 
@@ -21,7 +21,13 @@ if [ ! "$CACTUS_INSTALLER_VERSION" ]; then
   echo "WARNING: No environment variable CACTUS_INSTALLER_VERSION set. Using 0.0.0."
   CACTUS_INSTALLER_VERSION="0.0.0"
 fi
+if [ ! "$CACTUS_SEMVER_VERSION" ]; then
+  echo "WARNING: No environment variable CACTUS_SEMVER_VERSION set. Using $CACTUS_INSTALLER_VERSION."
+  CACTUS_SEMVER_VERSION="$CACTUS_INSTALLER_VERSION"
+fi
+
 echo "Cactus Installer Version is: $CACTUS_INSTALLER_VERSION"
+echo "Cactus Semver Version is: $CACTUS_SEMVER_VERSION"
 
 echo "Installing npm and electron packagers"
 cd npm_linux || exit 1
@@ -81,8 +87,8 @@ fpm -s dir -t rpm \
   --rpm-tag '%undefine _missing_build_ids_terminate_build' \
   --before-install=assets/rpm/before-install.sh \
   --rpm-tag 'Requires(pre): findutils' \
-  --rpm-compression xzmt \
-  --rpm-compression-level 6 \
+  --rpm-compression xz \
+  --rpm-compression-level 9 \
   .
 # CLI only rpm done
 cp -r dist/daemon ../cactus-blockchain-gui/packages/gui
@@ -91,7 +97,7 @@ cd ../cactus-blockchain-gui/packages/gui || exit 1
 
 # sets the version for cactus-blockchain in package.json
 cp package.json package.json.orig
-jq --arg VER "$CACTUS_INSTALLER_VERSION" '.version=$VER' package.json >temp.json && mv temp.json package.json
+jq --arg VER "$CACTUS_SEMVER_VERSION" '.version=$VER' package.json >temp.json && mv temp.json package.json
 
 export FPM_EDITOR="cat >../../../build_scripts/dist/gui.spec <"
 jq '.rpm.fpm |= . + ["--edit"]' ../../../build_scripts/electron-builder.json >temp.json && mv temp.json ../../../build_scripts/electron-builder.json
@@ -101,17 +107,14 @@ OPT_ARCH="--x64"
 if [ "$REDHAT_PLATFORM" = "arm64" ]; then
   OPT_ARCH="--arm64"
 fi
-PRODUCT_NAME="cactus"
-echo "${NPM_PATH}/electron-builder" build --linux rpm "${OPT_ARCH}" \
+echo USE_SYSTEM_FPM=true "${NPM_PATH}/electron-builder" build --linux rpm "${OPT_ARCH}" \
   --config.extraMetadata.name=cactus-blockchain \
-  --config.productName="${PRODUCT_NAME}" --config.linux.desktop.Name="Cactus Blockchain" \
-  --config.rpm.packageName="cactus-blockchain" \
-  --config ../../../build_scripts/electron-builder.json
-"${NPM_PATH}/electron-builder" build --linux rpm "${OPT_ARCH}" \
+  --config ../../../build_scripts/electron-builder.json \
+  --publish never
+USE_SYSTEM_FPM=true "${NPM_PATH}/electron-builder" build --linux rpm "${OPT_ARCH}" \
   --config.extraMetadata.name=cactus-blockchain \
-  --config.productName="${PRODUCT_NAME}" --config.linux.desktop.Name="Cactus Blockchain" \
-  --config.rpm.packageName="cactus-blockchain" \
-  --config ../../../build_scripts/electron-builder.json
+  --config ../../../build_scripts/electron-builder.json \
+  --publish never
 LAST_EXIT_CODE=$?
 ls -l dist/linux*-unpacked/resources
 
@@ -124,7 +127,7 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 fi
 
 GUI_RPM_NAME="cactus-blockchain-${CACTUS_INSTALLER_VERSION}-1.${REDHAT_PLATFORM}.rpm"
-mv "dist/${PRODUCT_NAME}-${CACTUS_INSTALLER_VERSION}.rpm" "../../../build_scripts/dist/${GUI_RPM_NAME}"
+mv "dist/cactus-${CACTUS_INSTALLER_VERSION}.rpm" "../../../build_scripts/dist/${GUI_RPM_NAME}"
 cd ../../../build_scripts || exit 1
 
 echo "Create final installer"

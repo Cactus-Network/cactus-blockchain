@@ -2,48 +2,40 @@ from __future__ import annotations
 
 import importlib.metadata
 import json
-from typing import AsyncIterator, List, Tuple
+from collections.abc import AsyncIterator
 
 import aiohttp
+import dns.rdataclass
+import dns.rdatatype
+import dns.rdtypes.IN.A
+import dns.rdtypes.IN.AAAA
 import pytest
+from chia_rs import BlockRecord
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint16, uint32, uint64
 
+from cactus._tests.conftest import test_constants_modified
 from cactus._tests.core.node_height import node_height_at_least
 from cactus._tests.util.setup_nodes import FullSystem, OldSimulatorsAndWallets
 from cactus._tests.util.time_out_assert import time_out_assert
 from cactus.cmds.units import units
-from cactus.consensus.block_record import BlockRecord
 from cactus.consensus.block_rewards import calculate_base_farmer_reward, calculate_pool_reward
 from cactus.daemon.server import WebSocketServer
 from cactus.full_node.full_node import FullNode
 from cactus.full_node.full_node_api import FullNodeAPI
-from cactus.server.outbound_message import NodeType
+from cactus.protocols.outbound_message import NodeType
 from cactus.server.server import CactusServer
-from cactus.simulator.block_tools import BlockTools, create_block_tools_async, test_constants
+from cactus.simulator.block_tools import BlockTools, create_block_tools_async
 from cactus.simulator.full_node_simulator import FullNodeSimulator
 from cactus.simulator.keyring import TempKeyring
 from cactus.simulator.setup_services import setup_full_node
 from cactus.simulator.simulator_protocol import FarmNewBlockProtocol, GetAllCoinsProtocol, ReorgProtocol
-from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.types.peer_info import PeerInfo
-from cactus.util.ints import uint8, uint16, uint32, uint64
 from cactus.util.ws_message import create_payload
 from cactus.wallet.util.tx_config import DEFAULT_TX_CONFIG
 from cactus.wallet.wallet_node import WalletNode
 
 chiapos_version = importlib.metadata.version("chiapos")
-
-test_constants_modified = test_constants.replace(
-    DIFFICULTY_STARTING=uint64(2**8),
-    DISCRIMINANT_SIZE_BITS=uint16(1024),
-    SUB_EPOCH_BLOCKS=uint32(140),
-    WEIGHT_PROOF_THRESHOLD=uint8(2),
-    WEIGHT_PROOF_RECENT_BLOCKS=uint32(350),
-    MAX_SUB_SLOT_BLOCKS=uint32(50),
-    NUM_SPS_SUB_SLOT=uint32(32),  # Must be a power of 2
-    EPOCH_BLOCKS=uint32(280),
-    SUB_SLOT_ITERS_STARTING=uint64(2**20),
-    NUMBER_ZERO_BITS_PLOT_FILTER=uint8(5),
-)
 
 
 # TODO: Ideally, the db_version should be the (parameterized) db_version
@@ -53,17 +45,29 @@ test_constants_modified = test_constants.replace(
 @pytest.fixture(scope="function")
 async def extra_node(self_hostname) -> AsyncIterator[FullNodeAPI | FullNodeSimulator]:
     with TempKeyring() as keychain:
-        b_tools = await create_block_tools_async(constants=test_constants_modified, keychain=keychain)
-        async with setup_full_node(
-            test_constants_modified,
-            "blockchain_test_3.db",
-            self_hostname,
-            b_tools,
-            db_version=2,
-        ) as service:
-            yield service._api
+        async with create_block_tools_async(constants=test_constants_modified, keychain=keychain) as b_tools:
+            async with setup_full_node(
+                test_constants_modified,
+                "blockchain_test_3.db",
+                self_hostname,
+                b_tools,
+                db_version=2,
+            ) as service:
+                yield service._api
 
 
+class FakeDNSResolver:
+    async def resolve(self, qname, rdtype, lifetime):
+        if rdtype == "A":
+            record = dns.rdtypes.IN.A.A(dns.rdataclass.IN, dns.rdatatype.A, "1.2.3.4")
+            return [record]
+        elif rdtype == "AAAA":
+            record = dns.rdtypes.IN.AAAA.AAAA(dns.rdataclass.IN, dns.rdatatype.AAAA, "::1")
+            return [record]
+        return []
+
+
+@pytest.mark.filterwarnings("ignore:unclosed:ResourceWarning")
 class TestSimulation:
     @pytest.mark.limit_consensus_modes(reason="This test only supports one running at a time.")
     @pytest.mark.anyio
@@ -186,7 +190,7 @@ class TestSimulation:
     @pytest.mark.anyio
     async def test_simulator_auto_farm_and_get_coins(
         self,
-        two_wallet_nodes: Tuple[List[FullNodeSimulator], List[Tuple[WalletNode, CactusServer]], BlockTools],
+        two_wallet_nodes: tuple[list[FullNodeSimulator], list[tuple[WalletNode, CactusServer]], BlockTools],
         self_hostname: str,
     ) -> None:
         num_blocks = 2
@@ -194,9 +198,11 @@ class TestSimulation:
         full_node_api = full_nodes[0]
         server_1 = full_node_api.full_node.server
         wallet_node, server_2 = wallets[0]
-        wallet_node_2, server_3 = wallets[1]
+        wallet_node_2, _server_3 = wallets[1]
         wallet = wallet_node.wallet_state_manager.main_wallet
-        ph = await wallet.get_new_puzzlehash()
+        wallet_2 = wallet_node_2.wallet_state_manager.main_wallet
+        async with wallet.wallet_state_manager.new_action_scope(DEFAULT_TX_CONFIG, push=True) as action_scope:
+            ph = await action_scope.get_puzzle_hash(wallet.wallet_state_manager)
         wallet_node.config["trusted_peers"] = {}
         wallet_node_2.config["trusted_peers"] = {}
 
@@ -212,10 +218,12 @@ class TestSimulation:
 
         await time_out_assert(10, wallet.get_confirmed_balance, funds)
         await time_out_assert(5, wallet.get_unconfirmed_balance, funds)
+        async with wallet_2.wallet_state_manager.new_action_scope(DEFAULT_TX_CONFIG, push=True) as action_scope:
+            ph_2 = await action_scope.get_puzzle_hash(wallet_2.wallet_state_manager)
         async with wallet.wallet_state_manager.new_action_scope(DEFAULT_TX_CONFIG, push=True) as action_scope:
             await wallet.generate_signed_transaction(
-                uint64(10),
-                await wallet_node_2.wallet_state_manager.main_wallet.get_new_puzzlehash(),
+                [uint64(10)],
+                [ph_2],
                 action_scope,
                 uint64(0),
             )
@@ -313,7 +321,7 @@ class TestSimulation:
             peak = full_node_api.full_node.blockchain.get_peak()
             assert isinstance(peak, BlockRecord)
             start_time = peak.timestamp
-            await full_node_api.farm_new_transaction_block(FarmNewBlockProtocol(bytes32([0] * 32)))
+            await full_node_api.farm_new_transaction_block(FarmNewBlockProtocol(bytes32.zeros))
             peak = full_node_api.full_node.blockchain.get_peak()
             assert isinstance(peak, BlockRecord)
             end_time = peak.timestamp
@@ -390,8 +398,8 @@ class TestSimulation:
         for coin in coins:
             async with wallet.wallet_state_manager.new_action_scope(DEFAULT_TX_CONFIG, push=True) as action_scope:
                 await wallet.generate_signed_transaction(
-                    amount=uint64(tx_amount),
-                    puzzle_hash=await wallet_node.wallet_state_manager.main_wallet.get_new_puzzlehash(),
+                    amounts=[uint64(tx_amount)],
+                    puzzle_hashes=[await action_scope.get_puzzle_hash(wallet.wallet_state_manager)],
                     action_scope=action_scope,
                     coins={coin},
                 )
@@ -439,8 +447,8 @@ class TestSimulation:
             ) as action_scope:
                 for coin in coins:
                     await wallet.generate_signed_transaction(
-                        amount=uint64(tx_amount),
-                        puzzle_hash=await wallet_node.wallet_state_manager.main_wallet.get_new_puzzlehash(),
+                        amounts=[uint64(tx_amount)],
+                        puzzle_hashes=[await action_scope.get_puzzle_hash(wallet.wallet_state_manager)],
                         action_scope=action_scope,
                         coins={coin},
                     )
@@ -485,7 +493,7 @@ class TestSimulation:
     async def test_create_coins_with_invalid_amounts_raises(
         self,
         self_hostname: str,
-        amounts: List[uint64],
+        amounts: list[uint64],
         simulator_and_wallet: OldSimulatorsAndWallets,
     ) -> None:
         [[full_node_api], [[wallet_node, wallet_server]], _] = simulator_and_wallet
@@ -499,3 +507,16 @@ class TestSimulation:
 
         with pytest.raises(Exception, match="Coins must have a positive value"):
             await full_node_api.create_coins_with_amounts(amounts=amounts, wallet=wallet)
+
+    @pytest.mark.limit_consensus_modes(reason="This test only supports one running at a time.")
+    @pytest.mark.anyio
+    async def test_introducer_fallback_to_dns(self, simulation):
+        full_system: FullSystem
+        full_system, _ = simulation
+        introducer = full_system.introducer
+        introducer.introducer.dns_servers = ["127.0.0.1"]
+        introducer.introducer.resolver = FakeDNSResolver()
+        peers = await introducer.introducer.get_peers_from_dns(num_peers=10)
+        assert len(peers) == 2
+        assert any(peer.host == "1.2.3.4" for peer in peers)
+        assert any(peer.host == "::1" for peer in peers)

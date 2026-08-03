@@ -1,16 +1,17 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
-from typing import Any, List, Optional, Tuple, Type, Union
+from typing import Any
 
 import pytest
-from clvm.casts import int_from_bytes
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint32, uint64
 from clvm.EvalError import EvalError
 
 from cactus.types.blockchain_format.program import Program
-from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.types.condition_opcodes import ConditionOpcode
-from cactus.util.ints import uint32, uint64
+from cactus.util.casts import int_from_bytes
 from cactus.wallet.conditions import (
     CONDITION_DRIVERS,
     CONDITION_DRIVERS_W_ABSTRACTIONS,
@@ -66,8 +67,8 @@ from cactus.wallet.conditions import (
 class ConditionSerializations:
     opcode: bytes
     program_args: Program
-    json_keys: List[str]
-    json_args: List[Any]
+    json_keys: list[str]
+    json_args: list[Any]
 
     @property
     def program(self) -> Program:
@@ -75,7 +76,7 @@ class ConditionSerializations:
         return prog
 
 
-HASH: bytes32 = bytes32([0] * 32)
+HASH: bytes32 = bytes32.zeros
 HASH_HEX: str = HASH.hex()
 PK: bytes = b"\xc0" + bytes(47)
 PK_HEX: str = PK.hex()
@@ -156,14 +157,26 @@ def test_completeness() -> None:
         ConditionSerializations(
             ConditionOpcode.SEND_MESSAGE,
             Program.to([0x3F, b"foobar", Program.to(HASH)]),
-            ["mode", "msg", "args"],
-            ["63", "0x" + b"foobar".hex(), "a0" + HASH_HEX],
+            ["mode_integer", "msg", "var_args", "sender", "receiver"],
+            [
+                "63",
+                "0x" + b"foobar".hex(),
+                ["a0" + HASH_HEX],
+                {"mode_integer": 0b111},
+                {"mode_integer": 0b111, "coin_id_committed": "0x" + HASH_HEX},
+            ],
         ),
         ConditionSerializations(
             ConditionOpcode.RECEIVE_MESSAGE,
             Program.to([0x3F, b"foobar", Program.to(HASH)]),
-            ["mode", "msg", "args"],
-            ["63", "0x" + b"foobar".hex(), "a0" + HASH_HEX],
+            ["mode_integer", "msg", "var_args", "sender", "receiver"],
+            [
+                "63",
+                "0x" + b"foobar".hex(),
+                ["a0" + HASH_HEX],
+                {"mode_integer": 0b111, "coin_id_committed": "0x" + HASH_HEX},
+                {"mode_integer": 0b111},
+            ],
         ),
     ],
 )
@@ -202,24 +215,22 @@ def test_unknown_condition() -> None:
     ],
 )
 def test_announcement_inversions(
-    drivers: Union[
-        Tuple[Type[CreateCoinAnnouncement], Type[AssertCoinAnnouncement]],
-        Tuple[Type[CreatePuzzleAnnouncement], Type[AssertPuzzleAnnouncement]],
-        Tuple[Type[CreateAnnouncement], Type[AssertAnnouncement]],
-    ]
+    drivers: tuple[type[CreateCoinAnnouncement], type[AssertCoinAnnouncement]]
+    | tuple[type[CreatePuzzleAnnouncement], type[AssertPuzzleAnnouncement]]
+    | tuple[type[CreateAnnouncement], type[AssertAnnouncement]],
 ) -> None:
     create_driver, assert_driver = drivers
     # mypy is not smart enough to understand that this `if` narrows down the potential types it could be
     # This leads to the large number of type ignores below
     if create_driver == CreateAnnouncement and assert_driver == AssertAnnouncement:
         with pytest.raises(ValueError, match="Must specify either"):
-            assert_driver(True)  # type: ignore[arg-type]
+            assert_driver(True)
         with pytest.raises(ValueError, match="Cannot create"):
-            create_driver(MSG, True).corresponding_assertion()  # type: ignore[arg-type]
+            create_driver(MSG, True).corresponding_assertion()
         with pytest.raises(ValueError, match="Cannot create"):
             assert_driver(True, MSG).corresponding_creation()  # type: ignore[arg-type]
-        create_instance = create_driver(MSG, True, HASH)  # type: ignore[call-arg, arg-type]
-        assert_instance = assert_driver(True, None, HASH, MSG)  # type: ignore[call-arg, arg-type]
+        create_instance = create_driver(MSG, True, HASH)
+        assert_instance = assert_driver(True, None, HASH, MSG)
     else:
         with pytest.raises(ValueError, match="Must specify either"):
             assert_driver()  # type: ignore[call-arg]
@@ -227,8 +238,8 @@ def test_announcement_inversions(
             create_driver(MSG).corresponding_assertion()  # type: ignore[call-arg]
         with pytest.raises(ValueError, match="Cannot create"):
             assert_driver(MSG).corresponding_creation()  # type: ignore[arg-type]
-        create_instance = create_driver(MSG, HASH)  # type: ignore[arg-type]
-        assert_instance = assert_driver(None, HASH, MSG)  # type: ignore[arg-type]
+        create_instance = create_driver(MSG, HASH)  # type: ignore[arg-type, assignment]
+        assert_instance = assert_driver(None, HASH, MSG)  # type: ignore[arg-type, assignment]
     assert_instance.to_program()  # Verifying that even without a specific message, we can still calculate the condition
     assert create_instance.corresponding_assertion() == assert_instance
     assert assert_instance.corresponding_creation() == create_instance
@@ -236,9 +247,9 @@ def test_announcement_inversions(
 
 @dataclass(frozen=True)
 class TimelockInfo:
-    drivers: List[Condition]
+    drivers: list[Condition]
     parsed_info: ConditionValidTimes
-    conditions_after: Optional[List[Condition]] = None
+    conditions_after: list[Condition] | None = None
 
 
 @pytest.mark.parametrize(
@@ -273,9 +284,7 @@ class TimelockInfo:
     ],
 )
 def test_timelock_parsing(timelock_info: TimelockInfo) -> None:
-    assert timelock_info.parsed_info == parse_timelock_info(
-        [UnknownCondition(Program.to(None), []), *timelock_info.drivers]
-    )
+    assert timelock_info.parsed_info == parse_timelock_info([UnknownCondition(Program.NIL, []), *timelock_info.drivers])
     assert timelock_info.parsed_info.to_conditions() == (
         timelock_info.conditions_after if timelock_info.conditions_after is not None else timelock_info.drivers
     )
@@ -336,53 +345,56 @@ def test_timelock_parsing(timelock_info: TimelockInfo) -> None:
     ],
 )
 def test_invalid_condition(
-    cond: Type[
-        Union[
-            AggSigParent,
-            AggSigPuzzle,
-            AggSigAmount,
-            AggSigPuzzleAmount,
-            AggSigParentAmount,
-            AggSigParentPuzzle,
-            AggSigUnsafe,
-            AggSigMe,
-            CreateCoin,
-            ReserveFee,
-            AssertCoinAnnouncement,
-            CreateCoinAnnouncement,
-            AssertPuzzleAnnouncement,
-            CreatePuzzleAnnouncement,
-            AssertConcurrentSpend,
-            AssertConcurrentPuzzle,
-            AssertMyCoinID,
-            AssertMyParentID,
-            AssertMyPuzzleHash,
-            AssertMyAmount,
-            AssertMyBirthSeconds,
-            AssertMyBirthHeight,
-            AssertSecondsRelative,
-            AssertSecondsAbsolute,
-            AssertHeightRelative,
-            AssertHeightAbsolute,
-            AssertBeforeSecondsRelative,
-            AssertBeforeSecondsAbsolute,
-            AssertBeforeHeightRelative,
-            AssertBeforeHeightAbsolute,
-            Softfork,
-            Remark,
-            UnknownCondition,
-            AggSig,
-            CreateAnnouncement,
-            AssertAnnouncement,
-            Timelock,
-            SendMessage,
-            ReceiveMessage,
-        ]
+    cond: type[
+        AggSigParent
+        | AggSigPuzzle
+        | AggSigAmount
+        | AggSigPuzzleAmount
+        | AggSigParentAmount
+        | AggSigParentPuzzle
+        | AggSigUnsafe
+        | AggSigMe
+        | CreateCoin
+        | ReserveFee
+        | AssertCoinAnnouncement
+        | CreateCoinAnnouncement
+        | AssertPuzzleAnnouncement
+        | CreatePuzzleAnnouncement
+        | AssertConcurrentSpend
+        | AssertConcurrentPuzzle
+        | AssertMyCoinID
+        | AssertMyParentID
+        | AssertMyPuzzleHash
+        | AssertMyAmount
+        | AssertMyBirthSeconds
+        | AssertMyBirthHeight
+        | AssertSecondsRelative
+        | AssertSecondsAbsolute
+        | AssertHeightRelative
+        | AssertHeightAbsolute
+        | AssertBeforeSecondsRelative
+        | AssertBeforeSecondsAbsolute
+        | AssertBeforeHeightRelative
+        | AssertBeforeHeightAbsolute
+        | Softfork
+        | Remark
+        | UnknownCondition
+        | AggSig
+        | CreateAnnouncement
+        | AssertAnnouncement
+        | Timelock
+        | SendMessage
+        | ReceiveMessage
     ],
     prg: bytes,
 ) -> None:
-    if (cond == Remark or cond == UnknownCondition) and prg != b"\x80":
+    if (cond in {Remark, UnknownCondition}) and prg != b"\x80":
         pytest.skip("condition takes arbitrary arguments")
 
     with pytest.raises((ValueError, EvalError, KeyError)):
         cond.from_program(Program.from_bytes(prg))
+
+
+def test_create_coin_initialization_error() -> None:
+    with pytest.raises(ValueError, match=re.escape("Cannot have both memos and memo_blob")):
+        CreateCoin(puzzle_hash=bytes32.zeros, amount=uint64(0), memos=[b""], memo_blob=Program.to("not both"))

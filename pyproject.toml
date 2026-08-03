@@ -1,123 +1,120 @@
-[tool.poetry]
+[project]
 name = "cactus-blockchain"
-# see [tool.poetry-dynamic-versioning]
-version = "2.5.0"
+dynamic = [ "dependencies", "version" ]
 description = "Cactus blockchain full node, farmer, timelord, and wallet."
-authors = ["Dommer <dommer@cactus-network.net>"]
-license = "Apache License"
-readme = "README.md"
+requires-python = ">=3.10, <4"
+authors = [
+    {name="Dommer", email="dommer@cactus-network.net"}
+]
+license = "Apache-2.0"
+readme = {file = "README.md", content-type = "text/markdown"}
 keywords= ["cactus", "blockchain", "node"]
 homepage = "https://cactus-network.net/"
-packages = [{ include = "cactus"}, { include = "mozilla-ca/cacert.pem" }]
 
-[tool.poetry.scripts]
+[tool.poetry]
+# see [tool.poetry-dynamic-versioning]
+packages = [{ include = "cactus"}]
+version = "0.0.0"
+
+[project.scripts]
 cactus = "cactus.cmds.cactus:main"
 cactus_daemon = "cactus.daemon.server:main"
-cactus_wallet = "cactus.server.start_wallet:main"
-cactus_full_node = "cactus.server.start_full_node:main"
-cactus_harvester = "cactus.server.start_harvester:main"
-cactus_farmer = "cactus.server.start_farmer:main"
-cactus_introducer = "cactus.server.start_introducer:main"
+cactus_wallet = "cactus.wallet.start_wallet:main"
+cactus_full_node = "cactus.full_node.start_full_node:main"
+cactus_harvester = "cactus.harvester.start_harvester:main"
+cactus_farmer = "cactus.farmer.start_farmer:main"
+cactus_introducer = "cactus.introducer.start_introducer:main"
 cactus_crawler = "cactus.seeder.start_crawler:main"
 cactus_seeder = "cactus.seeder.dns_server:main"
-cactus_timelord = "cactus.server.start_timelord:main"
+cactus_timelord = "cactus.timelord.start_timelord:main"
 cactus_timelord_launcher = "cactus.timelord.timelord_launcher:main"
 cactus_full_node_simulator = "cactus.simulator.start_simulator:main"
-cactus_data_layer = "cactus.server.start_data_layer:main"
+cactus_data_layer = "cactus.data_layer.start_data_layer:main"
 cactus_data_layer_http = "cactus.data_layer.data_layer_server:main"
 cactus_data_layer_s3_plugin = "cactus.data_layer.s3_plugin_service:run_server"
-
-[[tool.poetry.source]]
-name = "chia"
-url = "https://pypi.chia.net/simple/"
-priority = "supplemental"
+cactus_solver = "cactus.solver.start_solver:main"
 
 [[tool.poetry.source]]
 name = "cactus"
 url = "https://pypi.cactus-network.net/simple/"
 priority = "supplemental"
 
-[tool.poetry.urls]
-"Source" = "https://github.com/Cactus-Network/cactus-blockchain/"
-"Changelog" = "https://github.com/Cactus-Network/cactus-blockchain/blob/main/CHANGELOG.md"
+[project.urls]
+source = "https://github.com/Cactus-Network/cactus-blockchain/"
+changelog = "https://github.com/Cactus-Network/cactus-blockchain/blob/main/CHANGELOG.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9, <3.13"
-aiofiles = "24.1.0"  # Async IO for files
-aiohttp = "3.10.4"  # HTTP server for full node rpc
-aiosqlite = "0.20.0"  # asyncio wrapper for sqlite, to store blocks
-anyio = "4.3.0"
-bitstring = "4.1.4"  # Binary data management library
-boto3 = "1.34.143"  # AWS S3 for Data Layer S3 plugin
-chiabip158 = "1.5.1"  # bip158-style wallet filters
-chiapos = "2.0.4"  # proof of space
-#cactus_rs = { file="../cactus_rs/wheel/cactus_rs-0.10.0-cp310-cp310-linux_x86_64.whl"}
-cactus_rs = { version = "0.17.0", source = "cactus" }
-chiavdf = "1.1.6"  # timelord and vdf verification
-click = "8.1.7"  # For the CLI
-clvm = "0.9.10"
-clvm_tools = "0.4.9"  # Currying Program.to other conveniences
-clvm_tools_rs = "0.1.43"  # Rust implementation of clvm_tools' compiler
-colorama = "0.4.6"  # Colorizes terminal output
-colorlog = "6.8.2"  # Adds color to logs
-concurrent_log_handler = "0.9.25"  # Concurrently log and rotate logs
-cryptography = "43.0.1"  # Python cryptography library for TLS - keyring conflict
-dnslib = "0.9.25"  # dns lib
-dnspython = "2.6.1"  # Query DNS seeds
-filelock = "3.15.4"  # For reading and writing config multiprocess and multithread safely  (non-reentrant locks)
-keyring = "25.2.1"  # Store keys in MacOS Keychain, Windows Credential Locker
-packaging = "24.0"
-pip = "24.2"
-psutil = [
-    {version="5.9.4", markers="platform_machine!='aarch64'"},
-    {version="5.9.4", markers="platform_machine=='aarch64'", source="chia"},
-]
-pyyaml = "6.0.1"  # Used for config file format
-setproctitle = "1.3.3"  # Gives the cactus processes readable names
-setuptools = "75.1.0"
-sortedcontainers = "2.4.0"  # For maintaining sorted mempools
-typing-extensions = "4.11.0"  # typing backports like Protocol and TypedDict
-watchdog = "4.0.1"  # Filesystem event watching - watches keyring.yaml
-zstd = [
-	{version="1.5.5.1", python = "<3.12"},
-	{version="1.5.5.1", python = "3.12", source="chia"},
-]
-importlib-resources = "6.4.0"
-hsms = "0.3.1"
-aiohttp_cors = { version = "0.7.0", optional = true }
-black = { version = "24.8.0", optional = true }
-build = { version = "1.2.1", optional = true }
-coverage = { version = "7.6.1", optional = true }
-diff-cover = { version = "9.0.0", optional = true }
-flake8 = { version = "7.1.1", optional = true }
-isort = { version = "5.13.2", optional = true }
+aiofiles = ">=24.1.0"  # Async IO for files
+aiohttp = ">=3.14.0"  # HTTP server for full node rpc
+aiosqlite = ">=0.20.0"  # asyncio wrapper for sqlite, to store blocks
+anyio = ">=4.6.2.post1"
+bitstring = ">=4.1.4"  # Binary data management library
+boto3 = ">=1.43.8"  # AWS S3 for Data Layer S3 plugin
+chiabip158 = ">=1.5.2"  # bip158-style wallet filters
+chiapos = ">=2.0.10"  # proof of space
+chia-puzzles-py = ">=0.20.1"
+chia_rs = ">=0.45.1, <0.46"
+chiavdf = ">=1.1.10"  # timelord and vdf verification
+click = ">=8.1.7"  # For the CLI
+clvm = ">=0.9.14"
+clvm_tools = ">=0.4.9"  # Currying Program.to other conveniences
+chialisp = ">=0.4.1"  # Rust implementation of ChiaLisp compiler
+colorama = ">=0.4.6"  # Colorizes terminal output
+colorlog = ">=6.9.0"  # Adds color to logs
+concurrent_log_handler = ">=0.9.25"  # Concurrently log and rotate logs
+cryptography = ">=48.0.0"  # Python cryptography library for TLS - keyring conflict
+dnslib = ">=0.9.25"  # dns lib
+dnspython = ">=2.6.1"  # Query DNS seeds
+filelock = ">=3.29.0"  # For reading and writing config multiprocess and multithread safely  (non-reentrant locks)
+keyring = ">=25.5.0"  # Store keys in MacOS Keychain, Windows Credential Locker
+packaging = ">=26.2"
+pip = ">=26.1.1"
+psutil = ">=6.1.0"
+pyyaml = ">=6.0.2"  # Used for config file format
+setproctitle = ">=1.3.3"  # Gives the cactus processes readable names
+setuptools = ">=75.5.0"
+sortedcontainers = ">=2.4.0"  # For maintaining sorted mempools
+typing-extensions = ">=4.12.2"  # typing backports like Protocol and TypedDict
+watchdog = ">=4.0.1"  # Filesystem event watching - watches keyring.yaml
+zstd = ">=1.5.7.3"
+importlib-resources = ">=6.4.5"
+hsms = ">=0.3.2"
+aiohttp_cors = { version = ">=0.7.0", optional = true }
+build = { version = ">=1.5.0", optional = true }
+coverage = { version = ">=7.14.0", optional = true }
+diff-cover = { version = ">=9.2.0", optional = true }
 # TODO: but...  keyrings_cryptfile goes 15 minutes without locking while this does in 75 seconds
-"keyrings.cryptfile" = { version = "1.3.9", optional = true }
-mypy = { version = "1.11.1", optional = true }
-pre-commit = [ { version = "3.5.0", python = "<3.9", optional = true }, { version = "3.7.1", python = ">=3.9", optional = true } ]
-py3createtorrent = { version = "1.2.1", optional = true }
-pyinstaller = { version = "6.9.0", optional = true }
-pylint = { version = "3.2.6", optional = true }
-pytest = { version = "8.3.3", optional = true }
-pytest-cov = { version = "5.0.0", optional = true }
-pytest-mock = { version = "3.14.0", optional = true }
-pytest-monitor = { version = "1.6.6", platform = "linux", optional = true }
-pytest-xdist = { version = "3.6.1", optional = true }
-types-aiofiles = { version = "23.2.0.20240311", optional = true }
-types-cryptography = { version = "3.3.23.2", optional = true }
-types-pyyaml = { version = "6.0.12.20240311", optional = true }
-types-setuptools = { version = "70.0.0.20240524", optional = true }
-lxml = { version = "5.2.2", optional = true }
-miniupnpc = { version = "2.2.2", source = "chia", optional = true }
-pyupgrade = { version = "3.16.0", optional = true }
+"keyrings.cryptfile" = { version = ">=1.3.9", optional = true }
+mypy = { version = ">=1.11.1", optional = true }
+pre-commit = { version = ">=4.6.0", optional = true }
+py3createtorrent = { version = ">=1.2.1", optional = true }
+pyinstaller = { version = ">=6.20.0", python = "<3.14", optional = true }
+pytest = { version = ">=8.3.3", optional = true }
+pytest-cov = { version = ">=5.0.0", optional = true }
+pytest-mock = { version = ">=3.14.0", optional = true }
+pytest-monitor = { version = ">=1.6.6", platform = "linux", optional = true }
+pytest-xdist = { version = ">=3.6.1", optional = true }
+pytest-rerunfailures = { version = ">=16.1, <17.0", optional = true }
+tach = { version = ">=0.35.0", optional = true }
+types-aiofiles = { version = ">=25.1.0.20260508", optional = true }
+types-pyyaml = { version = ">=6.0.12.20260510", optional = true }
+types-setuptools = { version = ">=82.0.0.20260518", optional = true }
+types-psutil = { version = ">=7.2.2.20260518", optional = true }
+types-lxml = { version = ">=2026.2.16", optional = true }
+types-zstd = { version = ">=1.5.7.3.20260408", optional = true }
+boto3-stubs = { version = ">=1.43.18", optional = true }
+sortedcontainers-stubs = {version = ">= 2.4.3", optional = true }
+types-colorama = { version = ">=0.4.15.20260508", optional = true }
+lxml = { version = ">=6.1.0", optional = true }
+miniupnpc = {version = ">=2.3.2, <3", source = "cactus", optional = true}
 # big-o = {version = "0.11.0", optional = true}
 # numpy = [
-# 	{version="1.24.4", python = "<3.9", optional = true},
-# 	{version="1.26.4", python = ">=3.9", optional = true}]
+# 	{version="<=1.24.4", python = "<3.10", optional = true},
+# 	{version=">=1.26.4", python = ">=3.10", optional = true}]
+ruff = { version = ">=0.15.16", optional = true }
 
-
-[tool.poetry.extras]
-dev = ["aiohttp_cors", "black", "build", "coverage", "diff-cover", "flake8", "isort", "mypy", "pre-commit", "py3createtorrent", "pyinstaller", "pylint", "pytest", "pytest-cov", "pytest-mock", "pytest-monitor", "pytest-xdist", "types-aiofiles", "types-cryptography", "types-pyyaml", "types-setuptools", "pyupgrade", "lxml"]
+[project.optional-dependencies]
+dev = ["aiohttp_cors", "build", "coverage", "diff-cover", "mypy", "pre-commit", "py3createtorrent", "pyinstaller", "pytest", "pytest-cov", "pytest-mock", "pytest-monitor", "pytest-xdist", "pytest-rerunfailures", "ruff", "tach", "types-aiofiles", "types-pyyaml", "types-setuptools", "types-colorama", "types-zstd", "types-lxml", "types-psutil", "boto3-stubs[essential]", "lxml", "sortedcontainers-stubs"]
 upnp = ["miniupnpc"]
 legacy_keyring = ["keyrings.cryptfile"]
 
@@ -153,14 +150,3 @@ bump = true
 [build-system]
 requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
 build-backend = "poetry_dynamic_versioning.backend"
-
-[tool.black]
-line-length = 120
-target-version =  ['py39', 'py310', 'py311', 'py312']
-include = '''
-^/(
-    [^/]*.py
-    | (benchmarks|build_scripts|cactus|tests|tools)/.*\.pyi?
-)$
-'''
-exclude = ''

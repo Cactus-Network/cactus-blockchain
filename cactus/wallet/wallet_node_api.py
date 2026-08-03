@@ -1,46 +1,56 @@
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING, ClassVar
+
+from chia_rs import RespondToPhUpdates
 
 from cactus.protocols import full_node_protocol, introducer_protocol, wallet_protocol
-from cactus.server.outbound_message import NodeType
+from cactus.protocols.outbound_message import NodeType
+from cactus.server.api_protocol import ApiMetadata
 from cactus.server.ws_connection import WSCactusConnection
 from cactus.types.mempool_inclusion_status import MempoolInclusionStatus
-from cactus.util.api_decorators import api_request
 from cactus.util.errors import Err
 from cactus.wallet.wallet_node import WalletNode
 
 
 class WalletNodeAPI:
+    if TYPE_CHECKING:
+        from cactus.apis.wallet_stub import WalletNodeApiStub
+
+        # Verify this class implements the WalletNodeApiStub protocol
+        def _protocol_check(self: WalletNodeAPI) -> WalletNodeApiStub:
+            return self
+
     log: logging.Logger
     wallet_node: WalletNode
+    metadata: ClassVar[ApiMetadata] = ApiMetadata()
 
-    def __init__(self, wallet_node) -> None:
+    def __init__(self, wallet_node: WalletNode) -> None:
         self.log = logging.getLogger(__name__)
         self.wallet_node = wallet_node
 
     def ready(self) -> bool:
         return self.wallet_node.logged_in
 
-    @api_request(peer_required=True)
-    async def respond_removals(self, response: wallet_protocol.RespondRemovals, peer: WSCactusConnection):
+    @metadata.request()
+    async def respond_removals(self, response: wallet_protocol.RespondRemovals) -> None:
         pass
 
-    async def reject_removals_request(self, response: wallet_protocol.RejectRemovalsRequest, peer: WSCactusConnection):
+    @metadata.request()
+    async def reject_removals_request(self, response: wallet_protocol.RejectRemovalsRequest) -> None:
         """
         The full node has rejected our request for removals.
         """
-        pass
 
-    @api_request()
-    async def reject_additions_request(self, response: wallet_protocol.RejectAdditionsRequest):
+    @metadata.request()
+    async def reject_additions_request(self, response: wallet_protocol.RejectAdditionsRequest) -> None:
         """
         The full node has rejected our request for additions.
         """
-        pass
 
-    @api_request(peer_required=True, execute_task=True)
-    async def new_peak_wallet(self, peak: wallet_protocol.NewPeakWallet, peer: WSCactusConnection):
+    @metadata.request(peer_required=True, execute_task=True)
+    async def new_peak_wallet(self, peak: wallet_protocol.NewPeakWallet, peer: WSCactusConnection) -> None:
         """
         The full node sent as a new peak
         """
@@ -69,27 +79,26 @@ class WalletNodeAPI:
 
         await self.wallet_node.new_peak_queue.new_peak_wallet(peak, peer)
 
-    @api_request()
-    async def reject_header_request(self, response: wallet_protocol.RejectHeaderRequest):
+    @metadata.request()
+    async def reject_header_request(self, response: wallet_protocol.RejectHeaderRequest) -> None:
         """
         The full node has rejected our request for a header.
         """
+
+    @metadata.request()
+    async def respond_block_header(self, response: wallet_protocol.RespondBlockHeader) -> None:
         pass
 
-    @api_request()
-    async def respond_block_header(self, response: wallet_protocol.RespondBlockHeader):
+    @metadata.request()
+    async def respond_additions(self, response: wallet_protocol.RespondAdditions) -> None:
         pass
 
-    @api_request(peer_required=True)
-    async def respond_additions(self, response: wallet_protocol.RespondAdditions, peer: WSCactusConnection):
+    @metadata.request()
+    async def respond_proof_of_weight(self, response: full_node_protocol.RespondProofOfWeight) -> None:
         pass
 
-    @api_request()
-    async def respond_proof_of_weight(self, response: full_node_protocol.RespondProofOfWeight):
-        pass
-
-    @api_request(peer_required=True)
-    async def transaction_ack(self, ack: wallet_protocol.TransactionAck, peer: WSCactusConnection):
+    @metadata.request(peer_required=True)
+    async def transaction_ack(self, ack: wallet_protocol.TransactionAck, peer: WSCactusConnection) -> None:
         """
         This is an ack for our previous SendTransaction call. This removes the transaction from
         the send queue if we have sent it to enough nodes.
@@ -97,18 +106,28 @@ class WalletNodeAPI:
         async with self.wallet_node.wallet_state_manager.lock:
             assert peer.peer_node_id is not None
             name = peer.peer_node_id.hex()
+            matched_in_flight_send = False
             if peer.peer_node_id in self.wallet_node._tx_messages_in_progress:
-                self.wallet_node._tx_messages_in_progress[peer.peer_node_id] = [
-                    txid for txid in self.wallet_node._tx_messages_in_progress[peer.peer_node_id] if txid != ack.txid
-                ]
-                if self.wallet_node._tx_messages_in_progress[peer.peer_node_id] == []:
+                in_progress = self.wallet_node._tx_messages_in_progress[peer.peer_node_id]
+                if ack.txid in in_progress:
+                    matched_in_flight_send = True
+                    in_progress.remove(ack.txid)
+                if in_progress == []:
                     del self.wallet_node._tx_messages_in_progress[peer.peer_node_id]
+
+            # Ignore stale/unsolicited acknowledgements that don't correspond to an in-flight send.
+            if not matched_in_flight_send:
+                self.wallet_node.log.debug(
+                    "Ignoring unsolicited transaction ack from peer %s for tx %s", name, ack.txid
+                )
+                return
+
             status = MempoolInclusionStatus(ack.status)
             try:
                 wallet_state_manager = self.wallet_node.wallet_state_manager
             except RuntimeError as e:
                 if "not assigned" in str(e):
-                    return None
+                    return
                 raise
 
             if status == MempoolInclusionStatus.SUCCESS:
@@ -128,74 +147,75 @@ class WalletNodeAPI:
             else:
                 await wallet_state_manager.remove_from_queue(ack.txid, name, status, None)
 
-    @api_request(peer_required=True)
+    @metadata.request(peer_required=True)
     async def respond_peers_introducer(
         self, request: introducer_protocol.RespondPeersIntroducer, peer: WSCactusConnection
-    ):
+    ) -> None:
         if self.wallet_node.wallet_peers is not None:
             await self.wallet_node.wallet_peers.add_peers(request.peer_list, peer.get_peer_info(), False)
 
         if peer is not None and peer.connection_type is NodeType.INTRODUCER:
             await peer.close()
 
-    @api_request(peer_required=True)
-    async def respond_peers(self, request: full_node_protocol.RespondPeers, peer: WSCactusConnection):
+    @metadata.request(peer_required=True)
+    async def respond_peers(self, request: full_node_protocol.RespondPeers, peer: WSCactusConnection) -> None:
         if self.wallet_node.wallet_peers is None:
-            return None
+            return
 
         self.log.info(f"Wallet received {len(request.peer_list)} peers.")
         await self.wallet_node.wallet_peers.add_peers(request.peer_list, peer.get_peer_info(), True)
 
-        return None
-
-    @api_request()
-    async def respond_puzzle_solution(self, request: wallet_protocol.RespondPuzzleSolution):
+    @metadata.request()
+    async def respond_puzzle_solution(self, request: wallet_protocol.RespondPuzzleSolution) -> None:
         self.log.error("Unexpected message `respond_puzzle_solution`. Peer might be slow to respond")
-        return None
 
-    @api_request()
-    async def reject_puzzle_solution(self, request: wallet_protocol.RejectPuzzleSolution):
+    @metadata.request()
+    async def reject_puzzle_solution(self, request: wallet_protocol.RejectPuzzleSolution) -> None:
         self.log.warning(f"Reject puzzle solution: {request}")
 
-    @api_request()
-    async def respond_header_blocks(self, request: wallet_protocol.RespondHeaderBlocks):
+    @metadata.request()
+    async def respond_header_blocks(self, request: wallet_protocol.RespondHeaderBlocks) -> None:
         pass
 
-    @api_request()
-    async def respond_block_headers(self, request: wallet_protocol.RespondBlockHeaders):
+    @metadata.request()
+    async def respond_block_headers(self, request: wallet_protocol.RespondBlockHeaders) -> None:
         pass
 
-    @api_request()
-    async def reject_header_blocks(self, request: wallet_protocol.RejectHeaderBlocks):
+    @metadata.request()
+    async def reject_header_blocks(self, request: wallet_protocol.RejectHeaderBlocks) -> None:
         self.log.warning(f"Reject header blocks: {request}")
 
-    @api_request()
-    async def reject_block_headers(self, request: wallet_protocol.RejectBlockHeaders):
+    @metadata.request()
+    async def reject_block_headers(self, request: wallet_protocol.RejectBlockHeaders) -> None:
         pass
 
-    @api_request(peer_required=True, execute_task=True)
-    async def coin_state_update(self, request: wallet_protocol.CoinStateUpdate, peer: WSCactusConnection):
+    @metadata.request(peer_required=True, execute_task=True)
+    async def coin_state_update(self, request: wallet_protocol.CoinStateUpdate, peer: WSCactusConnection) -> None:
         await self.wallet_node.new_peak_queue.full_node_state_updated(request, peer)
 
     # TODO: Review this hinting issue around this rust type not being a Streamable
     #       subclass, as you might expect it wouldn't be.  Maybe we can get the
-    #       protocol working right back at the api_request definition.
-    @api_request()  # type: ignore[type-var]
-    async def respond_to_ph_update(self, request: wallet_protocol.RespondToPhUpdates):
+    #       protocol working right back at the api.request definition.
+    @metadata.request()  # type: ignore[type-var]
+    async def respond_to_ph_updates(self, request: RespondToPhUpdates) -> None:
         pass
 
-    @api_request()
-    async def respond_to_coin_update(self, request: wallet_protocol.RespondToCoinUpdates):
+    @metadata.request()
+    async def respond_to_coin_updates(self, request: wallet_protocol.RespondToCoinUpdates) -> None:
         pass
 
-    @api_request()
-    async def respond_children(self, request: wallet_protocol.RespondChildren):
+    @metadata.request()
+    async def respond_children(self, request: wallet_protocol.RespondChildren) -> None:
         pass
 
-    @api_request()
-    async def respond_ses_hashes(self, request: wallet_protocol.RespondSESInfo):
+    @metadata.request()
+    async def respond_ses_hashes(self, request: wallet_protocol.RespondSESInfo) -> None:
         pass
 
-    @api_request()
+    @metadata.request()
+    async def respond_fee_estimates(self, request: wallet_protocol.RespondFeeEstimates) -> None:
+        pass
+
+    @metadata.request()
     async def respond_blocks(self, request: full_node_protocol.RespondBlocks) -> None:
         pass

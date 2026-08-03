@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import contextlib
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 
 @contextlib.contextmanager
 def TempFile() -> Iterator[Path]:
-    path = Path(tempfile.NamedTemporaryFile().name)
-    yield path
-    if path.exists():
-        path.unlink()
+    t = tempfile.NamedTemporaryFile(delete=False)
+    path = Path(t.name)
+    t.close()
+    try:
+        yield path
+    finally:
+        if path.exists():
+            path.unlink()

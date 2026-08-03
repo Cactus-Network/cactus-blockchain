@@ -4,10 +4,10 @@ import math
 from dataclasses import dataclass
 
 import typing_extensions
+from chia_rs.sized_ints import uint64
 
 from cactus.types.clvm_cost import CLVMCost
 from cactus.types.mojos import Mojos
-from cactus.util.ints import uint64
 from cactus.util.streamable import Streamable, streamable
 
 

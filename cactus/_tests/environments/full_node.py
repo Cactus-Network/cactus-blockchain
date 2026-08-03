@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, ClassVar, Tuple, cast
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from cactus._tests.environments.common import ServiceEnvironment
 from cactus.full_node.full_node import FullNode
@@ -20,7 +20,7 @@ class FullNodeEnvironment:
             None,
         )
 
-    __match_args__: ClassVar[Tuple[str, ...]] = ()
+    __match_args__: ClassVar[tuple[str, ...]] = ()
 
     service: Service[FullNode, FullNodeSimulator, SimulatorFullNodeRpcApi]
 

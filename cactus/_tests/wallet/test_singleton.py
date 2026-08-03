@@ -1,22 +1,14 @@
 from __future__ import annotations
 
 import pytest
+from chia_rs.sized_bytes import bytes32
 from clvm_tools import binutils
 
+from cactus.consensus.condition_tools import parse_sexp_to_conditions
 from cactus.types.blockchain_format.program import INFINITE_COST, Program
-from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.util.condition_tools import parse_sexp_to_conditions
 from cactus.wallet.conditions import AssertPuzzleAnnouncement
-from cactus.wallet.puzzles.load_clvm import load_clvm
-
-SINGLETON_MOD = load_clvm("singleton_top_layer.clsp")
-LAUNCHER_PUZZLE = load_clvm("singleton_launcher.clsp")
-P2_SINGLETON_MOD = load_clvm("p2_singleton.clsp")
-POOL_MEMBER_MOD = load_clvm("pool_member_innerpuz.clsp", package_or_requirement="cactus.pools.puzzles")
-POOL_WAITINGROOM_MOD = load_clvm("pool_waitingroom_innerpuz.clsp", package_or_requirement="cactus.pools.puzzles")
-
-LAUNCHER_PUZZLE_HASH = LAUNCHER_PUZZLE.get_tree_hash()
-SINGLETON_MOD_HASH = SINGLETON_MOD.get_tree_hash()
+from cactus.wallet.puzzles.singleton_top_layer import P2_SINGLETON_MOD, SINGLETON_MOD, SINGLETON_MOD_HASH
+from cactus.wallet.puzzles.singleton_top_layer import SINGLETON_LAUNCHER_HASH as LAUNCHER_PUZZLE_HASH
 
 LAUNCHER_ID = Program.to(b"launcher-id").get_tree_hash()
 POOL_REWARD_PREFIX_MAINNET = bytes32.fromhex("ccd5bb71183532bff220ba46c268991a00000000000000000000000000000000")
@@ -54,7 +46,7 @@ def test_only_odd_coins() -> None:
 
     with pytest.raises(Exception) as exception_info:
         SINGLETON_MOD.run_with_cost(INFINITE_COST, solution)
-    assert exception_info.value.args == ("clvm raise", "80")
+    assert exception_info.value.args == ("clvm raise",)
 
     solution = Program.to(
         [
@@ -83,7 +75,7 @@ def test_only_one_odd_coin_created() -> None:
 
     with pytest.raises(Exception) as exception_info:
         SINGLETON_MOD.run_with_cost(INFINITE_COST, solution)
-    assert exception_info.value.args == ("clvm raise", "80")
+    assert exception_info.value.args == ("clvm raise",)
     clsp = "(q (51 0xcafef00d 203) (51 0xfadeddab 204) (51 0xdeadbeef 202))"
     solution = Program.to(
         [

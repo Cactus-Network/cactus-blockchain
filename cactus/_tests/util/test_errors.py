@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from chia_rs.sized_ints import int16
+
 from cactus.util.errors import Err
-from cactus.util.ints import int16
 
 
 def test_error_codes_int16() -> None:

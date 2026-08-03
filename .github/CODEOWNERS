@@ -1,5 +1,5 @@
 *	@Cactus-Network/required-reviewers
 /.github/**/* @Cactus-Network/actions-reviewers
-/PRETTY_GOOD_PRACTICES.md	@altendky @Cactus-Network/required-reviewers
-/pylintrc	@altendky @Cactus-Network/required-reviewers
-/tests/ether.py @altendky @Cactus-Network/required-reviewers
+/PRETTY_GOOD_PRACTICES.md	@Cactus-Network/required-reviewers
+/tests/ether.py @Cactus-Network/required-reviewers
+/pyproject.toml @Cactus-Network/required-reviewers

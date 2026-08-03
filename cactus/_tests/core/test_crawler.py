@@ -6,19 +6,19 @@ from datetime import datetime, timedelta
 from typing import cast
 
 import pytest
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint32, uint64, uint128
 
 from cactus._tests.util.setup_nodes import SimulatorsAndWalletsServices
 from cactus._tests.util.time_out_assert import time_out_assert
 from cactus.full_node.full_node_api import FullNodeAPI
 from cactus.protocols.full_node_protocol import NewPeak
+from cactus.protocols.outbound_message import make_msg
 from cactus.protocols.protocol_message_types import ProtocolMessageTypes
 from cactus.protocols.wallet_protocol import RequestChildren
+from cactus.seeder.crawler_service import CrawlerService
 from cactus.seeder.peer_record import PeerRecord, PeerReliability
-from cactus.server.outbound_message import make_msg
-from cactus.types.aliases import CrawlerService
-from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.types.peer_info import PeerInfo
-from cactus.util.ints import uint32, uint64, uint128
 
 
 @pytest.mark.anyio
@@ -52,13 +52,14 @@ async def test_unknown_messages(
     assert await crawler.server.start_client(
         PeerInfo(self_hostname, cast(FullNodeAPI, full_node_service._api).server.get_port()), None
     )
+    await time_out_assert(5, lambda: crawler.server.node_id in full_node.server.all_connections)
     connection = full_node.server.all_connections[crawler.server.node_id]
 
     def receiving_failed() -> bool:
         return "Non existing function: request_children" in caplog.text
 
     with caplog.at_level(logging.ERROR):
-        msg = make_msg(ProtocolMessageTypes.request_children, RequestChildren(bytes32(b"\0" * 32)))
+        msg = make_msg(ProtocolMessageTypes.request_children, RequestChildren(bytes32.zeros))
         assert await connection.send_message(msg)
         await time_out_assert(10, receiving_failed)
 
@@ -76,6 +77,7 @@ async def test_valid_message(
     assert await crawler.server.start_client(
         PeerInfo(self_hostname, cast(FullNodeAPI, full_node_service._api).server.get_port()), None
     )
+    await time_out_assert(5, lambda: crawler.server.node_id in full_node.server.all_connections)
     connection = full_node.server.all_connections[crawler.server.node_id]
 
     def peer_added() -> bool:
@@ -83,7 +85,7 @@ async def test_valid_message(
 
     msg = make_msg(
         ProtocolMessageTypes.new_peak,
-        NewPeak(bytes32(b"\0" * 32), uint32(2), uint128(1), uint32(1), bytes32(b"\1" * 32)),
+        NewPeak(bytes32.zeros, uint32(2), uint128(1), uint32(1), bytes32(b"\1" * 32)),
     )
     assert await connection.send_message(msg)
     await time_out_assert(10, peer_added)
@@ -111,7 +113,7 @@ async def test_crawler_to_db(crawler_service_no_loop: CrawlerService, one_node: 
         uint64(0),
         uint32(0),
         uint64(0),
-        uint64(int(time.time())),
+        uint64(time.time()),
         uint64(0),
         "undefined",
         uint64(0),
@@ -153,8 +155,8 @@ async def test_crawler_peer_cleanup(
             uint64(0),
             uint32(0),
             uint64(0),
-            uint64(int(time.time())),
-            uint64(int((datetime.now() - timedelta(days=idx * 10)).timestamp())),
+            uint64(time.time()),
+            uint64((datetime.now() - timedelta(days=idx * 10)).timestamp()),
             "undefined",
             uint64(0),
             tls_version="unknown",

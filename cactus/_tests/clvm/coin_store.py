@@ -1,19 +1,17 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from dataclasses import dataclass, replace
-from typing import Dict, Iterator, Optional
+from collections.abc import Iterator
+from dataclasses import dataclass
 
-from cactus.consensus.constants import ConsensusConstants
-from cactus.consensus.cost_calculator import NPCResult
+from chia_rs import CoinRecord, CoinSpend, ConsensusConstants, SpendBundle, check_time_locks
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint32, uint64
+
+from cactus._tests.util.get_name_puzzle_conditions import NPCResult, get_name_puzzle_conditions
 from cactus.full_node.bundle_tools import simple_solution_generator
-from cactus.full_node.mempool_check_conditions import get_name_puzzle_conditions, mempool_check_time_locks
 from cactus.types.blockchain_format.coin import Coin
-from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.types.coin_record import CoinRecord
-from cactus.types.spend_bundle import SpendBundle
 from cactus.util.errors import Err
-from cactus.util.ints import uint32, uint64
 
 MAX_COST = 11000000000
 
@@ -30,8 +28,8 @@ class CoinTimestamp:
 
 class CoinStore:
     def __init__(self, constants: ConsensusConstants, reward_mask: int = 0):
-        self._db: Dict[bytes32, CoinRecord] = dict()
-        self._ph_index: Dict = defaultdict(list)
+        self._db: dict[bytes32, CoinRecord] = dict()
+        self._ph_index: dict[bytes32, list[bytes32]] = defaultdict(list)
         self._reward_mask = reward_mask
         self._constants = constants
 
@@ -40,7 +38,7 @@ class CoinStore:
         puzzle_hash: bytes32,
         birthday: CoinTimestamp,
         amount: int = 1024,
-        prefix=bytes32.fromhex("ccd5bb71183532bff220ba46c268991a00000000000000000000000000000000"),  # noqa
+        prefix: bytes32 = bytes32.fromhex("ccd5bb71183532bff220ba46c268991a00000000000000000000000000000000"),
     ) -> Coin:
         parent = bytes32(
             [
@@ -71,7 +69,7 @@ class CoinStore:
         assert result.conds is not None
         for spend in result.conds.spends:
             for puzzle_hash, amount, hint in spend.create_coin:
-                coin = Coin(bytes32(spend.coin_id), bytes32(puzzle_hash), uint64(amount))
+                coin = Coin(spend.coin_id, puzzle_hash, uint64(amount))
                 name = coin.name()
                 ephemeral_db[name] = CoinRecord(
                     coin,
@@ -81,7 +79,7 @@ class CoinStore:
                     uint64(now.seconds),
                 )
 
-        err = mempool_check_time_locks(
+        err = check_time_locks(
             ephemeral_db,
             result.conds,
             # TODO: this is technically not right, it's supposed to be the
@@ -90,6 +88,7 @@ class CoinStore:
             # TODO: this is technically not right, it's supposed to be the
             # previous transaction block's timestamp
             uint64(now.seconds),
+            nowrap=now.height >= self._constants.HARD_FORK2_HEIGHT,
         )
 
         if err is not None:
@@ -102,7 +101,7 @@ class CoinStore:
         spend_bundle: SpendBundle,
         now: CoinTimestamp,
         max_cost: int,
-    ):
+    ) -> tuple[list[Coin], list[CoinSpend]]:
         err = self.validate_spend_bundle(spend_bundle, now, max_cost)
         if err != 0:
             raise BadSpendBundleError(f"validation failure {err}")
@@ -113,7 +112,7 @@ class CoinStore:
         for spent_coin in removals:
             coin_name = spent_coin.name()
             coin_record = self._db[coin_name]
-            self._db[coin_name] = replace(coin_record, spent_block_index=now.height)
+            self._db[coin_name] = coin_record.replace(spent_block_index=now.height)
         return additions, spend_bundle.coin_spends
 
     def coins_for_puzzle_hash(self, puzzle_hash: bytes32) -> Iterator[Coin]:
@@ -143,5 +142,5 @@ class CoinStore:
         )
         self._ph_index[coin.puzzle_hash].append(name)
 
-    def coin_record(self, coin_id: bytes32) -> Optional[CoinRecord]:
+    def coin_record(self, coin_id: bytes32) -> CoinRecord | None:
         return self._db.get(coin_id)

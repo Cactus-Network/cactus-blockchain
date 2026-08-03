@@ -4,15 +4,13 @@ import logging
 import traceback
 from enum import IntEnum
 from functools import lru_cache
-from typing import Optional
 
-from cactus_rs import VDFInfo, VDFProof
+from chia_rs import ConsensusConstants, VDFInfo, VDFProof
+from chia_rs.sized_bytes import bytes32, bytes100
+from chia_rs.sized_ints import uint8, uint64
 from chiavdf import create_discriminant, verify_n_wesolowski
 
-from cactus.consensus.constants import ConsensusConstants
 from cactus.types.blockchain_format.classgroup import ClassgroupElement
-from cactus.types.blockchain_format.sized_bytes import bytes32, bytes100
-from cactus.util.ints import uint8, uint64
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +50,7 @@ def validate_vdf(
     constants: ConsensusConstants,
     input_el: ClassgroupElement,
     info: VDFInfo,
-    target_vdf_info: Optional[VDFInfo] = None,
+    target_vdf_info: VDFInfo | None = None,
 ) -> bool:
     """
     If target_vdf_info is passed in, it is compared with info.
@@ -62,6 +60,9 @@ def validate_vdf(
         log.error(f"{tb} INVALID VDF INFO. Have: {info} Expected: {target_vdf_info}")
         return False
     if proof.witness_type + 1 > constants.MAX_VDF_WITNESS_SIZE:
+        return False
+    if len(input_el.data) != 100:
+        log.error(f"Invalid ClassgroupElement size: {len(input_el.data)} (expected 100)")
         return False
     try:
         disc: int = get_discriminant(info.challenge, constants.DISCRIMINANT_SIZE_BITS)

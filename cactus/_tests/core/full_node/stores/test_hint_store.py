@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import Tuple
 
 import pytest
-from clvm.casts import int_to_bytes
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint64
 
+from cactus._tests.core.full_node.test_full_node import find_reward_coin
 from cactus._tests.util.db_connection import DBConnection
 from cactus.full_node.hint_store import HintStore
 from cactus.server.server import CactusServer
@@ -13,10 +14,9 @@ from cactus.simulator.block_tools import BlockTools
 from cactus.simulator.full_node_simulator import FullNodeSimulator
 from cactus.simulator.wallet_tools import WalletTool
 from cactus.types.blockchain_format.coin import Coin
-from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.types.condition_opcodes import ConditionOpcode
 from cactus.types.condition_with_args import ConditionWithArgs
-from cactus.util.ints import uint64
+from cactus.util.casts import int_to_bytes
 
 log = logging.getLogger(__name__)
 
@@ -92,7 +92,7 @@ async def test_duplicates(db_version: int) -> None:
         hint_0 = 32 * b"\0"
         coin_id_0 = bytes32(32 * b"\4")
 
-        for i in range(0, 2):
+        for i in range(2):
             hints = [(coin_id_0, hint_0), (coin_id_0, hint_0)]
             await hint_store.add_hints(hints)
         coins_for_hint_0 = await hint_store.get_coin_ids(hint_0)
@@ -141,18 +141,17 @@ async def test_coin_ids_multi(db_version: int) -> None:
 
 @pytest.mark.anyio
 async def test_hints_in_blockchain(
-    wallet_nodes: Tuple[
+    wallet_nodes: tuple[
         FullNodeSimulator, FullNodeSimulator, CactusServer, CactusServer, WalletTool, WalletTool, BlockTools
     ],
 ) -> None:
-    full_node_1, full_node_2, server_1, server_2, wallet_a, wallet_receiver, bt = wallet_nodes
+    full_node_1, _full_node_2, _server_1, _server_2, _wallet_a, _wallet_receiver, bt = wallet_nodes
 
     blocks = bt.get_consecutive_blocks(
         5,
         block_list_input=[],
         guarantee_transaction_block=True,
         farmer_reward_puzzle_hash=bt.pool_ph,
-        pool_reward_puzzle_hash=bt.pool_ph,
     )
     for block in blocks:
         await full_node_1.full_node.add_block(block, None)
@@ -161,7 +160,7 @@ async def test_hints_in_blockchain(
     puzzle_hash = bytes32(32 * b"\0")
     amount = int_to_bytes(1)
     hint = bytes32(32 * b"\5")
-    coin_spent = list(blocks[-1].get_included_reward_coins())[0]
+    coin_spent = find_reward_coin(blocks[-1], bt.pool_ph)
     condition_dict = {
         ConditionOpcode.CREATE_COIN: [ConditionWithArgs(ConditionOpcode.CREATE_COIN, [puzzle_hash, amount, hint])]
     }
@@ -221,6 +220,43 @@ async def test_limits(db_version: int) -> None:
             assert len(await hint_store.get_coin_ids(hint, max_items=limit)) == limit
 
         assert len(await hint_store.get_coin_ids(hint, max_items=10000)) == 200
+
+
+@pytest.mark.anyio
+async def test_multi_batch_limit(db_version: int, monkeypatch: pytest.MonkeyPatch) -> None:
+    """get_coin_ids_multi must enforce max_items globally across batches."""
+    monkeypatch.setattr("cactus.full_node.hint_store.SQLITE_MAX_VARIABLE_NUMBER", 5)
+
+    async with DBConnection(db_version) as db_wrapper:
+        hint_store = await HintStore.create(db_wrapper)
+
+        num_hints = 20
+        coins_per_hint = 3
+        hints_list: list[tuple[bytes32, bytes]] = []
+        all_hints: set[bytes] = set()
+        for h in range(num_hints):
+            hint = bytes(h.to_bytes(1, "big")) + (31 * b"\x00")
+            all_hints.add(hint)
+            for c in range(coins_per_hint):
+                coin_id = bytes32(h.to_bytes(2, "big") + c.to_bytes(2, "big") + (28 * b"\x00"))
+                hints_list.append((coin_id, hint))
+
+        await hint_store.add_hints(hints_list)
+
+        total_in_db = num_hints * coins_per_hint
+        assert await hint_store.count_hints() == total_in_db
+
+        # Without a limit, all coins are returned.
+        result_all = await hint_store.get_coin_ids_multi(all_hints, max_items=total_in_db + 100)
+        assert len(result_all) == total_in_db
+
+        # With a limit smaller than total, the global cap must hold.
+        max_items = 10
+        result_capped = await hint_store.get_coin_ids_multi(all_hints, max_items=max_items)
+        assert len(result_capped) <= max_items
+
+        # With max_items=0, nothing is returned.
+        assert await hint_store.get_coin_ids_multi(all_hints, max_items=0) == []
 
 
 @pytest.mark.anyio

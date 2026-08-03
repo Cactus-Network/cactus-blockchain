@@ -3,14 +3,13 @@ from __future__ import annotations
 import asyncio
 import collections
 import logging
+from collections import OrderedDict
 from collections import OrderedDict as orderedDict
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, OrderedDict, Set
 
 import typing_extensions
-
-from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.util.ints import uint32, uint128
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint32, uint128
 
 log = logging.getLogger(__name__)
 
@@ -29,14 +28,14 @@ class SyncStore:
     sync_mode: bool = False
     long_sync: bool = False
     # Header hash : peer node id
-    peak_to_peer: OrderedDict[bytes32, Set[bytes32]] = field(default_factory=orderedDict)
+    peak_to_peer: OrderedDict[bytes32, set[bytes32]] = field(default_factory=orderedDict)
     # peer node id : Peak
-    peer_to_peak: Dict[bytes32, Peak] = field(default_factory=dict)
+    peer_to_peak: dict[bytes32, Peak] = field(default_factory=dict)
     # Peak we are syncing towards
-    target_peak: Optional[Peak] = None
+    target_peak: Peak | None = None
     peers_changed: asyncio.Event = field(default_factory=asyncio.Event)
     # Set of nodes which we are batch syncing from
-    batch_syncing: Set[bytes32] = field(default_factory=set)
+    batch_syncing: set[bytes32] = field(default_factory=set)
     # Set of nodes which we are backtrack syncing from, and how many threads
     _backtrack_syncing: collections.defaultdict[bytes32, int] = field(
         default_factory=lambda: collections.defaultdict(int),
@@ -77,21 +76,25 @@ class SyncStore:
                     self.peak_to_peer[item[0]] = item[1]  # Put it back in if it was the sync target
                     self.peak_to_peer.popitem(last=False)  # Remove the oldest entry again
         if new_peak:
+            old_peak = self.peer_to_peak.get(peer_id)
+            if old_peak is not None and old_peak.header_hash != header_hash:
+                if old_peak.header_hash in self.peak_to_peer:
+                    self.peak_to_peer[old_peak.header_hash].discard(peer_id)
             self.peer_to_peak[peer_id] = Peak(header_hash, height, weight)
 
-    def get_peers_that_have_peak(self, header_hashes: List[bytes32]) -> Set[bytes32]:
+    def get_peers_that_have_peak(self, header_hashes: list[bytes32]) -> set[bytes32]:
         """
         Returns: peer ids of peers that have at least one of the header hashes.
         """
 
-        node_ids: Set[bytes32] = set()
+        node_ids: set[bytes32] = set()
         for header_hash in header_hashes:
             if header_hash in self.peak_to_peer:
                 for node_id in self.peak_to_peer[header_hash]:
                     node_ids.add(node_id)
         return node_ids
 
-    def get_peak_of_each_peer(self) -> Dict[bytes32, Peak]:
+    def get_peak_of_each_peer(self) -> dict[bytes32, Peak]:
         """
         Returns: dictionary of peer id to peak information.
         """
@@ -103,7 +106,18 @@ class SyncStore:
             ret[peer_id] = peak
         return ret
 
-    def get_heaviest_peak(self) -> Optional[Peak]:
+    def get_advertisers_of_peak(self, peak: Peak) -> set[bytes32]:
+        """
+        Returns: peer IDs whose currently advertised peak exactly matches `peak`.
+
+        Intended to snapshot advertisers at peak-selection time so a peer that
+        overwrites its `peer_to_peak` entry with a fresh `NewPeak` afterward
+        cannot escape downstream banning for the earlier advertisement.
+        """
+
+        return {peer_id for peer_id, p in self.peer_to_peak.items() if p == peak}
+
+    def get_heaviest_peak(self) -> Peak | None:
         """
         Returns: the header_hash, height, and weight of the heaviest block that one of our peers has notified
         us of.
@@ -111,23 +125,25 @@ class SyncStore:
 
         if len(self.peer_to_peak) == 0:
             return None
-        heaviest_peak: Optional[Peak] = None
+        heaviest_peak: Peak | None = None
         for peak in self.peer_to_peak.values():
             if peak.header_hash not in self.peak_to_peer:
                 continue
             if heaviest_peak is None or peak.weight > heaviest_peak.weight:
                 heaviest_peak = peak
-        assert heaviest_peak is not None
         return heaviest_peak
 
     def peer_disconnected(self, node_id: bytes32) -> None:
         if node_id in self.peer_to_peak:
             del self.peer_to_peak[node_id]
 
+        empty_hashes: list[bytes32] = []
         for peak, peers in self.peak_to_peer.items():
-            if node_id in peers:
-                self.peak_to_peer[peak].remove(node_id)
-            assert node_id not in self.peak_to_peer[peak]
+            peers.discard(node_id)
+            if not peers:
+                empty_hashes.append(peak)
+        for h in empty_hashes:
+            del self.peak_to_peer[h]
 
         self._backtrack_syncing.pop(node_id, None)
 

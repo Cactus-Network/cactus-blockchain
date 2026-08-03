@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import pytest
+from chia_rs import FullBlock, HeaderBlock
 
 from cactus._tests.util.db_connection import DBConnection
 from cactus.simulator.block_tools import BlockTools
-from cactus.types.full_block import FullBlock
-from cactus.types.header_block import HeaderBlock
 from cactus.wallet.key_val_store import KeyValStore
 
 

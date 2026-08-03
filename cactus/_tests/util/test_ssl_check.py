@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from cactus.ssl.create_ssl import create_all_ssl
-from cactus.util.ssl_check import check_ssl
+from cactus.ssl.ssl_check import check_ssl
 
 
 def test_check_ssl_stream_with_bad_permissions(

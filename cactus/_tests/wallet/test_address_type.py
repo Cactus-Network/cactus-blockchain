@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
@@ -8,19 +8,19 @@ from cactus.wallet.util.address_type import AddressType, ensure_valid_address, i
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_cac_hrp_for_default_config(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_cac_hrp_for_default_config(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     assert AddressType.CAC.hrp(config) == "cac"
 
 
 @pytest.mark.parametrize("prefix", ["tcac"])
-def test_tcac_hrp_for_testnet(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_tcac_hrp_for_testnet(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     assert AddressType.CAC.hrp(config) == "tcac"
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_is_valid_address_cac(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_is_valid_address_cac(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     valid = is_valid_address(
         "cac1mnr0ygu7lvmk3nfgzmncfk39fwu0dv933yrcv97nd6pmrt7fzmhs8taffd", allowed_types={AddressType.CAC}, config=config
@@ -29,7 +29,7 @@ def test_is_valid_address_cac(config_with_address_prefix: Dict[str, Any]) -> Non
 
 
 @pytest.mark.parametrize("prefix", ["tcac"])
-def test_is_valid_address_tcac(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_is_valid_address_tcac(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     # TCAC address validation requires a config
     valid = is_valid_address(
@@ -41,7 +41,7 @@ def test_is_valid_address_tcac(config_with_address_prefix: Dict[str, Any]) -> No
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_is_valid_address_cac_bad_address(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_is_valid_address_cac_bad_address(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     valid = is_valid_address(
         "cac1mnr0ygu7lvmk3nfgzmncfk39fwu0dv933yrcv97nd6pmrt7fzmhs8xxxxx", allowed_types={AddressType.CAC}, config=config
@@ -50,7 +50,7 @@ def test_is_valid_address_cac_bad_address(config_with_address_prefix: Dict[str, 
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_is_valid_address_nft(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_is_valid_address_nft(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     valid = is_valid_address(
         "nft1mx2nkvml2eekjtqwdmxvmf3js8g083hpszzhkhtwvhcss8efqzhqtza773", allowed_types={AddressType.NFT}, config=config
@@ -59,7 +59,7 @@ def test_is_valid_address_nft(config_with_address_prefix: Dict[str, Any]) -> Non
 
 
 @pytest.mark.parametrize("prefix", ["tcac"])
-def test_is_valid_address_nft_with_testnet(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_is_valid_address_nft_with_testnet(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     valid = is_valid_address(
         "nft1mx2nkvml2eekjtqwdmxvmf3js8g083hpszzhkhtwvhcss8efqzhqtza773", allowed_types={AddressType.NFT}, config=config
@@ -68,7 +68,7 @@ def test_is_valid_address_nft_with_testnet(config_with_address_prefix: Dict[str,
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_is_valid_address_nft_bad_address(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_is_valid_address_nft_bad_address(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     valid = is_valid_address(
         "nft1mx2nkvml2eekjtqwdmxvmf3js8g083hpszzhkhtwvhcss8efqzhqtxxxxx", allowed_types={AddressType.NFT}, config=config
@@ -77,7 +77,7 @@ def test_is_valid_address_nft_bad_address(config_with_address_prefix: Dict[str, 
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_is_valid_address_did(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_is_valid_address_did(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     valid = is_valid_address(
         "did:cactus:14jxdtqcyp3gk8ka0678eq8mmtnktgpmp2vuqq3vtsl2e5qr7fyrsr9gsr7",
@@ -88,7 +88,7 @@ def test_is_valid_address_did(config_with_address_prefix: Dict[str, Any]) -> Non
 
 
 @pytest.mark.parametrize("prefix", ["tcac"])
-def test_is_valid_address_did_with_testnet(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_is_valid_address_did_with_testnet(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     valid = is_valid_address(
         "did:cactus:14jxdtqcyp3gk8ka0678eq8mmtnktgpmp2vuqq3vtsl2e5qr7fyrsr9gsr7",
@@ -99,7 +99,7 @@ def test_is_valid_address_did_with_testnet(config_with_address_prefix: Dict[str,
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_is_valid_address_did_bad_address(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_is_valid_address_did_bad_address(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     valid = is_valid_address(
         "did:cactus:14jxdtqcyp3gk8ka0678eq8mmtnktgpmp2vuqq3vtsl2e5qr7fyrsrxxxxx",
@@ -110,7 +110,7 @@ def test_is_valid_address_did_bad_address(config_with_address_prefix: Dict[str, 
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_ensure_valid_address_cac(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_ensure_valid_address_cac(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     address = ensure_valid_address(
         "cac1mnr0ygu7lvmk3nfgzmncfk39fwu0dv933yrcv97nd6pmrt7fzmhs8taffd", allowed_types={AddressType.CAC}, config=config
@@ -119,7 +119,7 @@ def test_ensure_valid_address_cac(config_with_address_prefix: Dict[str, Any]) ->
 
 
 @pytest.mark.parametrize("prefix", ["tcac"])
-def test_ensure_valid_address_tcac(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_ensure_valid_address_tcac(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     address = ensure_valid_address(
         "tcac1mnr0ygu7lvmk3nfgzmncfk39fwu0dv933yrcv97nd6pmrt7fzmhs2v6lg7",
@@ -130,7 +130,7 @@ def test_ensure_valid_address_tcac(config_with_address_prefix: Dict[str, Any]) -
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_ensure_valid_address_cac_bad_address(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_ensure_valid_address_cac_bad_address(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     with pytest.raises(ValueError):
         ensure_valid_address(
@@ -141,7 +141,7 @@ def test_ensure_valid_address_cac_bad_address(config_with_address_prefix: Dict[s
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_ensure_valid_address_nft(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_ensure_valid_address_nft(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     address = ensure_valid_address(
         "nft1mx2nkvml2eekjtqwdmxvmf3js8g083hpszzhkhtwvhcss8efqzhqtza773", allowed_types={AddressType.NFT}, config=config
@@ -150,7 +150,7 @@ def test_ensure_valid_address_nft(config_with_address_prefix: Dict[str, Any]) ->
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_ensure_valid_address_nft_bad_address(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_ensure_valid_address_nft_bad_address(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     with pytest.raises(ValueError):
         ensure_valid_address(
@@ -161,7 +161,7 @@ def test_ensure_valid_address_nft_bad_address(config_with_address_prefix: Dict[s
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_ensure_valid_address_did(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_ensure_valid_address_did(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     address = ensure_valid_address(
         "did:cactus:14jxdtqcyp3gk8ka0678eq8mmtnktgpmp2vuqq3vtsl2e5qr7fyrsr9gsr7",
@@ -172,7 +172,7 @@ def test_ensure_valid_address_did(config_with_address_prefix: Dict[str, Any]) ->
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_ensure_valid_address_did_bad_address(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_ensure_valid_address_did_bad_address(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     with pytest.raises(ValueError):
         ensure_valid_address(
@@ -183,7 +183,7 @@ def test_ensure_valid_address_did_bad_address(config_with_address_prefix: Dict[s
 
 
 @pytest.mark.parametrize("prefix", [None])
-def test_ensure_valid_address_bad_length(config_with_address_prefix: Dict[str, Any]) -> None:
+def test_ensure_valid_address_bad_length(config_with_address_prefix: dict[str, Any]) -> None:
     config = config_with_address_prefix
     with pytest.raises(ValueError):
         ensure_valid_address("cac1qqqqqqqqqqqqqqqqwygzk5", allowed_types={AddressType.CAC}, config=config)

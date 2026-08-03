@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -o errexit
 
@@ -22,8 +22,15 @@ if [ ! "$CACTUS_INSTALLER_VERSION" ]; then
   echo "WARNING: No environment variable CACTUS_INSTALLER_VERSION set. Using 0.0.0."
   CACTUS_INSTALLER_VERSION="0.0.0"
 fi
+if [ ! "$CACTUS_SEMVER_VERSION" ]; then
+  echo "WARNING: No environment variable CACTUS_SEMVER_VERSION set. Using $CACTUS_INSTALLER_VERSION."
+  CACTUS_SEMVER_VERSION="$CACTUS_INSTALLER_VERSION"
+fi
+
 echo "Cactus Installer Version is: $CACTUS_INSTALLER_VERSION"
+echo "Cactus Semver Version is: $CACTUS_SEMVER_VERSION"
 export CACTUS_INSTALLER_VERSION
+export CACTUS_SEMVER_VERSION
 
 echo "Installing npm and electron packagers"
 cd npm_linux || exit 1
@@ -49,29 +56,20 @@ echo "Building pip and NPM license directory"
 pwd
 bash ./build_license_directory.sh
 
-# Builds CLI only .deb
-# need j2 for templating the control file
-format_deb_version_string() {
-  version_str=$1
-  # Use sed to conform to expected apt versioning conventions:
-  # - conditionally insert a hyphen before 'rc' or 'beta' if not already present
-  # - replace '.dev' with '-dev'
-  echo "$version_str" | sed -E 's/([0-9])(rc|beta)/\1-\2/g; s/\.dev/-dev/g'
-}
-pip install j2cli
+pip install jinjanator
 CLI_DEB_BASE="cactus-blockchain-cli_$CACTUS_INSTALLER_VERSION-1_$PLATFORM"
 mkdir -p "dist/$CLI_DEB_BASE/opt/cactus"
 mkdir -p "dist/$CLI_DEB_BASE/usr/bin"
 mkdir -p "dist/$CLI_DEB_BASE/DEBIAN"
 mkdir -p "dist/$CLI_DEB_BASE/etc/systemd/system"
-CACTUS_DEB_CONTROL_VERSION=$(format_deb_version_string "$CACTUS_INSTALLER_VERSION")
+CACTUS_DEB_CONTROL_VERSION=$CACTUS_SEMVER_VERSION
 export CACTUS_DEB_CONTROL_VERSION
 j2 -o "dist/$CLI_DEB_BASE/DEBIAN/control" assets/deb/control.j2
 cp assets/systemd/*.service "dist/$CLI_DEB_BASE/etc/systemd/system/"
 cp -r dist/daemon/* "dist/$CLI_DEB_BASE/opt/cactus/"
 
 ln -s ../../opt/cactus/cactus "dist/$CLI_DEB_BASE/usr/bin/cactus"
-dpkg-deb --build --root-owner-group "dist/$CLI_DEB_BASE"
+dpkg-deb -Zxz -z9 --build --root-owner-group "dist/$CLI_DEB_BASE"
 # CLI only .deb done
 
 cp -r dist/daemon ../cactus-blockchain-gui/packages/gui
@@ -81,44 +79,31 @@ cd ../cactus-blockchain-gui/packages/gui || exit 1
 
 # sets the version for cactus-blockchain in package.json
 cp package.json package.json.orig
-jq --arg VER "$CACTUS_INSTALLER_VERSION" '.version=$VER' package.json >temp.json && mv temp.json package.json
+jq --arg VER "$CACTUS_SEMVER_VERSION" '.version=$VER' package.json >temp.json && mv temp.json package.json
 
 echo "Building Linux(deb) Electron app"
-PRODUCT_NAME="cactus"
 if [ "$PLATFORM" = "arm64" ]; then
-  # electron-builder does not work for arm64 as of Aug 16, 2022.
-  # This is a temporary fix.
   # https://github.com/jordansissel/fpm/issues/1801#issuecomment-919877499
-  # @TODO Consolidates the process to amd64 if the issue of electron-builder is resolved
-  sudo apt -y install ruby ruby-dev
-  # ERROR:  Error installing fpm:
-  #     The last version of dotenv (>= 0) to support your Ruby & RubyGems was 2.8.1. Try installing it with `gem install dotenv -v 2.8.1` and then running the current command again
-  #     dotenv requires Ruby version >= 3.0. The current ruby version is 2.7.0.0.
-  # @TODO Once ruby 3.0 can be installed on `apt install ruby`, installing dotenv below should be removed.
-  sudo gem install dotenv -v 2.8.1
-  sudo gem install fpm
-  echo USE_SYSTEM_FPM=true npx electron-builder build --linux deb --arm64 \
+  # workaround for above now implemented in the image build at
+  # https://github.com/Cactus-Network/build-images/blob/7c74d2f20739543c486c2522032cf09d96396d24/ubuntu-22.04/Dockerfile#L48-L61
+  echo USE_SYSTEM_FPM=true "${NPM_PATH}/electron-builder" build --linux deb --arm64 \
     --config.extraMetadata.name=cactus-blockchain \
-    --config.productName="$PRODUCT_NAME" --config.linux.desktop.Name="Cactus Blockchain" \
-    --config.deb.packageName="cactus-blockchain" \
-    --config ../../../build_scripts/electron-builder.json
-  USE_SYSTEM_FPM=true npx electron-builder build --linux deb --arm64 \
+    --config ../../../build_scripts/electron-builder.json \
+    --publish never
+  USE_SYSTEM_FPM=true "${NPM_PATH}/electron-builder" build --linux deb --arm64 \
     --config.extraMetadata.name=cactus-blockchain \
-    --config.productName="$PRODUCT_NAME" --config.linux.desktop.Name="Cactus Blockchain" \
-    --config.deb.packageName="cactus-blockchain" \
-    --config ../../../build_scripts/electron-builder.json
+    --config ../../../build_scripts/electron-builder.json \
+    --publish never
   LAST_EXIT_CODE=$?
 else
   echo "${NPM_PATH}/electron-builder" build --linux deb --x64 \
     --config.extraMetadata.name=cactus-blockchain \
-    --config.productName="$PRODUCT_NAME" --config.linux.desktop.Name="Cactus Blockchain" \
-    --config.deb.packageName="cactus-blockchain" \
-    --config ../../../build_scripts/electron-builder.json
+    --config ../../../build_scripts/electron-builder.json \
+    --publish never
   "${NPM_PATH}/electron-builder" build --linux deb --x64 \
     --config.extraMetadata.name=cactus-blockchain \
-    --config.productName="$PRODUCT_NAME" --config.linux.desktop.Name="Cactus Blockchain" \
-    --config.deb.packageName="cactus-blockchain" \
-    --config ../../../build_scripts/electron-builder.json
+    --config ../../../build_scripts/electron-builder.json \
+    --publish never
   LAST_EXIT_CODE=$?
 fi
 ls -l dist/linux*-unpacked/resources
@@ -132,7 +117,7 @@ if [ "$LAST_EXIT_CODE" -ne 0 ]; then
 fi
 
 GUI_DEB_NAME=cactus-blockchain_${CACTUS_INSTALLER_VERSION}_${PLATFORM}.deb
-mv "dist/${PRODUCT_NAME}-${CACTUS_INSTALLER_VERSION}.deb" "../../../build_scripts/dist/${GUI_DEB_NAME}"
+mv "dist/cactus-${CACTUS_INSTALLER_VERSION}.deb" "../../../build_scripts/dist/${GUI_DEB_NAME}"
 cd ../../../build_scripts || exit 1
 
 echo "Create final installer"

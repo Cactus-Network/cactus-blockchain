@@ -1,31 +1,26 @@
 from __future__ import annotations
 
-from typing import List, Optional, Union
+from chia_rs import BlockRecord, ChallengeBlockInfo, ConsensusConstants, FullBlock, HeaderBlock, SubEpochSummary
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint8, uint32, uint64
 
-from cactus.consensus.block_record import BlockRecord
 from cactus.consensus.blockchain_interface import BlockRecordsProtocol
-from cactus.consensus.constants import ConsensusConstants
 from cactus.consensus.deficit import calculate_deficit
 from cactus.consensus.difficulty_adjustment import get_next_sub_slot_iters_and_difficulty
+from cactus.consensus.get_block_challenge import post_hard_fork2
 from cactus.consensus.make_sub_epoch_summary import make_sub_epoch_summary
 from cactus.consensus.pot_iterations import is_overflow_block
 from cactus.types.blockchain_format.classgroup import ClassgroupElement
-from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.types.blockchain_format.slots import ChallengeBlockInfo
-from cactus.types.blockchain_format.sub_epoch_summary import SubEpochSummary
-from cactus.types.full_block import FullBlock
-from cactus.types.header_block import HeaderBlock
 from cactus.util.errors import Err
-from cactus.util.ints import uint8, uint32, uint64
 
 
 def block_to_block_record(
     constants: ConsensusConstants,
     blocks: BlockRecordsProtocol,
     required_iters: uint64,
-    block: Union[FullBlock, HeaderBlock],
+    block: FullBlock | HeaderBlock,
     sub_slot_iters: uint64,
-    prev_ses_block: Optional[BlockRecord] = None,
+    prev_ses_block: BlockRecord | None = None,
 ) -> BlockRecord:
     prev_b = blocks.try_block_record(block.prev_header_hash)
     if block.height > 0:
@@ -43,8 +38,8 @@ def block_to_block_record(
         len(block.finished_sub_slots),
     )
 
-    found_ses_hash: Optional[bytes32] = None
-    ses: Optional[SubEpochSummary] = None
+    found_ses_hash: bytes32 | None = None
+    ses: SubEpochSummary | None = None
     if len(block.finished_sub_slots) > 0:
         for sub_slot in block.finished_sub_slots:
             if sub_slot.challenge_chain.subepoch_summary_hash is not None:
@@ -52,6 +47,13 @@ def block_to_block_record(
     if found_ses_hash:
         assert prev_b is not None
         assert len(block.finished_sub_slots) > 0
+        with_challenge_hash = post_hard_fork2(
+            constants=constants,
+            blocks=blocks,
+            prev_b_hash=block.prev_header_hash,
+            sp_index=block.reward_chain_block.signage_point_index,
+            finished_sub_slots=len(block.finished_sub_slots),
+        )
         ses = make_sub_epoch_summary(
             constants,
             blocks,
@@ -59,13 +61,14 @@ def block_to_block_record(
             blocks.block_record(prev_b.prev_hash),
             block.finished_sub_slots[0].challenge_chain.new_difficulty,
             block.finished_sub_slots[0].challenge_chain.new_sub_slot_iters,
-            prev_ses_block,
+            make_challenge_root=with_challenge_hash,
+            prev_ses_block=prev_ses_block,
         )
         if ses.get_hash() != found_ses_hash:
             raise ValueError(Err.INVALID_SUB_EPOCH_SUMMARY)
 
     prev_transaction_block_height = uint32(0)
-    curr: Optional[BlockRecord] = blocks.try_block_record(block.prev_header_hash)
+    curr: BlockRecord | None = blocks.try_block_record(block.prev_header_hash)
     while curr is not None and not curr.is_transaction_block:
         curr = blocks.try_block_record(curr.prev_hash)
 
@@ -87,12 +90,12 @@ def block_to_block_record(
 def header_block_to_sub_block_record(
     constants: ConsensusConstants,
     required_iters: uint64,
-    block: Union[FullBlock, HeaderBlock],
+    block: FullBlock | HeaderBlock,
     sub_slot_iters: uint64,
     overflow: bool,
     deficit: uint8,
     prev_transaction_block_height: uint32,
-    ses: Optional[SubEpochSummary],
+    ses: SubEpochSummary | None,
 ) -> BlockRecord:
     reward_claims_incorporated = (
         block.transactions_info.reward_claims_incorporated if block.transactions_info is not None else None
@@ -106,18 +109,18 @@ def header_block_to_sub_block_record(
     )
 
     if block.reward_chain_block.infused_challenge_chain_ip_vdf is not None:
-        icc_output: Optional[ClassgroupElement] = block.reward_chain_block.infused_challenge_chain_ip_vdf.output
+        icc_output: ClassgroupElement | None = block.reward_chain_block.infused_challenge_chain_ip_vdf.output
     else:
         icc_output = None
 
     if len(block.finished_sub_slots) > 0:
-        finished_challenge_slot_hashes: Optional[List[bytes32]] = [
+        finished_challenge_slot_hashes: list[bytes32] | None = [
             sub_slot.challenge_chain.get_hash() for sub_slot in block.finished_sub_slots
         ]
-        finished_reward_slot_hashes: Optional[List[bytes32]] = [
+        finished_reward_slot_hashes: list[bytes32] | None = [
             sub_slot.reward_chain.get_hash() for sub_slot in block.finished_sub_slots
         ]
-        finished_infused_challenge_slot_hashes: Optional[List[bytes32]] = [
+        finished_infused_challenge_slot_hashes: list[bytes32] | None = [
             sub_slot.infused_challenge_chain.get_hash()
             for sub_slot in block.finished_sub_slots
             if sub_slot.infused_challenge_chain is not None

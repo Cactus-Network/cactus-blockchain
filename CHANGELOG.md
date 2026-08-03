@@ -6,6 +6,607 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does not yet adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 for setuptools_scm/PEP 440 reasons.
 
+## 2.7.3 Cactus blockchain 2026-07-16
+
+## What's Changed
+
+### Changed
+
+- Allow `cactus_getHeightInfo` and `cactus_getCoinRecordsByNames` WalletConnect commands to bypass confirmation prompts for read-only queries
+
+### Fixed
+
+- Fix confirmation dialogs not appearing on Linux (especially Wayland) when the `ready-to-show` event never fires
+- Fix Plot NFTs appearing assigned to the wrong key due to `launcherId` hex normalization
+- Fix log viewing in the reference wallet GUI by restoring missing Electron main-process imports
+- Fix "Asset type is not valid" error when confirming offers to sell NFTs
+
+## 2.7.2 Cactus blockchain 2026-07-09
+
+## What's Changed
+
+### Added
+
+- Add Python 3.14 support
+- Add Weight Proof v2 (WPv2) with MMR-based block commitments and optimized sub-epoch challenge segment tracking
+- Add PlotNFT v2 drivers for pool launch, join/leave, and reward claim
+- Add `/get_constants` RPC to full node
+- Add `get_full_node_peer_count` RPC to wallet
+
+### Changed
+
+- Add `offer_only` option to `create_offer_for_ids`
+- Change how `offer_only` works on `create_offer_for_id`
+- Add `get_fee_estimate` wallet RPC that retrieves fee-per-cost estimates from a connected full node peer, allowing wallet clients to get fee guidance without calling the full node RPC directly
+- Use a separate config for pooling information
+- Use `SQLITE_MAX_VARIABLE_NUMBER` for chunking limit
+- Simplify `TransactionQueueEntry`
+- Speedup `test_ban_for_mismatched_tx_cost_fee`
+- Improve state block handling in `WalletNode`'s `validate_received_state_from_peer`
+- Annotate `timelord_api.py`
+- Annotate `timelord_launcher.py`
+- Annotate `test_transactions.py`
+- Support treating old consensus constant names as the new ones
+- Improve collection of valid coin states in `WalletNode`'s `add_states_from_peer`
+- Make it clear that `bytes100` is always exactly 100 bytes long
+- Annotate `server.py`
+- Avoid recomputing peak header block in `WalletNode`'s `wallet_short_sync_backtrack`
+- Improve `fetch_coin_spend`
+- Annotate `wallet_user_store.py`
+- Add explicit None check in `full_node`'s `short_sync_batch` instead of naked assert
+- Improve `validate_additions`
+- Use `bad_element` in `test_invalid_rc_sub_slot_vdf`
+- Do not require peer for some wallet node APIs
+- Improve macOS Intel CI timeout headroom
+- Add configuration option to advertise rate limits v3 support
+- Annotate `wallet_node_api.py`
+
+### Fixed
+
+- Pass unresolved name as server name in `ws_connect`
+- Remove duplicate code from DID wallet
+- Fix wallet sync wait after puzzle-hash derivation in `test_self_revoke`
+- Handle stale peers during connection garbage collection
+- Fix error handling in `cactus plots check`
+- Fix stale overflow
+- Fix cactus peer errors for invalid or missing services
+- Isolate per-subscription failures in the DataLayer management loop
+- Fix apparmor profile
+- Fix off by one in cleanup (Thanks roopd3v)
+- Skip DataLayer upload/cleanup for stores with no committed data
+- Fix 407 cases
+- Sanity check that PlotNFT memos match actual inner puzzle
+- Upgrade `aiohttp` to 3.14.0 to fix blockchain sync on slow connections (including Starlink Standby mode)
+- Fix Windows runner tag-lock failures with shallow checkout in `test-single`
+- Upgrade `cactus_rs` to 0.45.0
+- Upgrade `cactus_rs` to 0.45.1
+
+### Additional Notes
+
+When building the Electron GUI from source, if you use Node.js version 24.16 or greater, only the first file will be extracted. As a result, the GUI won't install correctly. This is an [issue with Node](https://github.com/electron/electron/issues/51623). We plan to fix this on our end in the next release. Meanwhile, for Cactus 2.7.2, Node 24.15 is the newest supported version when installing the GUI from source.
+
+In 2.7.1, we fixed a bug that prevented the GUI from loading properly. However, the issue still exists for confirmation dialogs in the Linux GUI. As a result, when performing operations such as sending funds, creating offers, etc, a timeout will occur. This only affects Linux, and it affects both 2.7.1 and 2.7.2. As a workaround, Linux users can continue to use the CLI for the aforementioned operations.
+
+## 2.7.1 Cactus blockchain 2026-05-19
+
+## What's Changed
+
+### Added
+
+- Add Cursor AI context rules for modules and testing
+- Introduce a new window based rate limits capability
+- Add ability to specify coins to include in `CoinSelectionConfig`
+
+### Changed
+
+- WalletConnect: Upgraded to WalletConnect v2
+- WalletConnect: unified commands, redesigned permissions, and added support for cactus gaming
+- Remove several wallet modules from mypy strict exclusions
+- Improve requesting transactions advertised via `NewTransaction`
+- Give callers of `SingletonFastForward.process_fast_forward_spends` control over the state update
+- Update inbound timelord connection handling
+- Move `NPCResults` into tests
+- Improve compact VDF request handling
+- Replace multiple thread pool executors with a shared `PriorityThreadPoolExecutor` to improve CPU utilization
+- Optimize handling of unfinished blocks
+- Reject malformed weight proof segments with overflow block at index 0
+- Improve active requests tracking
+- Fix mypy 1.20.0 compatibility
+- Add outbound handshake timeout in `start_client`
+- Add more detailed information to `get_height_info()`
+- Improve proof of space unfinished block handling
+- Improve logging for unfinished blocks that overflow in the first sub-slot of a new epoch
+- Remove no longer needed tx peak computation in `declare_proof_of_space`
+- Various changes for cactus gaming support
+- Avoid recomputing tx peak when creating a block generator in `declare_proof_of_space`
+- Improve logging for unsolicited transactions in `FullNodeAPI.respond_transaction`
+- Improve handling of nonced timed-out requests in `WSCactusConnection`
+- Avoid redundant close handling on already-closed peers in `WalletNode.new_peak_wallet`
+- Add dynamic list-limited deserialization for Streamable types
+- Improve handling of additions/removals requests in `WalletNode.validate_received_state_from_peer`
+- Remove unused wallet outbound rate-limit config key
+- Bump `cactus_rs` to 0.42.1
+- Update GUI pin to release/2.7.1
+
+### Fixed
+
+- Use read-only snapshots for block pre-validation to prevent concurrent mutation
+- Ensure malformed websocket frames trigger a proper disconnect
+- Fix `combine_coins` ignoring `--max-coin-amount` and including spent coins
+- Fix wallet transaction inflight tracking
+- Restore DL wallet launcher entry after rollback
+- Fix invalid third-party harvester signage point fixture data
+- Fix `SyncStore` handling of stale peaks and empty peer entries
+- Replace assert with explicit check for unknown parent block
+- Replace assert with explicit None check in `get_heaviest_peak()`
+- Prevent unnecessary farming delays of height-asserted spends at exact match height
+- Widen wallet request protocol fields from `uint16` to `uint32` (fixes #20255)
+
+## 2.7.0 Cactus blockchain 2026-3-26
+
+## What's Changed
+
+### Added
+
+- Remote Wallet and new RPC calls
+
+### Changed
+
+- Numerous hardening measures and soft fork: Please read our blog post for more information
+  https://www.cactus-network.net/2026/03/26/cactus-2-7-0-combatting-the-ai-siege/
+- Make the mempool a bit more defensive on slow machines
+- Harden connection handling and message validation in `WSCactusConnection`
+- Improve `register_for_coin_updates`
+- Early check of proof of space in a few places
+- Ignore unsolicited `RespondTransaction`
+- Mempool spend limit
+- Harden `Streamable.from_bytes()` to raise `ValueError` on unconsumed trailing bytes
+- Bump `cactus_rs` to `0.41.1`
+
+### Fixed
+
+- Fix timelord to skip processing after failed VDF proof validation
+- Apply `client_timeout` to all DataLayer plugin HTTP calls
+- DataLayer hardening related to DAT file downloading
+
+## 2.6.1 Cactus blockchain 2026-3-18
+
+## What's Changed
+
+### Added
+
+- Add BYC and CRT to default CAT list
+- New inner puzzle meta-standard that has instructions for how a wallet can handle arbitrary authorization trees
+- Work in Progress - PoS2 integration
+- Use structured RPC errors in `full_node_rpc_api`
+
+### Changed
+
+- Simplify and optimize `TransactionQueue`
+- Use an adapted version of deficit round robin algorithm in `TransactionQueue`
+- Forward `send_transaction` and `cat_spend` to `create_signed_transaction`
+- Prioritize trusted peers in FullNodeAPI's `send_transaction`
+- Add `kw_only` to all wallet RPC types
+- Miscellaneous wallet RPC cleanups
+- Tolerate quote related cost mismatch for older nodes
+- Skip fetching additions and removals for non transaction blocks in FullNodeAPI's `request_header_blocks`
+- Refactor connection handshake
+- Reject unsolicited `RespondCompactVDF` messages
+- Made log less chatty for compact proofs
+- Harden full node store
+- Validate QR bit in DNS seeder to only process queries
+- Add missing request decorator to `reject_removals_request`
+- Correct accounting of cost limits in offer summary computation
+- Harden nodes message typechecking
+- Harden the full node’s incoming connection logic
+- Default to block creation 1
+- Only update the fast forward state on successful validation in `process_fast_forward_spends`
+- Bump `cactus_rs` to `0.38.2`
+
+### Fixed
+
+- Revert accidental RPC parameter name change
+- Augmented usage fix
+- Blocktools double sub epoch summary hash bug
+- Fix reorg edge case handling in the wallet protocol
+- Prevent dangling SAVEPOINTs by shielding against cancellation
+- Return RejectAdditionsRequest to wallets instead of raising an exception
+- Close VDF client TCP connections properly
+- Fix PendingTxCache eviction when encountering empty height buckets
+
+### Removed
+
+- Drop support for macOS 13 (Ventura) and macOS 14 (Sonoma)
+
+## 2.6.0 Cactus blockchain 2026-2-11
+
+As this is a soft fork release, upgrading is strongly recommended before height 8,655,000.
+
+## What's Changed
+
+### Added
+
+- Update error message for invalid IP and port format to clarify ipv6
+- Work in Progress - increased preliminary support for V2 plot format
+- Python 3.13 support
+- Do not advertise a new transaction with zero cost
+
+### Changed
+
+- Bump cactus_rs to 0.35.2
+- Bump chiavdf from 1.1.13 to 1.1.14
+- Bump chiabip158 from 1.5.3 to 1.5.4
+- Bump chiapos from 2.0.11 to 2.0.12
+- Skip fetching additions and removals for non transaction blocks in FullNodeAPI's request_header_blocks
+- Tolerate quote related cost mismatch for older nodes
+- Use an adapted version of deficit round robin algorithm in TransactionQueue's pop
+- Prioritize trusted peers in FullNodeAPI's send_transaction
+- Make sure the costs and fees match when a peer notifies us of a new transaction that we saw already
+- Remove unnecessary private key access from `get_public_keys`
+- Set minimum to TLSv1.3
+- Make sure the fee and cost specified in a NewTransaction match the ones from validating its spend bundle
+- Change v1 plot phase-out
+- Simplify tx_request_and_timeout and make it iterate over a dynamic list of peers with transactions
+- Improve v2-plot support in plot-sync
+- Don't allow, or harvest, v2 plots before hard fork activation
+- Change Cactus Root CA to expire 31 Dec 2037
+- Default to single solver thread
+- Relax PoS validation in weight proofs
+- Advertise requested mempool transactions instead of sending them
+- In TransactionQueue, prioritize peer queue transactions by fee per cost
+- Eliminate rate limits and bans for exempt peer networks
+- Updated GUI translations
+
+### Fixed
+
+- Fix RPC key deletion endpoints to actually delete intended DBs
+- Fix some typos in comments by @rocksload
+- Some minor issues in comment by @deepdring
+- Fix a large number of spelling issues in comments by @joemicky
+- Fix typo for Timelord.\_check_for_new_sp comments by @wanziforever
+- Change GetTransactions to use uint32 to support wallets with very large numbers of transactions
+- Fix measurement of harvester lookup times for logging
+- Fixed NFT minting RPC parameter (fixes #20360)
+- Fixed CAT names on overview (fixes #20297)
+
+## 2.5.7 Cactus blockchain 2025-11-12
+
+## What's Changed
+
+### Added
+
+- New Datalayer delta file format for improved performance
+- New Datalayer delta file migration and increased logging
+- New Datalayer config option `merkle_blobs_cache_size`
+- Work in Progress - preliminary support for V2 plot format (eg: `cactus plots check`)
+- Add Enum support to `streamable` framework
+- New option `-i/--include-pool-rewards` for `cactus farm summary` (thanks @wallentx)
+
+### Changed
+
+- Improved Datalayer performance significantly with migration to Rust (via `cactus_rs`)
+- Improved Mempool performance and fast forward support
+- Modified wallet RPC `add_key` to support providing a key label
+- Integrated `PLOT_V1_PHASE_OUT` constant
+- Optimixed code related to node handling of new peaks
+- Simplified `install-gui.sh` script to remove code that attempts to find and install NodeJS
+- Bump `cactus_rs` to `0.30`
+- Bump `chiavdf` to `1.1.13`
+- Bump `cryptography` to `45.0.5`
+- Bump `cffi` to `1.17.1`
+- Bump `markupsafe` to `3.0.2`
+
+### Fixed
+
+- Changed logging of `NO_OVERFLOWS_IN_FIRST_SUB_SLOT_NEW_EPOCH` from `error` to `info` as this is expected in certain situations
+- Fixed signage point lookup edge case at genesis in the first slot
+- Change default limit for `get_transactions` to 65536 (uint16)
+
+### Removed
+
+- Removed the following unsupported Wallet RPC APIs: `did_update_recovery_ids`, `did_recovery_spend`, `did_get_recovery_list`, `did_create_attest`, `did_get_information_needed_for_recovery`
+- Python 3.9 is no longer supported
+
+## 2.5.6 Cactus blockchain 2025-9-24
+
+## What's Changed
+
+### Changed
+
+- Supported previous harvester protocol for Dr. Plotter users
+- Updated Crowdin translations
+
+### Fixed
+
+- Upgraded electron dependency to 37.3.1 to fix GTK4 issue on some versions of Linux
+- Fixed GUI NFT offer uploads
+- Fixed GUI pooling switch
+
+## 2.5.5 Cactus blockchain 2025-08-19
+
+Note that protocol changes between node, farmer, and harvester will require all entities to be upgraded
+at the same time to 2.5.5. On a simple one machine setup, this will be handled by the installer.
+But if you have more complicated topologies with remote farmers or harvesters, you will need to upgrade
+all components.
+
+2.5.5 will also make changes to the blockchain database that are incompatible with previous versions. If you
+run 2.5.5 but later wish to downgrade to an earlier version, you will need to downgrade your database schema by
+running the following command:
+
+```
+python -c "import sqlite3, sys, os; conn = sqlite3.connect(os.path.expanduser(sys.argv[1])); cursor = conn.execute('UPDATE coin_record SET spent_index = 0 WHERE spent_index = -1'); print(f'Updated {cursor.rowcount} records'); conn.commit(); conn.close()" <path to the db>
+```
+
+Replacing `<path to the db>` with your actual database path.
+
+## What's Changed
+
+### Added
+
+- Add `cactus dev mempool` CLI commands to import, export, and benchmark the mempool
+- Add new error logging if the block cost fails to compute
+- Add dicts to streamable
+- Add independant Full Node RPC Validation Tool (`tools\validate_rpcs.py`)
+- Add Revocable CAT support to wallet (Chip 38)
+- Add mempool optimizations and fixes in spend deduplication and singleton fast forward.
+- Add mempool vault fast forward support
+- Add unit tests to cover singleton fast forward dynamics
+- Add new optional block creation algorithm to maximize transactions (set config.yaml `full_node:block_creation` to `1`)
+- Add new config setting for block creation timeout (`full_node:block_creation_timeout`)
+- Add preparation for new plot format and expected hard fork (Chip 48)
+- Add canonical CLVM serialization requirement after expected hard fork
+
+### Changed
+
+- Harvester<->Farmer protocol change: compute plot filter on the harvester (Chip 48 prep)
+- Farmer<->Node protocol change (Chip 48 prep)
+- Backwards incompatible schema change for mempool fast-forward support
+- Remove problematic `coins_added_at_height_cache` cache
+- Remove no longer needed `item_inclusion_filter` in the mempool
+- Significantly speedup mempool manager tests by not forcing them to request unneeded fixtures
+- Refactor and add test for WSM puzzle hash endpoints
+- Removed unneeded call to compute block cost
+- Add puzzle hash generation to action scopes
+- Remove direct secret key access from pool wallet
+- Add ContextManager to FullNodePeers
+- Simplify DB checks in `invariant_check_mempool`
+- log how long it took to call `peak_post_processing_2`
+- move `cactus.types.aliases` to `cactus.server.aliases`
+- move tx processing queue entry classes
+- Improve the serialisation of AddressManager
+- Remove the dependency of `cactus.consensus` on the module `cactus.types`
+- Adapt `test_check_removals_with_block_creation` to cover both block generator creation versions
+- Use upstream miniupnpc 2.3.3
+- Don't return addition coin records in CoinStore's new_block
+- Avoid recomputing coin record names in `rollback_to_block` when we have access to them
+- move sp broadcast outside of blockchain mutex
+- use `pyproject.toml` `[project]` section (again)
+- Simplify `test_set_spent`
+- Leverage `execute_fetchall` in CoinStore's `rollback_to_block`
+- Insert DB values in CoinStore's `new_block` without creating coin records
+- Also log the VDF field being compacted (thanks @xearl4)
+- Avoid recomputing coin IDs in `run_new_block_benchmark`
+- Simplify `test_rollback`
+- Extract `_add_coin_records` out of CoinStore and simplify it
+- Simplify `test_num_unspent`
+- Simplify `test_basic_coin_store`
+- Optimize rolled back state construction in `_reconsider_peak`
+- Leverage CoinStore's `new_block` in SpendSim's `farm_block` instead of custom coin store manipulation
+- Port NFT, pooling, DID, and Datalayer RPCs to `@marshal` decorator
+- Simplify SpendSim's `farm_block`
+- Migrate away from `clvm` imports
+- Pass coin IDs from Blockchain's `_reconsider_peak` to CoinStore's `new_block` to avoid recomputing them
+- Unify fork peak and reward coins handling between ForkInfo's `include_spends` and `include_block`
+- Replace `CATWallet.create_new_cat_wallet` in `test_cat_wallet.py`
+- Change minimium node version to 20 and npm version to 10
+- Timelord: dont skip same peak if in unfinished cache
+- Set app minimum macos version to macOS 13
+- Bump `cactus-rs` to `0.27.0`
+- Bump `chiavdf` to `1.1.11`
+- Bump `clvm` to `0.9.14`
+- Bump `clvm-tools-rs` to `0.1.48`
+
+### Fixed
+
+- Enable keccak softfork in the wallet (fixes #19480)
+- Add some checks when trying to join the same pool already joined (fixes #7592)
+- Allow DIDs from other wallets with NIL recovery lists (fixes #18947)
+- Set AGG_SIG_ME_ADDITIONAL_DATA in config.yaml for simulator
+- use index when fetching SP
+- redact daemon websocket message logging
+- less response failure error consumption
+- Fixed some typos in comments (thanks @timesince)
+- Fixed more typos in comments (thanks @racerole)
+- Fixed yet more typos in comments (thanks @yetyear)
+- Fixed typo in CONTRIBUTING.md (thanks @ctrlaltdel)
+
+### Removed
+
+- Testing and support for Ubuntu LTS 20.04
+- Testing and support for Debian 11 "Bullseye"
+
+## 2.5.4 Cactus blockchain 2025-05-28
+
+## What's Changed
+
+### Added
+
+- Enabled Keccak support in the wallet
+- Improved logging and timing around block validation
+- Improved logging of block creation
+
+### Changed
+
+- Mempool: Optimized removal checking
+- Mempool: Optimized and hardened dedup logic
+- Mempool: Reject transactions that take too long to validate (2 seconds)
+
+### Fixed
+
+- Tighten cactus_rs version to `>=0.21, <0.22` (Fixes #19613)
+- Fixed timelord peak selection to match the full node
+- Used monotonic clock for timing functions in harvester (Fixes "does not fit into uint" log errors)
+
+## 2.5.3 Cactus blockchain 2025-03-25
+
+## What's Changed
+
+### Added
+
+- Add config constant support to `cactus db validate`
+- Add names to threads in ThreadPoolExecutor
+- Add cache for `get_unspent_lineage_info()`
+
+### Changed
+
+- Mempool: Create a mempool item out of a copy of the input one when processing fast forward spends
+- Mempool: Validate fast forward spends before adding their spend bundle to the mempool
+- Mempool: make the super set rule stricter
+- Mempool: Add increment to skipped_items if we hit an Exception in mempool
+- Mempool: harden mempool fast-forward feature
+- Mempool: improve fast forward mempool eviction
+- Migrate puzzles away from `load_clvm` to import from cactus_puzzles_py
+- Add singleton records to action scopes
+- Swap out `Payment` for `CreateCoin`
+- Remove old offer guards
+- Delete unused `cactus/simulator/simulator_constants.py`
+- Port `test_dl_wallet.py` to `WalletTestFramework`
+- cactus.types no longer depends upon cactus.protocols
+- Standardize the `Wallet` API for `generate_signed_transaction`
+- Bring `VCWallet.generate_signed_transaction` into conformity
+- Add `generate_signed_transaction` to `WalletProtocol`
+- Refactor `create_block_generator`
+- bump `cactus_rs` to `0.21.1`
+- bump `anyio` to `4.8.0`
+- bump `boto3` to `1.37.1`
+- bump `filelock` to `3.9`
+- bump `keyring` to `25.6.0`
+
+### Fixed
+
+- Allow coin selection of 0 value coins
+- Add some extra safety into `create_message_spend`
+- check on import that assertions are working
+- chore: fix some typos (thanks @lencap)
+- chore: fix 404 status URL (thanks @peicuiping)
+- Assert height to hash in contains block
+- Add DNS-based fallback for original introducer
+
+### Removed
+
+- Removed n-weso algorithm. Timelords use either 2-weso or H/W
+- Removed unused proof-of-concept DAO wallet
+
+## 2.5.2 Cactus blockchain 2025-02-19
+
+## What's Changed
+
+### Fixed
+
+- Validate fast forward spends before adding their spend bundle to the mempool
+- Create a mempool item out of a copy of the input one when processing fast forward spends
+- Harden mempool fast forward feature
+- Improve handling when non-cactus fork chains connect to cactus nodes
+
+## 2.5.1 Cactus blockchain 2025-02-15
+
+## What's Changed
+
+### Added
+
+- Add parsing for JSON formatted spend bundles in `/push_tx`
+- Add new config option `follow_links` to support recursively scanning and following links
+- add `/get_log_level`, `/reset_log_level`, and `/set_log_level` to all rpcs
+- Add support for a static list of peers to always have available in the dns_server
+- Add simulator to installers
+- Add ergonomic message condition drivers
+- Add `seeder.xchseeder.com` to dns_servers in config
+- New `Cactus Tools` section in GUI with integrated Log Viewer
+
+### Changed
+
+- Add a time-out of adding more transactions to blocks during block creation
+- Add a configurable limit to the amount of DIDs that can be automatically added to the users wallet from transfer
+- validate blocks in thread pool (instead of process pool)
+- validate UnfinishedBlocks and signature in thread pool
+- Require fewer arguments for `cactus wallet coins split` in the CLI
+- Remove Python 3.8 support and update source to 3.9 standards
+- pipeline block validation in `sync_from_fork_point()`
+- Don't import a `wallet` file from `util`.
+- Pace block requests
+- allow backcompat mode for logging
+- only attempt poetry install when not present
+- make timeloard launcher fail with a non-zero exit code on windows
+- Use `#!/usr/bin/env bash` in scripts
+- Logging changes for feeler connections (thanks @thesemaphoreslim)
+- Sort offers in CLI by `RELEVANCE`
+- check network errors and their `.__cause__` for expected error types
+- If 0 peers to crawl, sleep before trying to crawl again
+- improve sync timeouts by being more conservative the fewer peers we have
+- improve logging of rate limits
+- Add better `reuse_puzhash` checking to `WalletTestFramework`
+- show cli defaults by default
+- add new configuration option to log the first 6 hex digits of coins
+- port `cactus plotnft` to `@cactus_commands` framework
+- set the block fill rate limit to 100% when farming a block
+- add a feature to log spend bundles being added to the mempool
+- go back to `<4` as the python version upper limit
+- Name wallet protocol subscription messages consistently
+- bump `cactus_rs` to `0.18.0`
+- bump `chiavdf` to `1.1.10`
+- bump `chiapos` to `2.0.10`
+- bump `chiabip158` to `1.5.2`
+- bump `clvm_tools_rs` to `0.1.45`
+- bump `clvm` to `0.9.11`
+- bump `clvm-tools` to `0.4.10`
+- bump `psutil` to `6.1.1`
+- bump `aiofiles` to `24.1.0`
+- bump `aiohttp` to `3.11.11`
+- bump `anyio` to `4.7.0`
+- bump `boto3` to `1.35.90`
+- bump `click` to `8.1.8`
+- bump `cryptography` to `43.0.3`
+- bump `dnslib` to `0.9.25`
+- bump `dnspython` to `2.7.0`
+- bump `filelock` to `3.16.1`
+- bump `keyring` to `25.5.0`
+- bump `pyyaml` to `6.0.2`
+- bump `watchdog` to `6.0.0`
+
+### Fixed
+
+- Fix install.sh upgrade issue (thanks @wallentx) (fixes #18672)
+- Fix incorrect comment about default hidden puzzle (fixes #11824)
+- Some daemon start cleanup (fixes #18677 and #16396)
+- Fixed missing incoming transactions for pool reward claims (fixes #13251)
+- Don't create zero amount royalty payments (fixes #19092)
+- Fixed an issue where cancelling NFT offer did not cancel other offers (fixes https://github.com/Cactus-Network/cactus-blockchain-gui/issues/2563)
+- Fix DID balance reporting, and port DID tests to WalletTestFramwork
+- Fix bluebox shutdown
+- Keep track of all long sync task references
+- correct wallet rpc api for get spendable coins with specified excluded coins
+- the mempool thread pool should not set the process name
+- save tasks for TX processing
+- fix the rollback of fork_info when validating a block fails
+- Update systemd templates to check if RPCs are up by using the cactus rpc commands instead of nc
+- fix trusted wallet sync on deep reorg
+- add in_main_chain=1 to the SQL query, that just asks for heights
+- fix short_sync_backtrack
+- don't drop outgoing response messages
+- Track weight proof tasks
+- use height to hash in short sync
+- fix wrong param in prevalidate
+- Fix problems with startup timing and the Datalayer processing loop
+- remove redundant block record conversion
+- Fix timelord log spam
+- Fix peak_post_processing w/priority_mutex
+- avoid a traceback on failure
+- clean overflow blocks moved to unfinished block cache on reset chain
+- use underlying height_to_hash to check main chain
+- fix: typos in documentation files (thanks @leopardracer)
+- fix 404 status URL (thanks @thirdkeyword)
+- Minor grammatical correction in wallet_rpc_api.py (thanks @Jsewill)
+
 ## 2.5.0 Cactus blockchain 2024-12-12
 
 ## What's Changed
@@ -726,7 +1327,7 @@ macOS 11 (Big Sur) is deprecated. This release (2.4.0) will be the last release 
 - Only subscribe to inner wallet puzzle hashes
 - Rpc: Fix and test `WalletRpcApi.get_coin_records_by_names`
 - Full_node: `uint32.MAXIMUM_EXCLUSIVE` -> `uint32.MAXIMUM`
-- Full_node: Don't send duplicates in `register_interest_in_puzzle_hash`
+- Full_node: Don't send duplicates in `register_for_ph_updates`
 - Wallet: Deduplicate coin states from peers
 - Build: include `puzzles` packages (#15508)
 - Handle VC syncing exceptions better

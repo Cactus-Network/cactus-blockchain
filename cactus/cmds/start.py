@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import click
 
+from cactus.cmds.cmd_classes import CactusCliContext
 from cactus.util.config import load_config
 from cactus.util.service_groups import all_groups
 
@@ -15,10 +16,9 @@ def start_cmd(ctx: click.Context, restart: bool, skip_keyring: bool, group: tupl
     import asyncio
 
     from cactus.cmds.beta_funcs import warn_if_beta_enabled
+    from cactus.cmds.start_funcs import async_start
 
-    from .start_funcs import async_start
-
-    root_path = ctx.obj["root_path"]
+    root_path = CactusCliContext.set_default(ctx).root_path
     config = load_config(root_path, "config.yaml")
     warn_if_beta_enabled(config)
     asyncio.run(async_start(root_path, config, group, restart, skip_keyring=skip_keyring))

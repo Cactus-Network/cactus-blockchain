@@ -1,17 +1,19 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
-from typing import Any, Callable, Optional, Union
+from typing import Any
 
 import click
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint64
 
+from cactus.cmds.cmd_classes import CactusCliContext
 from cactus.cmds.units import units
-from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.util.bech32m import bech32_decode, decode_puzzle_hash
 from cactus.util.config import load_config, selected_network_address_prefix
 from cactus.util.default_root import DEFAULT_ROOT_PATH
-from cactus.util.ints import uint64
 from cactus.wallet.util.address_type import AddressType
 
 one_decimal_mojo = Decimal("1e-12")
@@ -19,9 +21,9 @@ one_decimal_mojo = Decimal("1e-12")
 
 def validate_uint64(
     value: str,
-    fail_func: Callable[[str, Optional[click.Parameter], Optional[click.Context]], None],
-    param: Optional[click.Parameter],
-    ctx: Optional[click.Context],
+    fail_func: Callable[[str, click.Parameter | None, click.Context | None], None],
+    param: click.Parameter | None,
+    ctx: click.Context | None,
 ) -> uint64:
     try:
         d_value = Decimal(value)
@@ -40,9 +42,9 @@ def validate_uint64(
 
 def validate_decimal_cac(
     value: str,
-    fail_func: Callable[[str, Optional[click.Parameter], Optional[click.Context]], None],
-    param: Optional[click.Parameter],
-    ctx: Optional[click.Context],
+    fail_func: Callable[[str, click.Parameter | None, click.Context | None], None],
+    param: click.Parameter | None,
+    ctx: click.Context | None,
 ) -> Decimal:
     try:
         d_value = Decimal(value)
@@ -55,7 +57,7 @@ def validate_decimal_cac(
     return d_value
 
 
-class TransactionFeeParamType(click.ParamType):
+class TransactionFeeParamType(click.ParamType[uint64]):
     """
     A Click parameter type for transaction fees, which can be specified in CAC or mojos.
     """
@@ -63,7 +65,7 @@ class TransactionFeeParamType(click.ParamType):
     name: str = "CAC"  # type name for cli, TODO: Change once the mojo flag is implemented
     value_limit: Decimal = Decimal("0.5")
 
-    def convert(self, value: Any, param: Optional[click.Parameter], ctx: Optional[click.Context]) -> uint64:
+    def convert(self, value: Any, param: click.Parameter | None, ctx: click.Context | None) -> uint64:
         # suggested by click, but we are not using it to avoid possible misinterpretation of units.
         # if isinstance(value, uint64):
         #     return value
@@ -88,11 +90,11 @@ class CliAmount:
     """
 
     mojos: bool
-    amount: Union[uint64, Decimal, None]  # uint64 if mojos, Decimal if not, None if default value is none
+    amount: uint64 | Decimal | None  # uint64 if mojos, Decimal if not, None if default value is none
 
     def convert_amount_with_default(
-        self, mojo_per_unit: int, default_value: Optional[uint64] = uint64(0)
-    ) -> Optional[uint64]:
+        self, mojo_per_unit: int, default_value: uint64 | None = uint64(0)
+    ) -> uint64 | None:
         if self.amount is None:  # if the value is set to none, return the default value
             return default_value
         return self.convert_amount(mojo_per_unit)
@@ -114,14 +116,14 @@ class CliAmount:
         return uint64_amount
 
 
-class AmountParamType(click.ParamType):
+class AmountParamType(click.ParamType[CliAmount]):
     """
     A Click parameter type for TX / wallet amounts for both CAC and CAT, and of course mojos.
     """
 
     name: str = "CAC"  # type name for cli, TODO: Change once the mojo flag is implemented
 
-    def convert(self, value: Any, param: Optional[click.Parameter], ctx: Optional[click.Context]) -> CliAmount:
+    def convert(self, value: Any, param: click.Parameter | None, ctx: click.Context | None) -> CliAmount:
         # suggested by click, but being left in as mojos flag makes default misrepresentation less likely.
         if isinstance(value, CliAmount):
             return value
@@ -156,31 +158,40 @@ class CliAddress:
         return self.puzzle_hash
 
 
-class AddressParamType(click.ParamType):
+class AddressParamType(click.ParamType[CliAddress]):
     """
     A Click parameter type for bech32m encoded addresses, it gives a class with the address type and puzzle hash.
     """
 
     name: str = "Address"  # type name for cli
 
-    def convert(self, value: Any, param: Optional[click.Parameter], ctx: Optional[click.Context]) -> CliAddress:
+    def convert(self, value: Any, param: click.Parameter | None, ctx: click.Context | None) -> CliAddress:
         # suggested by click, but not really used so removed to make unexpected types more obvious.
         # if isinstance(value, CliAddress):
         #    return value
         if not isinstance(value, str):
             self.fail("Invalid Type, address must be string.", param, ctx)
         try:
-            hrp, b32data = bech32_decode(value)
-            if hrp in ["cac", "tcac"]:  # I hate having to load the config here
+            hrp, _b32data = bech32_decode(value)
+            if hrp in {"cac", "tcac"}:  # I hate having to load the config here
                 addr_type: AddressType = AddressType.CAC
-                expected_prefix = ctx.obj.get("expected_prefix") if ctx else None  # attempt to get cached prefix
+
+                # attempt to get cached prefix
+                expected_prefix: str | None = None
+                root_path = DEFAULT_ROOT_PATH
+
+                if ctx is not None:
+                    context = CactusCliContext.set_default(ctx)
+                    root_path = context.root_path
+                    expected_prefix = context.expected_prefix
+
                 if expected_prefix is None:
-                    root_path = ctx.obj["root_path"] if ctx is not None else DEFAULT_ROOT_PATH
                     config = load_config(root_path, "config.yaml")
                     expected_prefix = selected_network_address_prefix(config)
 
-                    if ctx is not None:
-                        ctx.obj["expected_prefix"] = expected_prefix  # cache prefix
+                if ctx is not None:
+                    context.expected_prefix = expected_prefix  # cache prefix
+
                 # now that we have the expected prefix, we can validate the address is for the right network
                 if hrp != expected_prefix:
                     self.fail(f"Unexpected Address Prefix: {hrp}, are you sure its for the right network?", param, ctx)
@@ -191,14 +202,14 @@ class AddressParamType(click.ParamType):
             self.fail("Address must be a valid bech32m address", param, ctx)
 
 
-class Bytes32ParamType(click.ParamType):
+class Bytes32ParamType(click.ParamType[bytes32]):
     """
     A Click parameter type for bytes32 hex strings, with or without the 0x prefix.
     """
 
     name: str = "HexString"  # type name for cli
 
-    def convert(self, value: Any, param: Optional[click.Parameter], ctx: Optional[click.Context]) -> bytes32:
+    def convert(self, value: Any, param: click.Parameter | None, ctx: click.Context | None) -> bytes32:
         # suggested by click but deemed not necessary due to unnecessary complexity.
         # if isinstance(value, bytes32):
         #     return value
@@ -210,14 +221,14 @@ class Bytes32ParamType(click.ParamType):
             self.fail("Value must be a valid bytes32 hex string like a coin id or puzzle hash", param, ctx)
 
 
-class Uint64ParamType(click.ParamType):
+class Uint64ParamType(click.ParamType[uint64]):
     """
     A Click parameter type for Uint64 integers.
     """
 
     name: str = uint64.__name__  # type name for cli
 
-    def convert(self, value: Any, param: Optional[click.Parameter], ctx: Optional[click.Context]) -> uint64:
+    def convert(self, value: Any, param: click.Parameter | None, ctx: click.Context | None) -> uint64:
         if isinstance(value, uint64):  # required by click
             return value
         if not isinstance(value, str):

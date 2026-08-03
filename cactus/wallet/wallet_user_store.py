@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from typing import List, Optional
+from chia_rs.sized_ints import uint32
+from typing_extensions import Self
 
 from cactus.util.db_wrapper import DBWrapper2, execute_fetchone
-from cactus.util.ints import uint32
 from cactus.wallet.util.wallet_types import WalletType
 from cactus.wallet.wallet_info import WalletInfo
 
@@ -17,7 +17,7 @@ class WalletUserStore:
     db_wrapper: DBWrapper2
 
     @classmethod
-    async def create(cls, db_wrapper: DBWrapper2):
+    async def create(cls, db_wrapper: DBWrapper2) -> Self:
         self = cls()
 
         self.db_wrapper = db_wrapper
@@ -39,7 +39,7 @@ class WalletUserStore:
         await self.init_wallet()
         return self
 
-    async def init_wallet(self):
+    async def init_wallet(self) -> None:
         all_wallets = await self.get_all_wallet_info_entries()
         if len(all_wallets) == 0:
             await self.create_wallet("Cactus Wallet", WalletType.STANDARD_WALLET, "")
@@ -49,7 +49,7 @@ class WalletUserStore:
         name: str,
         wallet_type: int,
         data: str,
-        id: Optional[int] = None,
+        id: int | None = None,
     ) -> WalletInfo:
         async with self.db_wrapper.writer_maybe_transaction() as conn:
             cursor = await conn.execute(
@@ -63,11 +63,11 @@ class WalletUserStore:
 
         return wallet
 
-    async def delete_wallet(self, id: int):
+    async def delete_wallet(self, id: int) -> None:
         async with self.db_wrapper.writer_maybe_transaction() as conn:
             await (await conn.execute("DELETE FROM users_wallets where id=?", (id,))).close()
 
-    async def update_wallet(self, wallet_info: WalletInfo):
+    async def update_wallet(self, wallet_info: WalletInfo) -> None:
         async with self.db_wrapper.writer_maybe_transaction() as conn:
             cursor = await conn.execute(
                 "INSERT or REPLACE INTO users_wallets VALUES(?, ?, ?, ?)",
@@ -80,13 +80,13 @@ class WalletUserStore:
             )
             await cursor.close()
 
-    async def get_last_wallet(self) -> Optional[WalletInfo]:
+    async def get_last_wallet(self) -> WalletInfo | None:
         async with self.db_wrapper.reader_no_transaction() as conn:
             row = await execute_fetchone(conn, "SELECT MAX(id) FROM users_wallets")
 
         return None if row is None else await self.get_wallet_by_id(row[0])
 
-    async def get_all_wallet_info_entries(self, wallet_type: Optional[WalletType] = None) -> List[WalletInfo]:
+    async def get_all_wallet_info_entries(self, wallet_type: WalletType | None = None) -> list[WalletInfo]:
         """
         Return a set containing all wallets, optionally with a specific WalletType
         """
@@ -99,7 +99,7 @@ class WalletUserStore:
                 )
             return [WalletInfo(row[0], row[1], row[2], row[3]) for row in rows]
 
-    async def get_wallet_by_id(self, id: int) -> Optional[WalletInfo]:
+    async def get_wallet_by_id(self, id: int) -> WalletInfo | None:
         """
         Return a wallet by id
         """

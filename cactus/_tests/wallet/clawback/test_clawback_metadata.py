@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import random
-from typing import List, Tuple
 
 import pytest
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint64
 
+from cactus._tests.conftest import ConsensusMode
 from cactus.server.server import CactusServer
 from cactus.simulator.block_tools import BlockTools
 from cactus.simulator.full_node_simulator import FullNodeSimulator
-from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.types.peer_info import PeerInfo
-from cactus.util.ints import uint64
 from cactus.wallet.puzzles.clawback.metadata import ClawbackMetadata
+from cactus.wallet.util.tx_config import DEFAULT_TX_CONFIG
 from cactus.wallet.wallet_node import WalletNode
 
 
@@ -19,9 +20,10 @@ from cactus.wallet.wallet_node import WalletNode
     "trusted",
     [True, False],
 )
+@pytest.mark.limit_consensus_modes(allowed=[ConsensusMode.HARD_FORK_2_0])
 @pytest.mark.anyio
 async def test_is_recipient(
-    simulator_and_wallet: Tuple[List[FullNodeSimulator], List[Tuple[WalletNode, CactusServer]], BlockTools],
+    simulator_and_wallet: tuple[list[FullNodeSimulator], list[tuple[WalletNode, CactusServer]], BlockTools],
     trusted: bool,
     self_hostname: str,
     seeded_random: random.Random,
@@ -31,8 +33,9 @@ async def test_is_recipient(
     server_1: CactusServer = full_node_api.full_node.server
     wallet_node, server_2 = wallets[0]
     wallet = wallet_node.wallet_state_manager.main_wallet
-    puzhash_1 = await wallet.get_new_puzzlehash()
-    puzhash_2 = await wallet.get_new_puzzlehash()
+    async with wallet.wallet_state_manager.new_action_scope(DEFAULT_TX_CONFIG, push=True) as action_scope:
+        puzhash_1 = await action_scope.get_puzzle_hash(wallet.wallet_state_manager)
+        puzhash_2 = await action_scope.get_puzzle_hash(wallet.wallet_state_manager)
     await server_2.start_client(PeerInfo(self_hostname, server_1.get_port()), None)
     invalid_data = ClawbackMetadata(uint64(500), bytes32.random(seeded_random), bytes32.random(seeded_random))
     both_data = ClawbackMetadata(uint64(500), puzhash_1, puzhash_2)

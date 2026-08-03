@@ -3,42 +3,48 @@ from __future__ import annotations
 import dataclasses
 import logging
 import operator
-import sys
 import time
+from collections.abc import Awaitable, Callable
 from math import ceil
 from os import mkdir
 from pathlib import Path
 from shutil import copy
-from typing import Any, Awaitable, Callable, Dict, List, Union, cast
+from typing import Any, cast
 
 import pytest
+from chia_rs import G1Element
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint8, uint32, uint64
 
 from cactus._tests.conftest import HarvesterFarmerEnvironment
 from cactus._tests.plot_sync.test_delta import dummy_plot
 from cactus._tests.util.misc import assert_rpc_error
 from cactus._tests.util.rpc import validate_get_routes
 from cactus._tests.util.time_out_assert import time_out_assert, time_out_assert_custom_interval
-from cactus.consensus.coinbase import create_puzzlehash_for_pk
 from cactus.farmer.farmer import Farmer
-from cactus.plot_sync.receiver import Receiver, get_list_or_len
-from cactus.plotting.util import add_plot_directory
-from cactus.protocols import farmer_protocol
-from cactus.protocols.harvester_protocol import Plot
-from cactus.rpc.farmer_rpc_api import (
+from cactus.farmer.farmer_rpc_api import (
     FilterItem,
     PaginatedRequestData,
     PlotInfoRequestData,
     PlotPathRequestData,
     plot_matches_filter,
 )
-from cactus.rpc.farmer_rpc_client import FarmerRpcClient
-from cactus.simulator.block_tools import get_plot_dir
-from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.farmer.farmer_rpc_client import FarmerRpcClient
+from cactus.farmer.farmer_service import FarmerService
+from cactus.harvester.harvester_service import HarvesterService
+from cactus.plot_sync.receiver import Receiver, get_list_or_len
+from cactus.pools.pool_config import PoolingShareState
+from cactus.protocols import farmer_protocol
+from cactus.protocols.harvester_protocol import Plot
+from cactus.rpc.rpc_client import ResponseFailureError
+from cactus.simulator.block_tools import BlockTools, get_plot_dir
+from cactus.solver.solver_service import SolverService
 from cactus.util.bech32m import decode_puzzle_hash, encode_puzzle_hash
-from cactus.util.config import load_config, lock_and_load_config, save_config
+from cactus.util.config import load_config, lock_and_load_config
+from cactus.util.harvester_config import add_plot_directory
 from cactus.util.hash import std_hash
-from cactus.util.ints import uint8, uint32, uint64
 from cactus.wallet.derive_keys import master_sk_to_wallet_sk, master_sk_to_wallet_sk_unhardened
+from cactus.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import puzzle_hash_for_pk
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +52,7 @@ log = logging.getLogger(__name__)
 async def wait_for_plot_sync(receiver: Receiver, previous_last_sync_id: uint64) -> None:
     def wait() -> bool:
         current_last_sync_id = receiver.last_sync().sync_id
-        return current_last_sync_id != 0 and current_last_sync_id != previous_last_sync_id
+        return current_last_sync_id not in {0, previous_last_sync_id}
 
     await time_out_assert(30, wait)
 
@@ -83,7 +89,7 @@ async def test_farmer_get_harvesters_and_summary(
         res = await harvester_rpc_client.get_plots()
         nonlocal harvester_plots
         harvester_plots = res["plots"]
-        return len(harvester_plots) > 0
+        return len(harvester_plots) == 65
 
     await time_out_assert(10, non_zero_plots)
 
@@ -130,7 +136,7 @@ async def test_farmer_signage_point_endpoints(harvester_farmer_environment: Harv
         return len(await farmer_rpc_client.get_signage_points()) > 0
 
     sp = farmer_protocol.NewSignagePoint(
-        std_hash(b"1"), std_hash(b"2"), std_hash(b"3"), uint64(1), uint64(1000000), uint8(2), uint32(1)
+        std_hash(b"1"), std_hash(b"2"), std_hash(b"3"), uint64(1), uint64(1000000), uint8(2), uint32(1), uint32(0)
     )
     await farmer_api.new_signage_point(sp)
 
@@ -149,8 +155,8 @@ async def test_farmer_reward_target_endpoints(harvester_farmer_environment: Harv
     targets_2 = await farmer_rpc_client.get_reward_targets(True, 2)
     assert targets_2["have_pool_sk"] and targets_2["have_farmer_sk"]
 
-    new_ph: bytes32 = create_puzzlehash_for_pk(master_sk_to_wallet_sk(bt.farmer_master_sk, uint32(2)).get_g1())
-    new_ph_2: bytes32 = create_puzzlehash_for_pk(master_sk_to_wallet_sk(bt.pool_master_sk, uint32(7)).get_g1())
+    new_ph: bytes32 = puzzle_hash_for_pk(master_sk_to_wallet_sk(bt.farmer_master_sk, uint32(2)).get_g1())
+    new_ph_2: bytes32 = puzzle_hash_for_pk(master_sk_to_wallet_sk(bt.pool_master_sk, uint32(7)).get_g1())
 
     await farmer_rpc_client.set_reward_targets(encode_puzzle_hash(new_ph, "cac"), encode_puzzle_hash(new_ph_2, "cac"))
     targets_3 = await farmer_rpc_client.get_reward_targets(True, 10)
@@ -163,10 +169,10 @@ async def test_farmer_reward_target_endpoints(harvester_farmer_environment: Harv
     assert not targets_4["have_pool_sk"] and targets_4["have_farmer_sk"]
 
     # check observer addresses
-    observer_farmer: bytes32 = create_puzzlehash_for_pk(
+    observer_farmer: bytes32 = puzzle_hash_for_pk(
         master_sk_to_wallet_sk_unhardened(bt.farmer_master_sk, uint32(2)).get_g1()
     )
-    observer_pool: bytes32 = create_puzzlehash_for_pk(
+    observer_pool: bytes32 = puzzle_hash_for_pk(
         master_sk_to_wallet_sk_unhardened(bt.pool_master_sk, uint32(7)).get_g1()
     )
     await farmer_rpc_client.set_reward_targets(
@@ -200,21 +206,23 @@ async def test_farmer_get_pool_state(
     farmer_api = farmer_service._api
 
     assert len((await farmer_rpc_client.get_pool_state())["pool_state"]) == 0
-    pool_list = [
-        {
-            "launcher_id": "ae4ef3b9bfe68949691281a015a9c16630fc8f66d48c19ca548fb80768791afa",
-            "owner_public_key": "aa11e92274c0f6a2449fd0c7cfab4a38f943289dbe2214c808b36390c34eacfaa1d4c8f3c6ec582ac502ff32228679a0",  # noqa
-            "payout_instructions": "c2b08e41d766da4116e388357ed957d04ad754623a915f3fd65188a8746cf3e8",
-            "pool_url": self_hostname,
-            "p2_singleton_puzzle_hash": "16e4bac26558d315cded63d4c5860e98deb447cc59146dd4de06ce7394b14f17",
-            "target_puzzle_hash": "344587cf06a39db471d2cc027504e8688a0a67cce961253500c956c73603fd58",
-        }
-    ]
 
     root_path = farmer_api.farmer._root_path
-    with lock_and_load_config(root_path, "config.yaml") as config:
-        config["pool"]["pool_list"] = pool_list
-        save_config(root_path, "config.yaml", config)
+    PoolingShareState(
+        launcher_id=bytes32.from_hexstr("ae4ef3b9bfe68949691281a015a9c16630fc8f66d48c19ca548fb80768791afa"),
+        owner_public_key=G1Element.from_bytes(
+            bytes.fromhex(
+                "aa11e92274c0f6a2449fd0c7cfab4a38f943289dbe2214c808b36390c34eacfaa1d4c8f3c6ec582ac502ff32228679a0"
+            )
+        ),
+        payout_instructions="c2b08e41d766da4116e388357ed957d04ad754623a915f3fd65188a8746cf3e8",
+        pool_url=self_hostname,
+        p2_singleton_puzzle_hash=bytes32.from_hexstr(
+            "16e4bac26558d315cded63d4c5860e98deb447cc59146dd4de06ce7394b14f17"
+        ),
+        target_puzzle_hash=bytes32.from_hexstr("344587cf06a39db471d2cc027504e8688a0a67cce961253500c956c73603fd58"),
+        key_derivation_index=-1,
+    ).add(root_path=root_path)
     await farmer_api.farmer.update_pool_state()
 
     pool_state = (await farmer_rpc_client.get_pool_state())["pool_state"]
@@ -240,7 +248,7 @@ async def test_farmer_get_pool_state(
             pool_dict[key].insert(0, before_24h)
 
     sp = farmer_protocol.NewSignagePoint(
-        std_hash(b"1"), std_hash(b"2"), std_hash(b"3"), uint64(1), uint64(1000000), uint8(2), uint32(1)
+        std_hash(b"1"), std_hash(b"2"), std_hash(b"3"), uint64(1), uint64(1000000), uint8(2), uint32(1), uint32(0)
     )
     await farmer_api.new_signage_point(sp)
     client_pool_state = await farmer_rpc_client.get_pool_state()
@@ -271,25 +279,25 @@ async def test_farmer_get_pool_state_plot_count(
     pool_contract_puzzle_hash: bytes32 = bytes32.from_hexstr(
         "1b9d1eaa3c6a9b27cd90ad9070eb012794a74b277446417bc7b904145010c087"
     )
-    pool_list = [
-        {
-            "launcher_id": "ae4ef3b9bfe68949691281a015a9c16630fc8f66d48c19ca548fb80768791afa",
-            "owner_public_key": "aa11e92274c0f6a2449fd0c7cfab4a38f943289dbe2214c808b36390c34eacfaa1d4c8f3c6ec582ac502ff32228679a0",  # noqa
-            "payout_instructions": "c2b08e41d766da4116e388357ed957d04ad754623a915f3fd65188a8746cf3e8",
-            "pool_url": self_hostname,
-            "p2_singleton_puzzle_hash": pool_contract_puzzle_hash.hex(),
-            "target_puzzle_hash": "344587cf06a39db471d2cc027504e8688a0a67cce961253500c956c73603fd58",
-        }
-    ]
 
     root_path = farmer_api.farmer._root_path
-    with lock_and_load_config(root_path, "config.yaml") as config:
-        config["pool"]["pool_list"] = pool_list
-        save_config(root_path, "config.yaml", config)
+    PoolingShareState(
+        launcher_id=bytes32.from_hexstr("ae4ef3b9bfe68949691281a015a9c16630fc8f66d48c19ca548fb80768791afa"),
+        owner_public_key=G1Element.from_bytes(
+            bytes.fromhex(
+                "aa11e92274c0f6a2449fd0c7cfab4a38f943289dbe2214c808b36390c34eacfaa1d4c8f3c6ec582ac502ff32228679a0"
+            )
+        ),
+        payout_instructions="c2b08e41d766da4116e388357ed957d04ad754623a915f3fd65188a8746cf3e8",
+        pool_url=self_hostname,
+        p2_singleton_puzzle_hash=pool_contract_puzzle_hash,
+        target_puzzle_hash=bytes32.from_hexstr("344587cf06a39db471d2cc027504e8688a0a67cce961253500c956c73603fd58"),
+        key_derivation_index=-1,
+    ).add(root_path=root_path)
     await farmer_api.farmer.update_pool_state()
 
     pool_plot_count: int = (await farmer_rpc_client.get_pool_state())["pool_state"][0]["plot_count"]
-    assert pool_plot_count == 5
+    assert pool_plot_count == 10
 
     # TODO: Maybe improve this to not remove from Receiver directly but instead from the harvester and then wait for
     #       plot sync event.
@@ -329,14 +337,14 @@ def test_plot_matches_filter(filter_item: FilterItem, match: bool) -> None:
 @pytest.mark.parametrize(
     "endpoint, filtering, sort_key, reverse, expected_plot_count",
     [
-        (FarmerRpcClient.get_harvester_plots_valid, [], "filename", False, 20),
-        (FarmerRpcClient.get_harvester_plots_valid, [], "size", True, 20),
+        (FarmerRpcClient.get_harvester_plots_valid, [], "filename", False, 65),
+        (FarmerRpcClient.get_harvester_plots_valid, [], "size", True, 65),
         (
             FarmerRpcClient.get_harvester_plots_valid,
             [FilterItem("pool_contract_puzzle_hash", None)],
             "file_size",
             True,
-            15,
+            55,
         ),
         (
             FarmerRpcClient.get_harvester_plots_valid,
@@ -344,6 +352,20 @@ def test_plot_matches_filter(filter_item: FilterItem, match: bool) -> None:
             "plot_id",
             False,
             4,
+        ),
+        (
+            FarmerRpcClient.get_harvester_plots_valid,
+            [FilterItem("size", "130")],  # 127 means v2 plot, 2 means strength
+            "size",
+            True,
+            23,
+        ),
+        (
+            FarmerRpcClient.get_harvester_plots_valid,
+            [FilterItem("size", "20")],
+            "size",
+            True,
+            20,
         ),
         (FarmerRpcClient.get_harvester_plots_invalid, [], None, True, 13),
         (FarmerRpcClient.get_harvester_plots_invalid, ["invalid_0"], None, False, 6),
@@ -355,11 +377,10 @@ def test_plot_matches_filter(filter_item: FilterItem, match: bool) -> None:
     ],
 )
 @pytest.mark.anyio
-@pytest.mark.skipif(sys.platform == "win32", reason="avoiding crashes on windows until we fix this (crashing workers)")
 async def test_farmer_get_harvester_plots_endpoints(
     harvester_farmer_environment: HarvesterFarmerEnvironment,
-    endpoint: Callable[[FarmerRpcClient, PaginatedRequestData], Awaitable[Dict[str, Any]]],
-    filtering: Union[List[FilterItem], List[str]],
+    endpoint: Callable[[FarmerRpcClient, PaginatedRequestData], Awaitable[dict[str, Any]]],
+    filtering: list[FilterItem] | list[str],
     sort_key: str,
     reverse: bool,
     expected_plot_count: int,
@@ -378,12 +399,12 @@ async def test_farmer_get_harvester_plots_endpoints(
     request: PaginatedRequestData
     if endpoint == FarmerRpcClient.get_harvester_plots_valid:
         request = PlotInfoRequestData(
-            harvester_id, uint32(0), uint32(0), cast(List[FilterItem], filtering), sort_key, reverse
+            harvester_id, uint32(0), uint32(0), cast(list[FilterItem], filtering), sort_key, reverse
         )
     else:
-        request = PlotPathRequestData(harvester_id, uint32(0), uint32(0), cast(List[str], filtering), reverse)
+        request = PlotPathRequestData(harvester_id, uint32(0), uint32(0), cast(list[str], filtering), reverse)
 
-    def add_plot_directories(prefix: str, count: int) -> List[Path]:
+    def add_plot_directories(prefix: str, count: int) -> list[Path]:
         new_paths = []
         for i in range(count):
             new_paths.append(harvester.root_path / f"{prefix}_{i}")
@@ -396,7 +417,7 @@ async def test_farmer_get_harvester_plots_endpoints(
         plots = harvester_plots
     elif endpoint == FarmerRpcClient.get_harvester_plots_invalid:
         invalid_paths = add_plot_directories("invalid", 3)
-        for dir_index, r in [(0, range(0, 6)), (1, range(6, 8)), (2, range(8, 13))]:
+        for dir_index, r in [(0, range(6)), (1, range(6, 8)), (2, range(8, 13))]:
             plots += [str(invalid_paths[dir_index] / f"{i}.plot") for i in r]
         for plot in plots:
             with open(plot, "w"):
@@ -411,7 +432,7 @@ async def test_farmer_get_harvester_plots_endpoints(
 
     elif endpoint == FarmerRpcClient.get_harvester_plots_duplicates:
         duplicate_paths = add_plot_directories("duplicates", 2)
-        for dir_index, r in [(0, range(0, 3)), (1, range(3, 7))]:
+        for dir_index, r in [(0, range(3)), (1, range(3, 7))]:
             for i in r:
                 plot_path = Path(harvester_plots[i]["filename"])
                 plots.append(str(duplicate_paths[dir_index] / plot_path.name))
@@ -502,3 +523,32 @@ async def test_harvester_add_plot_directory(harvester_farmer_environment: Harves
     added_directories = await harvester_rpc_client.get_plot_directories()
     assert str(test_path) in added_directories
     assert str(test_path_other) in added_directories
+
+
+@pytest.mark.anyio
+async def test_farmer_connect_to_solver(
+    farmer_one_harvester_solver: tuple[list[HarvesterService], FarmerService, SolverService, BlockTools],
+) -> None:
+    _, farmer_service, solver_service, bt = farmer_one_harvester_solver
+    assert farmer_service.rpc_server is not None
+    farmer_rpc_client = await FarmerRpcClient.create(
+        bt.config["self_hostname"],
+        farmer_service.rpc_server.listen_port,
+        farmer_service.root_path,
+        farmer_service.config,
+    )
+
+    try:
+        # Test successful connection to existing solver
+        solver_host = bt.config["self_hostname"]
+        solver_port = solver_service._server.get_port()
+        result = await farmer_rpc_client.connect_to_solver(solver_host, solver_port)
+        assert result["success"] is True
+
+        # Test connection failure to non-existent solver
+        with pytest.raises(ResponseFailureError) as exc_info:
+            await farmer_rpc_client.connect_to_solver("localhost", 65000)
+        assert "Could not connect to solver" in exc_info.value.response["error"]
+    finally:
+        farmer_rpc_client.close()
+        await farmer_rpc_client.await_closed()

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import os
 import re
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence
 
 from click.testing import CliRunner
 
 from cactus._tests.util.misc import Marks, datacases
-from cactus.util.dump_keyring import dump
+from cactus.cmds.dump_keyring import dump
 from cactus.util.keychain import Keychain
 
 output_prefix = """Attempting to dump contents of keyring file: {path}

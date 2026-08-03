@@ -1,14 +1,22 @@
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from cactus.data_layer.data_layer import DataLayer
+from cactus.server.api_protocol import ApiMetadata
 from cactus.server.server import CactusServer
 
 
 class DataLayerAPI:
+    if TYPE_CHECKING:
+        from cactus.server.api_protocol import ApiProtocol
+
+        _protocol_check: ClassVar[ApiProtocol] = cast("DataLayerAPI", None)
+
     log: logging.Logger
     data_layer: DataLayer
+    metadata: ClassVar[ApiMetadata] = ApiMetadata()
 
     def __init__(self, data_layer: DataLayer) -> None:
         self.log = logging.getLogger(__name__)

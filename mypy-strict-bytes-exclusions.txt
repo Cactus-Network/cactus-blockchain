@@ -1,0 +1,9 @@
+# Modules where strict-bytes is disabled (mypy 2.1 treats bytearray/memoryview as bytes subtypes).
+cactus.full_node.full_block_utils
+cactus.full_node.block_store
+cactus.types.blockchain_format.coin
+cactus.seeder.dns_server
+cactus._tests.util.test_full_block_utils
+cactus._tests.core.full_node.test_block_height_map
+cactus._tests.timelord.test_timelord
+cactus._tests.core.test_filter

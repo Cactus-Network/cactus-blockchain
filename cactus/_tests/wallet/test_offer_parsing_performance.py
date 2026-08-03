@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import cProfile
+from collections.abc import Iterator
 from contextlib import contextmanager
-from typing import Iterator
 
 from cactus._tests.util.misc import BenchmarkRunner
 from cactus.wallet.trading.offer import Offer

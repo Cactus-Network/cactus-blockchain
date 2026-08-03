@@ -2,25 +2,23 @@ from __future__ import annotations
 
 import random
 import unittest
-from typing import List, Tuple
 
 import pytest
-from cactus_rs import G2Element
+from chia_rs import CoinSpend, G2Element, SpendBundle
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint64
 
 from cactus.types.blockchain_format.coin import Coin
 from cactus.types.blockchain_format.program import Program
-from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.types.coin_spend import CoinSpend, make_spend
+from cactus.types.coin_spend import make_spend
 from cactus.types.condition_opcodes import ConditionOpcode
-from cactus.types.spend_bundle import SpendBundle
-from cactus.util.ints import uint64
 
 BLANK_SPEND_BUNDLE = SpendBundle(coin_spends=[], aggregated_signature=G2Element())
 NULL_SIGNATURE = "0xc" + "0" * 191
 
 
 class TestStructStream(unittest.TestCase):
-    def test_round_trip(self):
+    def test_round_trip(self) -> None:
         spend_bundle = BLANK_SPEND_BUNDLE
         json_dict = spend_bundle.to_json_dict()
 
@@ -30,15 +28,12 @@ class TestStructStream(unittest.TestCase):
 
 
 def rand_hash(rng: random.Random) -> bytes32:
-    ret = bytearray(32)
-    for i in range(32):
-        ret[i] = rng.getrandbits(8)
-    return bytes32(ret)
+    return bytes32.random(r=rng)
 
 
-def create_spends(num: int) -> Tuple[List[CoinSpend], List[Coin]]:
-    spends: List[CoinSpend] = []
-    create_coin: List[Coin] = []
+def create_spends(num: int) -> tuple[list[CoinSpend], list[Coin]]:
+    spends: list[CoinSpend] = []
+    create_coin: list[Coin] = []
     rng = random.Random()
 
     puzzle = Program.to(1)
@@ -65,7 +60,7 @@ def test_compute_additions_create_coin() -> None:
 
 def test_compute_additions_create_coin_max_cost() -> None:
     # make a large number of CoinSpends
-    spends, _ = create_spends(6111)
+    spends, _ = create_spends(8148)
     sb = SpendBundle(spends, G2Element())
     with pytest.raises(ValueError, match="cost exceeded"):
         sb.additions()

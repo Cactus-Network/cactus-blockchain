@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from cactus_rs import ConsensusConstants as ConsensusConstants
+from chia_rs import ConsensusConstants
 
 from cactus.util.byte_types import hexstr_to_bytes
 from cactus.util.hash import std_hash
@@ -11,16 +11,25 @@ from cactus.util.hash import std_hash
 log = logging.getLogger(__name__)
 
 
+LEGACY_RENAMES = {"MIN_PLOT_SIZE": "MIN_PLOT_SIZE_V1", "MAX_PLOT_SIZE": "MAX_PLOT_SIZE_V1"}
+
+
 def replace_str_to_bytes(constants: ConsensusConstants, **changes: Any) -> ConsensusConstants:
     """
     Overrides str (hex) values with bytes.
     """
 
+    for old_name, new_name in LEGACY_RENAMES.items():
+        if old_name in changes and new_name not in changes:
+            changes[new_name] = changes.pop(old_name)
+        elif old_name in changes:
+            del changes[old_name]
+
     filtered_changes = {}
     for k, v in changes.items():
         if not hasattr(constants, k):
             # NETWORK_TYPE used to be present in default config, but has been removed
-            if k not in ["NETWORK_TYPE"]:
+            if k not in {"NETWORK_TYPE"}:
                 log.warning(f'invalid key in network configuration (config.yaml) "{k}". Ignoring')
             continue
         if isinstance(v, str):

@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from typing import List, Tuple
-
 import pytest
 
+from cactus._tests.conftest import ConsensusMode
 from cactus.server.server import CactusServer
 from cactus.simulator.block_tools import BlockTools
 from cactus.simulator.full_node_simulator import FullNodeSimulator
 from cactus.types.peer_info import PeerInfo
 from cactus.wallet.puzzles.clawback.puzzle_decorator import ClawbackPuzzleDecorator
 from cactus.wallet.util.puzzle_decorator import PuzzleDecoratorManager
+from cactus.wallet.util.tx_config import DEFAULT_TX_CONFIG
 from cactus.wallet.wallet_node import WalletNode
 
 
@@ -17,9 +17,10 @@ from cactus.wallet.wallet_node import WalletNode
     "trusted",
     [True, False],
 )
+@pytest.mark.limit_consensus_modes(allowed=[ConsensusMode.HARD_FORK_2_0])
 @pytest.mark.anyio
 async def test_missing_decorator(
-    simulator_and_wallet: Tuple[List[FullNodeSimulator], List[Tuple[WalletNode, CactusServer]], BlockTools],
+    simulator_and_wallet: tuple[list[FullNodeSimulator], list[tuple[WalletNode, CactusServer]], BlockTools],
     trusted: bool,
     self_hostname: str,
 ) -> None:
@@ -37,9 +38,10 @@ async def test_missing_decorator(
     "trusted",
     [True, False],
 )
+@pytest.mark.limit_consensus_modes(allowed=[ConsensusMode.HARD_FORK_2_0])
 @pytest.mark.anyio
 async def test_unknown_decorator(
-    simulator_and_wallet: Tuple[List[FullNodeSimulator], List[Tuple[WalletNode, CactusServer]], BlockTools],
+    simulator_and_wallet: tuple[list[FullNodeSimulator], list[tuple[WalletNode, CactusServer]], BlockTools],
     trusted: bool,
     self_hostname: str,
 ) -> None:
@@ -57,9 +59,10 @@ async def test_unknown_decorator(
     "trusted",
     [True, False],
 )
+@pytest.mark.limit_consensus_modes(allowed=[ConsensusMode.HARD_FORK_2_0])
 @pytest.mark.anyio
 async def test_decorator(
-    simulator_and_wallet: Tuple[List[FullNodeSimulator], List[Tuple[WalletNode, CactusServer]], BlockTools],
+    simulator_and_wallet: tuple[list[FullNodeSimulator], list[tuple[WalletNode, CactusServer]], BlockTools],
     trusted: bool,
     self_hostname: str,
 ) -> None:
@@ -76,5 +79,6 @@ async def test_decorator(
     assert isinstance(wallet_node.wallet_state_manager.decorator_manager.decorator_list[0], ClawbackPuzzleDecorator)
     clawback_decorator: ClawbackPuzzleDecorator = wallet_node.wallet_state_manager.decorator_manager.decorator_list[0]
     assert clawback_decorator.time_lock == 3600
-    puzzle = await wallet.get_new_puzzle()
+    async with wallet.wallet_state_manager.new_action_scope(DEFAULT_TX_CONFIG, push=True) as action_scope:
+        puzzle = await action_scope.get_puzzle(wallet.wallet_state_manager)
     assert puzzle == wallet_node.wallet_state_manager.decorator_manager.decorate(puzzle)

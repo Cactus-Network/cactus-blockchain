@@ -1,3 +1,5 @@
+# Package: utils
+
 from __future__ import annotations
 
 from dataclasses import replace
@@ -8,7 +10,7 @@ def recursive_replace(root_obj: Any, replace_str: str, replace_with: Any) -> Any
     split_str = replace_str.split(".")
     if len(split_str) == 1:
         # This check is here to support native types (implemented in Rust
-        # in cactus_rs) that aren't dataclasses. They instead implement a
+        # in chia_rs) that aren't dataclasses. They instead implement a
         # replace() method in their python bindings.
         if hasattr(root_obj, "replace"):
             return root_obj.replace(**{split_str[0]: replace_with})

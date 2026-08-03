@@ -2,34 +2,35 @@ from __future__ import annotations
 
 from logging import Logger
 from pathlib import Path
-from typing import Tuple
 
 import pytest
+from chia_rs.sized_ints import uint16, uint64
 
 from cactus.full_node.full_node_api import FullNodeAPI
-from cactus.server.node_discovery import FullNodeDiscovery
+from cactus.server.node_discovery import FullNodeDiscovery, FullNodePeers
 from cactus.server.server import CactusServer
 from cactus.simulator.block_tools import BlockTools
+from cactus.types.peer_info import PeerInfo, TimestampedPeerInfo
 from cactus.util.default_root import SIMULATOR_ROOT_PATH
 
 
 @pytest.mark.anyio
 async def test_enable_private_networks(
-    two_nodes: Tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools],
+    two_nodes: tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools],
 ) -> None:
     cactus_server = two_nodes[2]
 
     # Missing `enable_private_networks` config entry in introducer_peer should default to False for back compat
     discovery0 = FullNodeDiscovery(
-        cactus_server,
-        0,
-        SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
-        {"host": "introducer.cactus-network.net", "port": 11444},
-        [],
-        0,
-        cactus_server.config["selected_network"],
-        None,
-        Logger("node_discovery_tests"),
+        server=cactus_server,
+        target_outbound_count=0,
+        peers_file_path=SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
+        introducer_info={"host": "introducer.cactus-network.net", "port": 11444},
+        dns_servers=[],
+        peer_connect_interval=0,
+        selected_network=cactus_server.config["selected_network"],
+        default_port=None,
+        log=Logger("node_discovery_tests"),
     )
     assert discovery0 is not None
     assert discovery0.enable_private_networks is False
@@ -37,17 +38,31 @@ async def test_enable_private_networks(
     assert discovery0.address_manager is not None
     assert discovery0.address_manager.allow_private_subnets is False
 
+    # Missing `default_port` but known selected_network should automatically pick a port
+    discovery0 = FullNodeDiscovery(
+        server=cactus_server,
+        target_outbound_count=0,
+        peers_file_path=SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
+        introducer_info={"host": "introducer.cactus-network.net", "port": 11444},
+        dns_servers=[],
+        peer_connect_interval=0,
+        selected_network="testnet7",
+        default_port=None,
+        log=Logger("node_discovery_tests"),
+    )
+    assert discovery0.default_port == 511444
+
     # Test with enable_private_networks set to False in Config
     discovery1 = FullNodeDiscovery(
-        cactus_server,
-        0,
-        SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
-        {"host": "introducer.cactus-network.net", "port": 11444, "enable_private_networks": False},
-        [],
-        0,
-        cactus_server.config["selected_network"],
-        None,
-        Logger("node_discovery_tests"),
+        server=cactus_server,
+        target_outbound_count=0,
+        peers_file_path=SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
+        introducer_info={"host": "introducer.cactus-network.net", "port": 11444, "enable_private_networks": False},
+        dns_servers=[],
+        peer_connect_interval=0,
+        selected_network=cactus_server.config["selected_network"],
+        default_port=None,
+        log=Logger("node_discovery_tests"),
     )
     assert discovery1 is not None
     assert discovery1.enable_private_networks is False
@@ -57,18 +72,171 @@ async def test_enable_private_networks(
 
     # Test with enable_private_networks set to True in Config
     discovery2 = FullNodeDiscovery(
-        cactus_server,
-        0,
-        SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
-        {"host": "introducer.cactus-network.net", "port": 11444, "enable_private_networks": True},
-        [],
-        0,
-        cactus_server.config["selected_network"],
-        None,
-        Logger("node_discovery_tests"),
+        server=cactus_server,
+        target_outbound_count=0,
+        peers_file_path=SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
+        introducer_info={"host": "introducer.cactus-network.net", "port": 11444, "enable_private_networks": True},
+        dns_servers=[],
+        peer_connect_interval=0,
+        selected_network=cactus_server.config["selected_network"],
+        default_port=None,
+        log=Logger("node_discovery_tests"),
     )
     assert discovery2 is not None
     assert discovery2.enable_private_networks is True
     await discovery2.initialize_address_manager()
     assert discovery2.address_manager is not None
     assert discovery2.address_manager.allow_private_subnets is True
+
+
+class TestPeerHostValidation:
+    """Regression tests for oversized peer list host strings."""
+
+    @pytest.mark.anyio
+    async def test_add_peers_common_rejects_oversized_host(
+        self,
+        two_nodes: tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools],
+    ) -> None:
+        cactus_server = two_nodes[2]
+        discovery = FullNodeDiscovery(
+            server=cactus_server,
+            target_outbound_count=0,
+            peers_file_path=SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
+            introducer_info={"host": "introducer.cactus-network.net", "port": 11444, "enable_private_networks": True},
+            dns_servers=[],
+            peer_connect_interval=0,
+            selected_network=cactus_server.config["selected_network"],
+            default_port=11444,
+            log=Logger("test_host_validation"),
+        )
+        await discovery.initialize_address_manager()
+        assert discovery.address_manager is not None
+
+        oversized_host = "A" * 1000
+        peer_list = [
+            TimestampedPeerInfo(oversized_host, uint16(11444), uint64(0)),
+        ]
+
+        # Must not raise, and must not add the peer
+        await discovery._add_peers_common(peer_list, None, False)
+        assert await discovery.address_manager.size() == 0
+
+    @pytest.mark.anyio
+    async def test_add_peers_common_rejects_non_ip_host(
+        self,
+        two_nodes: tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools],
+    ) -> None:
+        cactus_server = two_nodes[2]
+        discovery = FullNodeDiscovery(
+            server=cactus_server,
+            target_outbound_count=0,
+            peers_file_path=SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
+            introducer_info={"host": "introducer.cactus-network.net", "port": 11444, "enable_private_networks": True},
+            dns_servers=[],
+            peer_connect_interval=0,
+            selected_network=cactus_server.config["selected_network"],
+            default_port=11444,
+            log=Logger("test_host_validation"),
+        )
+        await discovery.initialize_address_manager()
+        assert discovery.address_manager is not None
+
+        invalid_hosts = ["not-an-ip-address", "hello world", "999.999.999.999", ""]
+        peer_list = [TimestampedPeerInfo(host, uint16(11444), uint64(0)) for host in invalid_hosts]
+
+        await discovery._add_peers_common(peer_list, None, False)
+        assert await discovery.address_manager.size() == 0
+
+    @pytest.mark.anyio
+    async def test_add_peers_common_accepts_valid_ipv4(
+        self,
+        two_nodes: tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools],
+    ) -> None:
+        cactus_server = two_nodes[2]
+        discovery = FullNodeDiscovery(
+            server=cactus_server,
+            target_outbound_count=0,
+            peers_file_path=SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
+            introducer_info={"host": "introducer.cactus-network.net", "port": 11444, "enable_private_networks": True},
+            dns_servers=[],
+            peer_connect_interval=0,
+            selected_network=cactus_server.config["selected_network"],
+            default_port=11444,
+            log=Logger("test_host_validation"),
+        )
+        await discovery.initialize_address_manager()
+        assert discovery.address_manager is not None
+
+        peer_list = [
+            TimestampedPeerInfo("192.168.1.1", uint16(11444), uint64(0)),
+        ]
+
+        await discovery._add_peers_common(peer_list, None, False)
+        assert await discovery.address_manager.size() >= 1
+
+    @pytest.mark.anyio
+    async def test_add_peers_common_mixed_valid_and_invalid(
+        self,
+        two_nodes: tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools],
+    ) -> None:
+        """Invalid hosts are skipped; valid hosts in the same batch are still added."""
+        cactus_server = two_nodes[2]
+        discovery = FullNodeDiscovery(
+            server=cactus_server,
+            target_outbound_count=0,
+            peers_file_path=SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
+            introducer_info={"host": "introducer.cactus-network.net", "port": 11444, "enable_private_networks": True},
+            dns_servers=[],
+            peer_connect_interval=0,
+            selected_network=cactus_server.config["selected_network"],
+            default_port=11444,
+            log=Logger("test_host_validation"),
+        )
+        await discovery.initialize_address_manager()
+        assert discovery.address_manager is not None
+
+        peer_list = [
+            TimestampedPeerInfo("X" * 500, uint16(11444), uint64(0)),
+            TimestampedPeerInfo("not-an-ip", uint16(11444), uint64(0)),
+            TimestampedPeerInfo("192.168.1.1", uint16(11444), uint64(0)),
+            TimestampedPeerInfo("192.168.1.2", uint16(11444), uint64(0)),
+        ]
+
+        await discovery._add_peers_common(peer_list, None, False)
+        assert await discovery.address_manager.size() >= 1
+
+    @pytest.mark.anyio
+    async def test_add_peers_neighbour_rejects_invalid_host(
+        self,
+        two_nodes: tuple[FullNodeAPI, FullNodeAPI, CactusServer, CactusServer, BlockTools],
+    ) -> None:
+        cactus_server = two_nodes[2]
+        discovery = FullNodePeers(
+            server=cactus_server,
+            target_outbound_count=0,
+            peers_file_path=SIMULATOR_ROOT_PATH / Path(cactus_server.config["peers_file_path"]),
+            introducer_info={"host": "introducer.cactus-network.net", "port": 11444, "enable_private_networks": True},
+            dns_servers=[],
+            peer_connect_interval=0,
+            selected_network=cactus_server.config["selected_network"],
+            default_port=11444,
+            log=Logger("test_host_validation"),
+        )
+        await discovery.initialize_address_manager()
+
+        oversized_host = "B" * 500
+        invalid_host = "not.an.ip"
+        valid_host = "10.0.0.1"
+        neighbour = PeerInfo("10.0.0.100", 11444)
+        peers = [
+            TimestampedPeerInfo(oversized_host, uint16(11444), uint64(0)),
+            TimestampedPeerInfo(invalid_host, uint16(11444), uint64(0)),
+            TimestampedPeerInfo(valid_host, uint16(11444), uint64(0)),
+        ]
+
+        await discovery.add_peers_neighbour(peers, neighbour)
+
+        known = discovery.neighbour_known_peers.get(neighbour, set())
+        assert oversized_host not in known
+        assert invalid_host not in known
+        assert valid_host in known

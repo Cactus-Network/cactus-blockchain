@@ -1,24 +1,20 @@
 from __future__ import annotations
 
-from typing import List
-
-from cactus_rs import AugSchemeMPL, Coin, Program
-from cactus_rs.sized_bytes import bytes32
-from cactus_rs.sized_ints import uint32, uint64
+from chia_rs import AugSchemeMPL, Coin, CoinSpend, Program, SpendBundle
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint32, uint64
 
 from cactus._tests.core.mempool.test_mempool_manager import TEST_HEIGHT, make_bundle_spends_map_and_fee
+from cactus._tests.util.get_name_puzzle_conditions import get_name_puzzle_conditions
 from cactus.consensus.default_constants import DEFAULT_CONSTANTS
 from cactus.full_node.bitcoin_fee_estimator import create_bitcoin_fee_estimator
 from cactus.full_node.bundle_tools import simple_solution_generator
 from cactus.full_node.fee_estimation import MempoolInfo
 from cactus.full_node.mempool import Mempool
-from cactus.full_node.mempool_check_conditions import get_name_puzzle_conditions
 from cactus.types.blockchain_format.program import INFINITE_COST
 from cactus.types.clvm_cost import CLVMCost
-from cactus.types.coin_spend import CoinSpend
 from cactus.types.fee_rate import FeeRate
 from cactus.types.mempool_item import MempoolItem
-from cactus.types.spend_bundle import SpendBundle
 
 MEMPOOL_INFO = MempoolInfo(
     max_size_in_cost=CLVMCost(uint64(INFINITE_COST * 10)),
@@ -43,7 +39,7 @@ OTHER_COIN_3 = Coin(bytes32(b"5" * 32), OTHER_PUZZLE_HASH, uint64(1000))
 EMPTY_SIGNATURE = AugSchemeMPL.aggregate([])
 
 
-def make_item(coin_spends: List[CoinSpend]) -> MempoolItem:
+def make_item(coin_spends: list[CoinSpend]) -> MempoolItem:
     spend_bundle = SpendBundle(coin_spends, EMPTY_SIGNATURE)
     generator = simple_solution_generator(spend_bundle)
     npc_result = get_name_puzzle_conditions(
@@ -52,7 +48,7 @@ def make_item(coin_spends: List[CoinSpend]) -> MempoolItem:
     assert npc_result.conds is not None
     bundle_coin_spends, fee = make_bundle_spends_map_and_fee(spend_bundle, npc_result.conds)
     return MempoolItem(
-        spend_bundle=spend_bundle,
+        aggregated_signature=spend_bundle.aggregated_signature,
         fee=fee,
         conds=npc_result.conds,
         spend_bundle_name=spend_bundle.name(),

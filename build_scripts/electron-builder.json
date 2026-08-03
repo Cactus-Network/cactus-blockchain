@@ -18,8 +18,10 @@
   "win": {
     "target": "nsis",
     "icon": "src/assets/img/cactus.ico",
-    "timeStampServer": "http://timestamp.comodoca.com",
-    "executableName": "Cactus"
+    "executableName": "Cactus",
+    "signtoolOptions": {
+      "timeStampServer": "http://timestamp.comodoca.com"
+    }
   },
   "nsis": {
     "artifactName": "CactusSetup-${env.CACTUS_INSTALLER_VERSION}.exe",
@@ -36,6 +38,7 @@
     "artifactName": "${productName}-${env.CACTUS_INSTALLER_VERSION}.${ext}",
     "category": "public.app-category.finance",
     "target": "dmg",
+    "minimumSystemVersion": "15",
     "icon": "src/assets/img/cactus.icns",
     "entitlements": "entitlements.mac.plist",
     "provisioningProfile": "cactusblockchain.provisionprofile",
@@ -65,12 +68,19 @@
     }
   },
   "linux": {
+    "desktop": {
+      "entry": {
+        "Name": "Cactus Blockchain"
+      }
+    },
     "artifactName": "${productName}-${env.CACTUS_INSTALLER_VERSION}.${ext}",
     "icon": "src/assets/img/cactus.icns"
   },
   "deb": {
+    "packageName": "cactus-blockchain",
     "afterInstall": "../../../build_scripts/assets/deb/postinst.sh",
     "afterRemove": "../../../build_scripts/assets/deb/prerm.sh",
+    "fpm": ["--deb-compression", "xz", "--deb-compression-level", "9"],
     "depends": [
       "libgbm1",
       "libgtk-3-0",
@@ -85,6 +95,7 @@
     ]
   },
   "rpm": {
+    "packageName": "cactus-blockchain",
     "afterInstall": "../../../build_scripts/assets/rpm/postinst.sh",
     "afterRemove": "../../../build_scripts/assets/rpm/prerm.sh",
     "fpm": [
@@ -96,7 +107,9 @@
       "--rpm-tag=Recommends: libxcrypt-compat",
       "--directories=/opt/cactus",
       "--rpm-tag=Requires(pre): findutils",
-      "--before-install=../../../build_scripts/assets/rpm/before-install.sh"
+      "--before-install=../../../build_scripts/assets/rpm/before-install.sh",
+      "--rpm-compression=xz",
+      "--rpm-compression-level=9"
     ]
   }
 }

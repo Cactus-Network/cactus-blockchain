@@ -7,14 +7,15 @@ import ssl
 
 import aiohttp
 import pytest
+from chia_rs.sized_bytes import bytes32
 
+from cactus.apis import StubMetadataRegistry
+from cactus.protocols.outbound_message import NodeType
 from cactus.protocols.shared_protocol import default_capabilities
-from cactus.server.outbound_message import NodeType
 from cactus.server.server import CactusServer, ssl_context_for_client
 from cactus.server.ssl_context import cactus_ssl_ca_paths, private_ssl_ca_paths
 from cactus.server.ws_connection import WSCactusConnection
 from cactus.ssl.create_ssl import generate_ca_signed_cert
-from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.types.peer_info import PeerInfo
 
 
@@ -33,10 +34,11 @@ async def establish_connection(server: CactusServer, self_hostname: str, ssl_con
             True,
             server.received_message_callback,
             None,
-            bytes32(b"\x00" * 32),
+            bytes32.zeros,
             100,
             30,
             local_capabilities_for_handshake=default_capabilities[NodeType.FULL_NODE],
+            stub_metadata_for_type=StubMetadataRegistry,
         )
         await wsc.perform_handshake(server._network_id, dummy_port, NodeType.FULL_NODE)
         await wsc.close()
@@ -84,7 +86,7 @@ class TestSSL:
         full_nodes, wallets, _ = simulator_and_wallet
         full_node_api = full_nodes[0]
         server_1: CactusServer = full_node_api.full_node.server
-        wallet_node, server_2 = wallets[0]
+        _wallet_node, server_2 = wallets[0]
 
         success = await server_2.start_client(PeerInfo(self_hostname, server_1.get_port()), None)
         assert success is True
@@ -165,7 +167,7 @@ class TestSSL:
 
     @pytest.mark.anyio
     async def test_full_node(self, simulator_and_wallet, self_hostname):
-        full_nodes, wallets, bt = simulator_and_wallet
+        full_nodes, _wallets, bt = simulator_and_wallet
         full_node_api = full_nodes[0]
         full_node_server = full_node_api.full_node.server
         cactus_ca_crt_path, cactus_ca_key_path = cactus_ssl_ca_paths(bt.root_path, bt.config)

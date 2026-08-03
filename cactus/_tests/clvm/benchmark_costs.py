@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from cactus.consensus.cost_calculator import NPCResult
+from chia_rs import SpendBundle
+from chia_rs.sized_ints import uint64
+
+from cactus._tests.util.get_name_puzzle_conditions import NPCResult, get_name_puzzle_conditions
 from cactus.consensus.default_constants import DEFAULT_CONSTANTS
 from cactus.full_node.bundle_tools import simple_solution_generator
-from cactus.full_node.mempool_check_conditions import get_name_puzzle_conditions
 from cactus.types.blockchain_format.program import INFINITE_COST
 from cactus.types.generator_types import BlockGenerator
-from cactus.types.spend_bundle import SpendBundle
-from cactus.util.ints import uint64
 
 
 def cost_of_spend_bundle(spend_bundle: SpendBundle) -> int:

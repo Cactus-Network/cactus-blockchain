@@ -55,13 +55,13 @@ def get_cactus_version() -> str:
     cactus_executable = shutil.which("cactus")
     if cactus_executable is None:
         cactus_executable = "cactus"
-    output = subprocess.run([cactus_executable, "version"], capture_output=True)
+    output = subprocess.run([cactus_executable, "version"], capture_output=True, check=False)
     if output.returncode == 0:
         version = str(output.stdout.strip(), "utf-8").splitlines()[-1]
     return make_semver(version)
 
 
-def update_version(package_json_path: str):
+def update_version(package_json_path: str) -> None:
     if not exists(package_json_path):
         return
 

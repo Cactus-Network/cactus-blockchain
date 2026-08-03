@@ -4,10 +4,12 @@ import pytest
 
 from cactus import __version__
 from cactus.daemon.client import connect_to_daemon
+from cactus.daemon.server import WebSocketServer
+from cactus.simulator.block_tools import BlockTools
 
 
 @pytest.mark.anyio
-async def test_get_version_rpc(get_daemon, bt):
+async def test_get_version_rpc(get_daemon: WebSocketServer, bt: BlockTools) -> None:
     ws_server = get_daemon
     config = bt.config
     client = await connect_to_daemon(
@@ -21,4 +23,4 @@ async def test_get_version_rpc(get_daemon, bt):
 
     assert response["data"]["success"]
     assert response["data"]["version"] == __version__
-    ws_server.stop()
+    await ws_server.stop()

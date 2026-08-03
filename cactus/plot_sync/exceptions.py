@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import Any
 
+from chia_rs.sized_ints import uint64
+
 from cactus.plot_sync.util import ErrorCodes, State
 from cactus.protocols.harvester_protocol import PlotSyncIdentifier
-from cactus.server.outbound_message import NodeType
-from cactus.util.ints import uint64
+from cactus.protocols.outbound_message import NodeType
 
 
 class PlotSyncException(Exception):

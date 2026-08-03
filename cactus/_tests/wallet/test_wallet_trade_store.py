@@ -4,12 +4,12 @@ import random
 import time
 
 import pytest
-from cactus_rs import G2Element
+from chia_rs import G2Element
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint32, uint64
 
 from cactus._tests.util.db_connection import DBConnection
 from cactus.types.blockchain_format.coin import Coin
-from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.util.ints import uint32, uint64
 from cactus.wallet.conditions import ConditionValidTimes
 from cactus.wallet.trade_record import TradeRecord, TradeRecordOld
 from cactus.wallet.trading.offer import Offer
@@ -133,7 +133,7 @@ async def test_valid_times_migration() -> None:
             )
 
         fake_offer = Offer({}, WalletSpendBundle([], G2Element()), {})
-        fake_coin = Coin(bytes32([0] * 32), bytes32([0] * 32), uint64(0))
+        fake_coin = Coin(bytes32.zeros, bytes32.zeros, uint64(0))
         old_record = TradeRecordOld(
             confirmed_at_index=uint32(0),
             accepted_at_time=None,
@@ -143,7 +143,7 @@ async def test_valid_times_migration() -> None:
             offer=bytes(fake_offer),
             taken_offer=None,
             coins_of_interest=[fake_coin],
-            trade_id=bytes32([0] * 32),
+            trade_id=bytes32.zeros,
             status=uint32(TradeStatus.PENDING_ACCEPT.value),
             sent_to=[],
         )

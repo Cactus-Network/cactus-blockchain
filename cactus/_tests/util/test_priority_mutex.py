@@ -7,8 +7,8 @@ import itertools
 import logging
 import random
 import time
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, List, Optional
 
 import anyio
 import pytest
@@ -16,6 +16,7 @@ import pytest
 from cactus._tests.util.misc import Marks, datacases
 from cactus._tests.util.time_out_assert import time_out_assert_custom_interval
 from cactus.util.priority_mutex import NestedLockUnsupportedError, PriorityMutex
+from cactus.util.task_referencer import create_referenced_task
 from cactus.util.timing import adjusted_timeout
 
 log = logging.getLogger(__name__)
@@ -65,10 +66,10 @@ class TestPriorityMutex:
                 log.warning(f"Spend {time.time() - t1} waiting for low {i}")
                 await kind_of_slow_func()
 
-        h = asyncio.create_task(do_high())
+        h = create_referenced_task(do_high())
         l_tasks = []
         for i in range(50):
-            l_tasks.append(asyncio.create_task(do_low(i)))
+            l_tasks.append(create_referenced_task(do_low(i)))
 
         winner = None
 
@@ -118,8 +119,8 @@ class Request:
     # TODO: is the ID unneeded?
     id: str
     priority: MutexPriority
-    acquisition_order: Optional[int] = None
-    release_order: Optional[int] = None
+    acquisition_order: int | None = None
+    release_order: int | None = None
     order_counter: Callable[[], int] = counter.__next__
     # TODO: done may not be needed
     done: bool = False
@@ -127,7 +128,7 @@ class Request:
 
     def __lt__(self, other: Request) -> bool:
         if self.acquisition_order is None or other.acquisition_order is None:
-            raise RequestNotCompleteError()
+            raise RequestNotCompleteError
 
         return self.acquisition_order < other.acquisition_order
 
@@ -151,15 +152,15 @@ class Request:
 
     def before(self, other: Request) -> bool:
         if self.release_order is None or other.acquisition_order is None:
-            raise RequestNotCompleteError()
+            raise RequestNotCompleteError
 
         return self.release_order < other.acquisition_order
 
 
 @dataclass(frozen=True)
 class OrderCase:
-    requests: List[Request]
-    expected_acquisitions: List[str]
+    requests: list[Request]
+    expected_acquisitions: list[str]
 
 
 @dataclass
@@ -268,7 +269,7 @@ async def test_order(case: OrderCase) -> None:
     assert sane(requests=case.requests)
 
 
-def expected_acquisition_order(requests: List[Request]) -> List[Request]:
+def expected_acquisition_order(requests: list[Request]) -> list[Request]:
     first_request, *other_requests = requests
     return [
         first_request,
@@ -334,13 +335,13 @@ async def test_cancellation_while_waiting() -> None:
         async with mutex.acquire(priority=MutexPriority.high):
             pass
 
-    block_task = asyncio.create_task(block())
+    block_task = create_referenced_task(block())
     await blocker_acquired_event.wait()
 
-    cancel_task = asyncio.create_task(to_be_cancelled(mutex=mutex))
+    cancel_task = create_referenced_task(to_be_cancelled(mutex=mutex))
     await wait_queued(mutex=mutex, task=cancel_task)
 
-    queued_after_task = asyncio.create_task(queued_after())
+    queued_after_task = create_referenced_task(queued_after())
     await wait_queued(mutex=mutex, task=queued_after_task)
 
     cancel_task.cancel()
@@ -353,6 +354,49 @@ async def test_cancellation_while_waiting() -> None:
     await queued_after_task
 
     # TODO: do something other than hanging for ever on a, well, a hang
+
+
+@pytest.mark.anyio
+async def test_cancellation_of_non_first_waiter_releases_to_live_waiter() -> None:
+    # A waiter cancelled while it is not first in line must not strand the live
+    # waiter queued ahead of it, and the mutex must release to that live waiter.
+    mutex = PriorityMutex.create(priority_type=MutexPriority)
+
+    blocker_continue_event = asyncio.Event()
+    blocker_acquired_event = asyncio.Event()
+    live_waiter_acquired_event = asyncio.Event()
+
+    async def block() -> None:
+        async with mutex.acquire(priority=MutexPriority.high):
+            blocker_acquired_event.set()
+            await blocker_continue_event.wait()
+
+    async def live_waiter() -> None:
+        async with mutex.acquire(priority=MutexPriority.high):
+            live_waiter_acquired_event.set()
+
+    block_task = create_referenced_task(block())
+    await blocker_acquired_event.wait()
+
+    # Queue the live waiter ahead of the one that will be cancelled.
+    live_waiter_task = create_referenced_task(live_waiter())
+    await wait_queued(mutex=mutex, task=live_waiter_task)
+
+    # Queue and cancel a waiter that is not first in line.
+    cancel_task = create_referenced_task(to_be_cancelled(mutex=mutex))
+    await wait_queued(mutex=mutex, task=cancel_task)
+
+    cancel_task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await cancel_task
+
+    blocker_continue_event.set()
+    await block_task
+
+    with anyio.fail_after(delay=adjusted_timeout(timeout=10)):
+        await live_waiter_task
+
+    assert live_waiter_acquired_event.is_set()
 
 
 # testing many repeatable randomization cases
@@ -375,19 +419,19 @@ async def test_retains_request_order_for_matching_priority(seed: int) -> None:
     assert sane(requests=all_requests)
 
 
-def sane(requests: List[Request]) -> bool:
+def sane(requests: list[Request]) -> bool:
     if any(not request.completed for request in requests):
         return False
 
     ordered = sorted(requests)
-    return all(a.before(b) for a, b in zip(ordered, ordered[1:]))
+    return all(a.before(b) for a, b in itertools.pairwise(ordered))
 
 
 @dataclass
 class SaneCase:
     id: str
     good: bool
-    requests: List[Request]
+    requests: list[Request]
     marks: Marks = ()
 
 
@@ -434,14 +478,14 @@ def test_sane_all_in_order(case: SaneCase) -> None:
 
 
 async def create_acquire_tasks_in_controlled_order(
-    requests: List[Request],
+    requests: list[Request],
     mutex: PriorityMutex[MutexPriority],
-) -> List[asyncio.Task[None]]:
-    tasks: List[asyncio.Task[None]] = []
+) -> list[asyncio.Task[None]]:
+    tasks: list[asyncio.Task[None]] = []
     release_event = asyncio.Event()
 
     for request in requests:
-        task = asyncio.create_task(request.acquire(mutex=mutex, wait_for=release_event))
+        task = create_referenced_task(request.acquire(mutex=mutex, wait_for=release_event))
         tasks.append(task)
         await wait_queued(mutex=mutex, task=task)
 
@@ -461,14 +505,14 @@ async def test_multiple_tasks_track_active_task_accurately() -> None:
             await other_task_allow_release_event.wait()
 
     async with mutex.acquire(priority=MutexPriority.high):
-        other_task = asyncio.create_task(other_task_function())
+        other_task = create_referenced_task(other_task_function())
         await wait_queued(mutex=mutex, task=other_task)
 
     async def another_task_function() -> None:
         async with mutex.acquire(priority=MutexPriority.high):
             pass
 
-    another_task = asyncio.create_task(another_task_function())
+    another_task = create_referenced_task(another_task_function())
     await wait_queued(mutex=mutex, task=another_task)
     other_task_allow_release_event.set()
 

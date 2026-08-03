@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import logging
-from typing import Optional, Union
 
-from cactus.consensus.block_record import BlockRecord
+from chia_rs import BlockRecord, ConsensusConstants, FullBlock, SubEpochSummary, UnfinishedBlock
+from chia_rs.sized_ints import uint8, uint32, uint64, uint128
+
 from cactus.consensus.blockchain_interface import BlockRecordsProtocol
-from cactus.consensus.constants import ConsensusConstants
+from cactus.consensus.challenge_tree import compute_challenge_merkle_root
 from cactus.consensus.deficit import calculate_deficit
 from cactus.consensus.difficulty_adjustment import (
     _get_next_difficulty,
@@ -15,10 +16,6 @@ from cactus.consensus.difficulty_adjustment import (
     height_can_be_first_in_epoch,
 )
 from cactus.consensus.pot_iterations import calculate_ip_iters, calculate_sp_iters, is_overflow_block
-from cactus.types.blockchain_format.sub_epoch_summary import SubEpochSummary
-from cactus.types.full_block import FullBlock
-from cactus.types.unfinished_block import UnfinishedBlock
-from cactus.util.ints import uint8, uint32, uint64, uint128
 
 log = logging.getLogger(__name__)
 
@@ -28,15 +25,16 @@ def make_sub_epoch_summary(
     blocks: BlockRecordsProtocol,
     blocks_included_height: uint32,
     prev_prev_block: BlockRecord,
-    new_difficulty: Optional[uint64],
-    new_sub_slot_iters: Optional[uint64],
-    prev_ses_block: Optional[BlockRecord] = None,
+    new_difficulty: uint64 | None,
+    new_sub_slot_iters: uint64 | None,
+    *,
+    make_challenge_root: bool = False,
+    prev_ses_block: BlockRecord | None = None,
 ) -> SubEpochSummary:
     """
     Creates a sub-epoch-summary object, assuming that the first block in the new sub-epoch is at height
     "blocks_included_height". Prev_prev_b is the second to last block in the previous sub-epoch. On a new epoch,
     new_difficulty and new_sub_slot_iters are also added.
-
     Args:
         constants: consensus constants being used for this chain
         blocks: dictionary from header hash to SBR of all included SBR
@@ -56,6 +54,7 @@ def make_sub_epoch_summary(
             uint8(0),
             None,
             None,
+            None,  # No challenge root in first sub-epoch
         )
     if prev_ses_block is None:
         curr: BlockRecord = prev_prev_block
@@ -67,22 +66,39 @@ def make_sub_epoch_summary(
     assert prev_ses_block.finished_reward_slot_hashes is not None
 
     prev_ses = prev_ses_block.sub_epoch_summary_included.get_hash()
-    return SubEpochSummary(
+    if make_challenge_root:
+        challenge_root = compute_challenge_merkle_root(blocks, blocks_included_height, prev_ses_block.height)
+        log.info(
+            f"make_sub_epoch_summary: height={blocks_included_height} >= fork_height={constants.HARD_FORK2_HEIGHT}, "
+            f"computed challenge_root={challenge_root.hex()}"
+        )
+    else:
+        challenge_root = None
+        log.info(
+            f"make_sub_epoch_summary: height={blocks_included_height} < fork_height={constants.HARD_FORK2_HEIGHT}, "
+            f"using None for challenge_root"
+        )
+
+    result = SubEpochSummary(
         prev_ses,
         prev_ses_block.finished_reward_slot_hashes[-1],
         uint8(prev_ses_block.height % constants.SUB_EPOCH_BLOCKS),
         new_difficulty,
         new_sub_slot_iters,
+        challenge_root,
     )
+    log.debug(f"make_sub_epoch_summary result hash: {result.get_hash().hex()}")
+    return result
 
 
 def next_sub_epoch_summary(
     constants: ConsensusConstants,
     blocks: BlockRecordsProtocol,
     required_iters: uint64,
-    block: Union[UnfinishedBlock, FullBlock],
+    block: UnfinishedBlock | FullBlock,
     can_finish_soon: bool = False,
-) -> Optional[SubEpochSummary]:
+    with_challenge_root: bool = False,
+) -> SubEpochSummary | None:
     """
     Returns the sub-epoch summary that can be included in the block after block. If it should include one. Block
     must be eligible to be the last block in the epoch. If not, returns None. Assumes that there is a new slot
@@ -100,7 +116,7 @@ def next_sub_epoch_summary(
         object: the new sub-epoch summary
     """
     signage_point_index = block.reward_chain_block.signage_point_index
-    prev_b: Optional[BlockRecord] = blocks.try_block_record(block.prev_header_hash)
+    prev_b: BlockRecord | None = blocks.try_block_record(block.prev_header_hash)
     if prev_b is None or prev_b.height == 0:
         return None
 
@@ -207,4 +223,5 @@ def next_sub_epoch_summary(
         prev_b,
         next_difficulty,
         next_sub_slot_iters,
+        make_challenge_root=with_challenge_root,
     )

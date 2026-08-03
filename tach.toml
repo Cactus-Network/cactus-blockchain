@@ -1,0 +1,284 @@
+interfaces = []
+exclude = ["**/*__pycache__", "**/*egg-info", "**/docs", "**/tests", "**/venv"]
+source_roots = ["."]
+
+[[modules]]
+path = "cactus.protocols"
+depends_on = ["cactus.types", "cactus.util"]
+
+[[modules]]
+path = "cactus.pools"
+depends_on = [
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.wallet", deprecated = false },
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.consensus", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.consensus"
+depends_on = [
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.full_node", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.server"
+depends_on = [
+    "cactus.protocols",
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.ssl", deprecated = false },
+    { path = "cactus.rpc", deprecated = false },
+    { path = "cactus.daemon", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.simulator"
+depends_on = [
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.plotting", deprecated = false },
+    { path = "cactus.full_node", deprecated = false },
+    { path = "cactus.introducer", deprecated = false },
+    { path = "cactus.wallet", deprecated = false },
+    { path = "cactus.farmer", deprecated = false },
+    { path = "cactus.seeder", deprecated = false },
+    { path = "cactus.consensus", deprecated = false },
+    { path = "cactus.apis", deprecated = false },
+    { path = "cactus.cmds", deprecated = false },
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.solver", deprecated = false },
+    { path = "cactus.timelord", deprecated = false },
+    { path = "cactus.harvester", deprecated = false },
+    { path = "cactus.daemon", deprecated = false },
+    { path = "cactus.ssl", deprecated = false },
+    { path = "cactus.rpc", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.full_node"
+depends_on = [
+    "cactus.apis",
+    "cactus.types",
+    "cactus.util",
+    "cactus.consensus",
+    "cactus.protocols",
+    "cactus.server",
+    { path = "cactus.rpc", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.data_layer"
+depends_on = [
+    "cactus.apis",
+    "cactus.ssl",
+    "cactus.types",
+    "cactus.util",
+    "cactus.protocols",
+    { path = "cactus.rpc", deprecated = false },
+    { path = "cactus.wallet", deprecated = false },
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.protocols", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.apis"
+depends_on = [
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.server", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.introducer"
+depends_on = [
+    "cactus.apis",
+    "cactus.full_node",
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.rpc", deprecated = false },
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.server", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.plot_sync"
+depends_on = [
+    "cactus.util",
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.plotting", deprecated = false },
+    { path = "cactus.consensus", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.farmer"
+depends_on = [
+    "cactus.apis",
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.pools", deprecated = false },
+    { path = "cactus.plot_sync", deprecated = false },
+    { path = "cactus.daemon", deprecated = false },
+    { path = "cactus.consensus", deprecated = false },
+    { path = "cactus.rpc", deprecated = false },
+    { path = "cactus.wallet", deprecated = false },
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.ssl", deprecated = false },
+    { path = "cactus.harvester", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.plotters"
+depends_on = [
+    { path = "cactus.util", deprecated = false },
+    { path = "cactus.plotting", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.ssl"
+depends_on = ["cactus.util"]
+
+[[modules]]
+path = "cactus.timelord"
+depends_on = [
+    "cactus.apis",
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.consensus", deprecated = false },
+    { path = "cactus.rpc", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.legacy"
+depends_on = ["cactus.util"]
+
+[[modules]]
+path = "cactus.rpc"
+# this module should probably be disbanded and contents moved to the modules
+# for their respective services
+depends_on = [
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.wallet", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.harvester"
+depends_on = [
+    "cactus.apis",
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.consensus", deprecated = false },
+    { path = "cactus.plotting", deprecated = false },
+    { path = "cactus.wallet", deprecated = false },
+    { path = "cactus.rpc", deprecated = false },
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.plot_sync", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.cmds"
+depends_on = [
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.plotters", deprecated = false },
+    { path = "cactus.consensus", deprecated = false },
+    { path = "cactus.plotting", deprecated = false },
+    { path = "cactus.pools", deprecated = false },
+    { path = "cactus.daemon", deprecated = false },
+    { path = "cactus.ssl", deprecated = false },
+    { path = "cactus.farmer", deprecated = false },
+    { path = "cactus.full_node", deprecated = false },
+    { path = "cactus.harvester", deprecated = false },
+    { path = "cactus.wallet", deprecated = false },
+    { path = "cactus.rpc", deprecated = false },
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.simulator", deprecated = false },
+    { path = "cactus.solver", deprecated = false },
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.data_layer", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.daemon"
+depends_on = [
+    "cactus.util",
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.cmds", deprecated = false },
+    { path = "cactus.wallet", deprecated = false },
+    { path = "cactus.plotters", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.wallet"
+depends_on = [
+    "cactus.apis",
+    "cactus.simulator",
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.daemon", deprecated = false },
+    { path = "cactus.rpc", deprecated = false },
+    { path = "cactus.data_layer", deprecated = false },
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.pools", deprecated = false },
+    { path = "cactus.full_node", deprecated = false },
+    { path = "cactus.consensus", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.types"
+depends_on = ["cactus.util"]
+
+[[modules]]
+path = "cactus.util"
+
+[[modules]]
+path = "cactus.clvm"
+depends_on = []
+
+[[modules]]
+path = "cactus.plotting"
+depends_on = [
+    "cactus.types",
+    "cactus.util",
+    "cactus.consensus",
+    { path = "cactus.daemon", deprecated = false },
+    { path = "cactus.wallet", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.solver"
+depends_on = [
+    "cactus.protocols",
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.apis", deprecated = false },
+    { path = "cactus.consensus", deprecated = false },
+    { path = "cactus.rpc", deprecated = false },
+    { path = "cactus.server", deprecated = false },
+]
+
+[[modules]]
+path = "cactus.seeder"
+depends_on = [
+    "cactus.types",
+    "cactus.util",
+    { path = "cactus.protocols", deprecated = false },
+    { path = "cactus.rpc", deprecated = false },
+    { path = "cactus.full_node", deprecated = false },
+    { path = "cactus.server", deprecated = false },
+    { path = "cactus.apis", deprecated = false },
+    { path = "cactus.consensus", deprecated = false },
+]

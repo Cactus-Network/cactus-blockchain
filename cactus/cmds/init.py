@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import click
 
+from cactus.cmds.cmd_classes import CactusCliContext
+
 
 @click.command("init", help="Create or migrate the configuration")
 @click.option(
@@ -46,25 +48,16 @@ def init_cmd(
     """
     from pathlib import Path
 
+    from cactus.cmds.init_funcs import init
     from cactus.cmds.passphrase_funcs import initialize_passphrase
-
-    from .init_funcs import init
 
     if set_passphrase:
         initialize_passphrase()
 
     init(
         Path(create_certs) if create_certs is not None else None,
-        ctx.obj["root_path"],
+        CactusCliContext.set_default(ctx).root_path,
         fix_ssl_permissions,
         testnet,
         v1_db,
     )
-
-
-if __name__ == "__main__":
-    from cactus.util.default_root import DEFAULT_ROOT_PATH
-
-    from .init_funcs import cactus_init
-
-    cactus_init(DEFAULT_ROOT_PATH)

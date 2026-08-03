@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import contextlib
 import sys
+from collections.abc import AsyncIterator
 from pathlib import Path
-from typing import Any, AsyncGenerator, Dict, Optional, Tuple
+from typing import Any
 
-from cactus_rs import PrivateKey
+from chia_rs import PrivateKey
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint32
 
-from cactus.consensus.coinbase import create_puzzlehash_for_pk
 from cactus.daemon.server import WebSocketServer, daemon_launch_lock_path
 from cactus.server.signal_handlers import SignalHandlers
 from cactus.simulator.full_node_simulator import FullNodeSimulator
@@ -20,21 +23,20 @@ from cactus.simulator.ssl_certs import (
 )
 from cactus.simulator.start_simulator import async_main as start_simulator_main
 from cactus.ssl.create_ssl import create_all_ssl
-from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.util.bech32m import encode_puzzle_hash
 from cactus.util.config import create_default_cactus_config, load_config, save_config
 from cactus.util.errors import KeychainFingerprintExists
-from cactus.util.ints import uint32
 from cactus.util.keychain import Keychain
 from cactus.util.lock import Lockfile
 from cactus.wallet.derive_keys import master_sk_to_wallet_sk
+from cactus.wallet.puzzles.p2_delegated_puzzle_or_hidden_puzzle import puzzle_hash_for_pk
 
 """
 These functions are used to test the simulator.
 """
 
 
-def mnemonic_fingerprint(keychain: Keychain) -> Tuple[str, int]:
+def mnemonic_fingerprint(keychain: Keychain) -> tuple[str, int]:
     mnemonic = (
         "today grape album ticket joy idle supreme sausage "
         "oppose voice angle roast you oven betray exact "
@@ -55,17 +57,17 @@ def get_puzzle_hash_from_key(keychain: Keychain, fingerprint: int, key_id: int =
         raise Exception("Fingerprint not found")
     private_key = priv_key_and_entropy[0]
     sk_for_wallet_id: PrivateKey = master_sk_to_wallet_sk(private_key, uint32(key_id))
-    puzzle_hash: bytes32 = create_puzzlehash_for_pk(sk_for_wallet_id.get_g1())
+    puzzle_hash: bytes32 = puzzle_hash_for_pk(sk_for_wallet_id.get_g1())
     return puzzle_hash
 
 
 def create_config(
     cactus_root: Path,
     fingerprint: int,
-    private_ca_crt_and_key: Tuple[bytes, bytes],
-    node_certs_and_keys: Dict[str, Dict[str, Dict[str, bytes]]],
+    private_ca_crt_and_key: tuple[bytes, bytes],
+    node_certs_and_keys: dict[str, dict[str, dict[str, bytes]]],
     keychain: Keychain,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     # create cactus directories
     create_default_cactus_config(cactus_root)
     create_all_ssl(
@@ -106,7 +108,8 @@ def create_config(
     return config
 
 
-async def start_simulator(cactus_root: Path, automated_testing: bool = False) -> AsyncGenerator[FullNodeSimulator, None]:
+@contextlib.asynccontextmanager
+async def start_simulator(cactus_root: Path, automated_testing: bool = False) -> AsyncIterator[FullNodeSimulator]:
     sys.argv = [sys.argv[0]]  # clear sys.argv to avoid issues with config.yaml
     started_simulator = await start_simulator_main(True, automated_testing, root_path=cactus_root)
     service = started_simulator.service
@@ -115,12 +118,13 @@ async def start_simulator(cactus_root: Path, automated_testing: bool = False) ->
         yield service._api
 
 
+@contextlib.asynccontextmanager
 async def get_full_cactus_simulator(
     cactus_root: Path,
-    keychain: Optional[Keychain] = None,
+    keychain: Keychain | None = None,
     automated_testing: bool = False,
-    config: Optional[Dict[str, Any]] = None,
-) -> AsyncGenerator[Tuple[FullNodeSimulator, Path, Dict[str, Any], str, int, Keychain], None]:
+    config: dict[str, Any] | None = None,
+) -> AsyncIterator[tuple[FullNodeSimulator, Path, dict[str, Any], str, int, Keychain]]:
     """
     A cactus root Path is required.
     The cactus root Path can be a temporary directory (tempfile.TemporaryDirectory)
@@ -159,5 +163,5 @@ async def get_full_cactus_simulator(
         async with SignalHandlers.manage() as signal_handlers:
             await ws_server.setup_process_global_state(signal_handlers=signal_handlers)
             async with ws_server.run():
-                async for simulator in start_simulator(cactus_root, automated_testing):
+                async with start_simulator(cactus_root, automated_testing) as simulator:
                     yield simulator, cactus_root, config, mnemonic, fingerprint, keychain

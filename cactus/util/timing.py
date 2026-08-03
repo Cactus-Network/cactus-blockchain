@@ -1,9 +1,13 @@
+# Package: utils
+
 from __future__ import annotations
 
 import os
+import platform
 import sys
 import time
-from typing import Callable, Iterator, Optional, overload
+from collections.abc import Callable, Iterator
+from typing import overload
 
 system_delays = {
     # based on data from https://github.com/Cactus-Network/cactus-blockchain/pull/13724
@@ -21,9 +25,23 @@ system_delays = {
 }
 
 
+def _github_darwin_system_delay() -> int:
+    machine = platform.machine().lower()
+    runner_arch = os.environ.get("RUNNER_ARCH", "").lower()
+    arch = machine or runner_arch
+    if arch in {"x86_64", "amd64", "x64"}:
+        # Intel macOS runners are slower; tune as the hosted runner tier changes.
+        return 40
+
+    return system_delays["github"]["darwin"]
+
+
 if os.environ.get("GITHUB_ACTIONS") == "true":
     # https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
-    _system_delay = system_delays["github"][sys.platform]
+    if sys.platform == "darwin":
+        _system_delay = _github_darwin_system_delay()
+    else:
+        _system_delay = system_delays["github"][sys.platform]
 else:
     try:
         _system_delay = system_delays["local"][sys.platform]
@@ -39,7 +57,7 @@ def adjusted_timeout(timeout: float) -> float: ...
 def adjusted_timeout(timeout: None) -> None: ...
 
 
-def adjusted_timeout(timeout: Optional[float]) -> Optional[float]:
+def adjusted_timeout(timeout: float | None) -> float | None:
     if timeout is None:
         return None
 

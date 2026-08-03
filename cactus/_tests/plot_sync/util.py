@@ -2,19 +2,21 @@ from __future__ import annotations
 
 import contextlib
 import time
+from collections.abc import AsyncIterator
 from dataclasses import dataclass
-from typing import AsyncIterator, Optional
+
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint16, uint64
 
 from cactus._tests.util.split_managers import SplitAsyncManager, split_async_manager
 from cactus._tests.util.time_out_assert import time_out_assert
+from cactus.farmer.farmer_service import FarmerService
 from cactus.harvester.harvester import Harvester
+from cactus.harvester.harvester_service import HarvesterService
 from cactus.plot_sync.sender import Sender
 from cactus.protocols.harvester_protocol import PlotSyncIdentifier
-from cactus.server.outbound_message import Message, NodeType
-from cactus.types.aliases import FarmerService, HarvesterService
-from cactus.types.blockchain_format.sized_bytes import bytes32
+from cactus.protocols.outbound_message import Message, NodeType
 from cactus.types.peer_info import PeerInfo, UnresolvedPeerInfo
-from cactus.util.ints import uint16, uint64
 
 
 @dataclass
@@ -22,7 +24,7 @@ class WSCactusConnectionDummy:
     connection_type: NodeType
     peer_node_id: bytes32
     peer_info: PeerInfo = PeerInfo("127.0.0.1", uint16(0))
-    last_sent_message: Optional[Message] = None
+    last_sent_message: Message | None = None
 
     async def send_message(self, message: Message) -> None:
         self.last_sent_message = message
@@ -36,7 +38,7 @@ def get_dummy_connection(node_type: NodeType, peer_id: bytes32) -> WSCactusConne
 
 
 def plot_sync_identifier(current_sync_id: uint64, message_id: uint64) -> PlotSyncIdentifier:
-    return PlotSyncIdentifier(uint64(int(time.time())), current_sync_id, message_id)
+    return PlotSyncIdentifier(uint64(time.time()), current_sync_id, message_id)
 
 
 @contextlib.asynccontextmanager

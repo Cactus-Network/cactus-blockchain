@@ -2,11 +2,14 @@ from __future__ import annotations
 
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, cast
 
+import click
 import pytest
-from click import BadParameter, Context
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint64
+from click import BadParameter
 
+from cactus.cmds.cmd_classes import CactusCliContext
 from cactus.cmds.param_types import (
     AddressParamType,
     AmountParamType,
@@ -17,9 +20,7 @@ from cactus.cmds.param_types import (
     Uint64ParamType,
 )
 from cactus.cmds.units import units
-from cactus.types.blockchain_format.sized_bytes import bytes32
 from cactus.util.bech32m import encode_puzzle_hash
-from cactus.util.ints import uint64
 from cactus.wallet.util.address_type import AddressType
 
 """
@@ -37,11 +38,9 @@ overflow_decimal_str = "18446744.073709551616"
 overflow_decimal = Decimal(overflow_decimal_str)
 
 
-class FakeContext:
-    obj: dict[Any, Any] = {}
-
-    def __init__(self, obj: dict[Any, Any]):
-        self.obj = obj
+@click.command()
+def a_command_for_testing() -> None:
+    pass  # pragma: no cover
 
 
 def test_click_tx_fee_type() -> None:
@@ -67,7 +66,7 @@ def test_click_tx_fee_type() -> None:
         TransactionFeeParamType().convert(overflow_decimal_str, None, None)
     # Test Type Failures
     with pytest.raises(BadParameter):
-        TransactionFeeParamType().convert(float(0.01), None, None)
+        TransactionFeeParamType().convert(0.01, None, None)
 
 
 def test_click_amount_type() -> None:
@@ -115,7 +114,11 @@ def test_click_amount_type() -> None:
 
 
 def test_click_address_type() -> None:
-    context = cast(Context, FakeContext(obj={"expected_prefix": "cac"}))  # this makes us not have to use a config file
+    context = click.Context(command=a_command_for_testing)
+    cactus_context = CactusCliContext.set_default(context)
+    # this makes us not have to use a config file
+    cactus_context.expected_prefix = "cac"
+
     std_cli_address = CliAddress(burn_ph, burn_address, AddressType.CAC)
     nft_cli_address = CliAddress(burn_ph, burn_nft_addr, AddressType.DID)
     # Test CliAddress (Generally is not used)
@@ -133,13 +136,13 @@ def test_click_address_type() -> None:
     # check error handling
     with pytest.raises(BadParameter):
         AddressParamType().convert("test", None, None)
-    with pytest.raises(AttributeError):  # attribute error because the context does not have a real error handler
+    with pytest.raises(click.BadParameter):
         AddressParamType().convert(burn_address_tcac, None, context)
     with pytest.raises(BadParameter):
         AddressParamType().convert(burn_bad_prefix, None, None)
     # Test Type Failures
     with pytest.raises(BadParameter):
-        AddressParamType().convert(float(0.01), None, None)
+        AddressParamType().convert(0.01, None, None)
 
     # check class error handling
     with pytest.raises(ValueError):
@@ -149,13 +152,15 @@ def test_click_address_type() -> None:
 
 
 def test_click_address_type_config(root_path_populated_with_config: Path) -> None:
+    context = click.Context(command=a_command_for_testing)
+    cactus_context = CactusCliContext.set_default(context)
     # set a root path in context.
-    context = cast(Context, FakeContext(obj={"root_path": root_path_populated_with_config}))
+    cactus_context.root_path = root_path_populated_with_config
     # run test that should pass
     assert AddressParamType().convert(burn_address, None, context) == CliAddress(burn_ph, burn_address, AddressType.CAC)
-    assert context.obj["expected_prefix"] == "cac"  # validate that the prefix was set correctly
+    assert CactusCliContext.set_default(context).expected_prefix == "cac"  # validate that the prefix was set correctly
     # use tcac address
-    with pytest.raises(AttributeError):  # attribute error because the context does not have a real error handler
+    with pytest.raises(click.BadParameter):
         AddressParamType().convert(burn_address_tcac, None, context)
 
 
@@ -170,7 +175,7 @@ def test_click_bytes32_type() -> None:
         Bytes32ParamType().convert("test", None, None)
     # Test Type Failures
     with pytest.raises(BadParameter):
-        Bytes32ParamType().convert(float(0.01), None, None)
+        Bytes32ParamType().convert(0.01, None, None)
 
 
 def test_click_uint64_type() -> None:
@@ -192,4 +197,4 @@ def test_click_uint64_type() -> None:
         Uint64ParamType().convert(str(overflow_ammt), None, None)
     # Test Type Failures
     with pytest.raises(BadParameter):
-        Uint64ParamType().convert(float(0.01), None, None)
+        Uint64ParamType().convert(0.01, None, None)

@@ -6,10 +6,9 @@ import os
 import pathlib
 import sys
 import tempfile
-from typing import List
 
 import importlib_resources
-from clvm_tools_rs import compile_clvm as compile_clvm_rust
+from chialisp import compile_clvm as compile_clvm_rust
 
 from cactus.types.blockchain_format.program import Program
 from cactus.types.blockchain_format.serialized_program import SerializedProgram
@@ -40,7 +39,7 @@ if "CLVM_TOOLS" in os.environ:
     compile_clvm_py = compile_clvm_py_candidate
 
 
-def compile_clvm_in_lock(full_path: pathlib.Path, output: pathlib.Path, search_paths: List[pathlib.Path]):
+def compile_clvm_in_lock(full_path: pathlib.Path, output: pathlib.Path, search_paths: list[pathlib.Path]):
     # Compile using rust (default)
 
     # Ensure path translation is done in the idiomatic way currently
@@ -75,7 +74,7 @@ def compile_clvm_in_lock(full_path: pathlib.Path, output: pathlib.Path, search_p
     return res
 
 
-def compile_clvm(full_path: pathlib.Path, output: pathlib.Path, search_paths: List[pathlib.Path] = []):
+def compile_clvm(full_path: pathlib.Path, output: pathlib.Path, search_paths: list[pathlib.Path] = []):
     with Lockfile.create(pathlib.Path(tempfile.gettempdir()) / "clvm_compile" / full_path.name):
         compile_clvm_in_lock(full_path, output, search_paths)
 
@@ -97,7 +96,7 @@ def load_serialized_clvm(
     # "" or "0" to trigger automatic recompilation of the Cactuslisp on load.
     resources = importlib_resources.files(package_or_requirement)
     if recompile and not getattr(sys, "frozen", False):
-        full_path = resources.joinpath(clvm_filename)
+        full_path = pathlib.Path(str(resources.joinpath(clvm_filename)))
         if full_path.exists():
             # Establish whether the size is zero on entry
             output = full_path.parent / hex_filename
@@ -105,8 +104,8 @@ def load_serialized_clvm(
                 search_paths = [full_path.parent]
                 if include_standard_libraries:
                     # we can't get the dir, but we can get a file then get its parent.
-                    cactus_puzzles_path = pathlib.Path(__file__).parent
-                    search_paths.append(cactus_puzzles_path)
+                    chia_puzzles_path = pathlib.Path(__file__).parent
+                    search_paths.append(chia_puzzles_path)
                 compile_clvm(full_path, output, search_paths=search_paths)
 
     clvm_path = resources.joinpath(hex_filename)

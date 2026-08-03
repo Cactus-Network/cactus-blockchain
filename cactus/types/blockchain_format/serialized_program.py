@@ -1,5 +1,5 @@
 from __future__ import annotations
 
-import cactus_rs
+import chia_rs
 
-SerializedProgram = cactus_rs.Program
+SerializedProgram = chia_rs.Program

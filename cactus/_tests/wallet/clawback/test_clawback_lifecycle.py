@@ -1,24 +1,22 @@
 from __future__ import annotations
 
-from typing import Dict, Optional, Tuple
-
 import pytest
-from cactus_rs import AugSchemeMPL, G1Element, G2Element, PrivateKey
+from chia_rs import AugSchemeMPL, CoinSpend, G1Element, G2Element, PrivateKey
+from chia_rs.sized_bytes import bytes32
+from chia_rs.sized_ints import uint64
 
 from cactus._tests.clvm.benchmark_costs import cost_of_spend_bundle
 from cactus._tests.clvm.test_puzzles import public_key_for_index, secret_exponent_for_index
 from cactus._tests.util.key_tool import KeyTool
+from cactus._tests.util.spend_sim import CostLogger, SimClient, SpendSim, sim_and_client
 from cactus._tests.util.time_out_assert import time_out_assert
-from cactus.clvm.spend_sim import CostLogger, SimClient, SpendSim, sim_and_client
+from cactus.consensus.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
 from cactus.consensus.default_constants import DEFAULT_CONSTANTS
 from cactus.types.blockchain_format.program import INFINITE_COST, Program
-from cactus.types.blockchain_format.sized_bytes import bytes32
-from cactus.types.coin_spend import CoinSpend, make_spend
+from cactus.types.coin_spend import make_spend
 from cactus.types.condition_opcodes import ConditionOpcode
 from cactus.types.mempool_inclusion_status import MempoolInclusionStatus
-from cactus.util.condition_tools import conditions_dict_for_solution, pkm_pairs_for_conditions_dict
 from cactus.util.errors import Err
-from cactus.util.ints import uint64
 from cactus.util.streamable import VersionedBlob
 from cactus.wallet.puzzles.clawback.drivers import (
     create_augmented_cond_puzzle_hash,
@@ -48,8 +46,8 @@ async def do_spend(
     sim: SpendSim,
     sim_client: SimClient,
     spend_bundle: WalletSpendBundle,
-    expected_result: Tuple[MempoolInclusionStatus, Optional[Err]],
-    cost_logger: Optional[CostLogger] = None,
+    expected_result: tuple[MempoolInclusionStatus, Err | None],
+    cost_logger: CostLogger | None = None,
     cost_log_msg: str = "",
 ) -> int:
     if cost_logger is not None:
@@ -66,7 +64,7 @@ async def do_spend(
 class TestClawbackLifecycle:
     # Helper function
     def sign_coin_spend(self, coin_spend: CoinSpend, index: int) -> G2Element:
-        synthetic_secret_key: PrivateKey = calculate_synthetic_secret_key(  # noqa
+        synthetic_secret_key: PrivateKey = calculate_synthetic_secret_key(
             PrivateKey.from_bytes(
                 secret_exponent_for_index(index).to_bytes(32, "big"),
             ),
@@ -277,7 +275,7 @@ class TestClawbackLifecycle:
         cb_sender_sol = create_merkle_solution(timelock, sender_ph, recipient_ph, sender_puz, sender_sol)
 
         conds = conditions_dict_for_solution(clawback_puz, cb_sender_sol, INFINITE_COST)
-        assert isinstance(conds, Dict)
+        assert isinstance(conds, dict)
         create_coins = conds[ConditionOpcode.CREATE_COIN]
         assert len(create_coins) == 1
         assert create_coins[0].vars[0] == sender_ph
@@ -286,7 +284,7 @@ class TestClawbackLifecycle:
         cb_recipient_sol = create_merkle_solution(timelock, sender_ph, recipient_ph, recipient_puz, recipient_sol)
         clawback_puz.run(cb_recipient_sol)
         conds = conditions_dict_for_solution(clawback_puz, cb_recipient_sol, INFINITE_COST)
-        assert isinstance(conds, Dict)
+        assert isinstance(conds, dict)
         create_coins = conds[ConditionOpcode.CREATE_COIN]
         assert len(create_coins) == 1
         assert create_coins[0].vars[0] == recipient_ph
