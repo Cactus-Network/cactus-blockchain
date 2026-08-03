@@ -56,6 +56,10 @@ jobs:
           cd build_scripts
           .\build_windows-1-gui.ps1
 
+      # puts editbin.exe (and signtool.exe) on PATH for the installer script
+      - name: Set up MSVC developer environment
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Build installer
         shell: pwsh
         run: |

@@ -8,11 +8,11 @@ git submodule
 # If the env variable NOTARIZE and the username and password variables are
 # set, this will attempt to Notarize the signed DMG.
 
-if [ ! "$CACTUS_INSTALLER_VERSION" ]; then
+if [ ! "${CACTUS_INSTALLER_VERSION:-}" ]; then
   echo "WARNING: No environment variable CACTUS_INSTALLER_VERSION set. Using 0.0.0."
   CACTUS_INSTALLER_VERSION="0.0.0"
 fi
-if [ ! "$CACTUS_SEMVER_VERSION" ]; then
+if [ ! "${CACTUS_SEMVER_VERSION:-}" ]; then
   echo "WARNING: No environment variable CACTUS_SEMVER_VERSION set. Using $CACTUS_INSTALLER_VERSION."
   CACTUS_SEMVER_VERSION="$CACTUS_INSTALLER_VERSION"
 fi

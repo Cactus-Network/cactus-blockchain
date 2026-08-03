@@ -39,6 +39,11 @@ jobs:
         with:
           node-version-file: "cactus-blockchain-gui/.nvmrc"
 
+      # app-builder has no bundled icon-conversion helper on arm64 and falls
+      # back to the system opj_decompress
+      - name: Install icon tooling
+        run: sudo apt-get update && sudo apt-get install -y libopenjp2-tools
+
       - name: Install cactus-blockchain
         uses: ./.github/actions/install
         with:

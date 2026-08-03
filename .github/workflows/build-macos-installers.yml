@@ -21,7 +21,9 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - runs-on: macos-13
+          # macos-13 was retired by GitHub (jobs queue forever); macos-15-intel
+          # is the remaining Intel label (available through Aug 2027)
+          - runs-on: macos-15-intel
             arch: intel
           - runs-on: macos-latest
             arch: arm64

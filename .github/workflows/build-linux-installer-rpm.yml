@@ -36,7 +36,11 @@ jobs:
           node-version-file: "cactus-blockchain-gui/.nvmrc"
 
       - name: Install rpm tooling
-        run: sudo apt-get update && sudo apt-get install -y rpm
+        # fpm packages the CLI rpm (runner ruby is new enough); libopenjp2-tools
+        # mirrors the deb workflow (app-builder icon conversion fallback).
+        run: |
+          sudo apt-get update && sudo apt-get install -y rpm libopenjp2-tools
+          command -v fpm >/dev/null || sudo gem install fpm --no-document
 
       - name: Install cactus-blockchain
         uses: ./.github/actions/install

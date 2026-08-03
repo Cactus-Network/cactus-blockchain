@@ -62,10 +62,13 @@ cp -r dist/daemon/* "dist/$CLI_RPM_BASE/opt/cactus/"
 cp assets/systemd/*.service "dist/$CLI_RPM_BASE/etc/systemd/system/"
 
 ln -s ../../opt/cactus/cactus "dist/$CLI_RPM_BASE/usr/bin/cactus"
-# This is built into the base build image
-# shellcheck disable=SC1091
-. /etc/profile.d/rvm.sh
-rvm use ruby-3
+# rvm only exists in the rocky8 builder container; on plain runners fpm is
+# already on PATH (gem install in the workflow)
+if [ -f /etc/profile.d/rvm.sh ]; then
+  # shellcheck disable=SC1091
+  . /etc/profile.d/rvm.sh
+  rvm use ruby-3
+fi
 
 export FPM_EDITOR="cat >dist/cli.spec <"
 
