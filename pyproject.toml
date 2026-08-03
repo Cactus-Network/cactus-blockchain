@@ -35,8 +35,8 @@ cactus_data_layer_s3_plugin = "cactus.data_layer.s3_plugin_service:run_server"
 cactus_solver = "cactus.solver.start_solver:main"
 
 [[tool.poetry.source]]
-name = "cactus"
-url = "https://pypi.cactus-network.net/simple/"
+name = "chia"
+url = "https://pypi.chia.net/simple/"
 priority = "supplemental"
 
 [project.urls]
@@ -106,7 +106,7 @@ boto3-stubs = { version = ">=1.43.18", optional = true }
 sortedcontainers-stubs = {version = ">= 2.4.3", optional = true }
 types-colorama = { version = ">=0.4.15.20260508", optional = true }
 lxml = { version = ">=6.1.0", optional = true }
-miniupnpc = {version = ">=2.3.2, <3", source = "cactus", optional = true}
+miniupnpc = {version = ">=2.3.2, <3", source = "chia", optional = true}
 # big-o = {version = "0.11.0", optional = true}
 # numpy = [
 # 	{version="<=1.24.4", python = "<3.10", optional = true},
