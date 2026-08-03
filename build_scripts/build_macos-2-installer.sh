@@ -62,7 +62,7 @@ OPT_ARCH="--x64"
 if [ "$(arch)" = "arm64" ]; then
   OPT_ARCH="--arm64"
 fi
-if [ "$NOTARIZE" == true ]; then
+if [ "${NOTARIZE:-}" == true ]; then
   echo "Setting credentials for signing"
   export CSC_LINK=$APPLE_DEV_ID_APP
   export CSC_KEY_PASSWORD=$APPLE_DEV_ID_APP_PASS
@@ -104,7 +104,7 @@ mv dist/"$ORIGINAL_DMG_NAME" final_installer/"$DMG_NAME"
 
 ls -lh final_installer
 
-if [ "$NOTARIZE" == true ]; then
+if [ "${NOTARIZE:-}" == true ]; then
   echo "Notarize $DMG_NAME on ci"
   cd final_installer || exit 1
   xcrun notarytool submit --wait --apple-id "$APPLE_NOTARIZE_USERNAME" --password "$APPLE_NOTARIZE_PASSWORD" --team-id "$APPLE_TEAM_ID" "$DMG_NAME"
