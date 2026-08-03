@@ -74,6 +74,7 @@ jobs:
         with:
           name: cactus-installers-rpm-x86_64
           path: build_scripts/final_installer/
+          if-no-files-found: error
 
       - name: Attach to release
         if: github.ref_type == 'tag'

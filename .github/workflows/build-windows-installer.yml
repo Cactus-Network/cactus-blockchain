@@ -67,13 +67,16 @@ jobs:
           cd build_scripts
           .\build_windows-2-installer.ps1
 
+      # build_windows-2-installer.ps1 copies the setup exe here, not to
+      # build_scripts/final_installer like the other platforms
       - uses: actions/upload-artifact@v4
         with:
           name: cactus-installers-windows-x64
-          path: build_scripts/final_installer/
+          path: cactus-blockchain-gui/release-builds/windows-installer/
+          if-no-files-found: error
 
       - name: Attach to release
         if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
-          files: build_scripts/final_installer/*
+          files: cactus-blockchain-gui/release-builds/windows-installer/*
