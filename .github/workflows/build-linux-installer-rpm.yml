@@ -16,31 +16,28 @@ permissions:
 jobs:
   build:
     name: Build RPM (x86_64)
-    # NOTE: built on ubuntu-latest, so the pyinstaller binaries need its glibc
-    # or newer on the target distro. Chia builds in a rocky8 container for
-    # wider compat — switch `container: chianetwork/rocky8-builder:latest`
-    # here if old-distro support is requested.
     runs-on: ubuntu-latest
+    # Build inside Chia's rocky8 builder image (like upstream) so the
+    # pyinstaller binaries link against glibc 2.28 and run on RHEL/Rocky 8+
+    # and any recent Fedora. The image bundles rpmbuild, fpm, and the icon
+    # tooling, so no package installs are needed here.
+    container: chianetwork/rocky8-builder:python312
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      # container checkouts leave the workspace owned by a different uid
+      - name: Mark git workspace safe
+        run: git config --global --add safe.directory '*'
+
+      # python 3.12 comes from the builder image; setup-python would install
+      # a runner-targeted build instead
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: "cactus-blockchain-gui/.nvmrc"
-
-      - name: Install rpm tooling
-        # fpm packages the CLI rpm (runner ruby is new enough); libopenjp2-tools
-        # mirrors the deb workflow (app-builder icon conversion fallback).
-        run: |
-          sudo apt-get update && sudo apt-get install -y rpm libopenjp2-tools
-          command -v fpm >/dev/null || sudo gem install fpm --no-document
 
       - name: Install cactus-blockchain
         uses: ./.github/actions/install

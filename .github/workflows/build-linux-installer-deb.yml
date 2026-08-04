@@ -17,6 +17,11 @@ jobs:
   build:
     name: Build DEB (${{ matrix.os.arch }})
     runs-on: ${{ matrix.os.runs-on }}
+    # Build inside Chia's ubuntu-22.04 builder image (like upstream) so the
+    # pyinstaller binaries link against glibc 2.35 and run on Ubuntu 22.04+ /
+    # Debian 12+. Building directly on ubuntu-latest (24.04) produced daemons
+    # requiring GLIBC_2.38 that crash on older distros.
+    container: chianetwork/ubuntu-22.04-builder:python312
     strategy:
       fail-fast: false
       matrix:
@@ -35,20 +40,25 @@ jobs:
           fetch-depth: 0 # dynamic version needs tags
           submodules: recursive
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      # container checkouts leave the workspace owned by a different uid
+      - name: Mark git workspace safe
+        run: git config --global --add safe.directory '*'
+
+      # python 3.12 comes from the builder image; setup-python would install
+      # a runner-targeted build instead
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: "cactus-blockchain-gui/.nvmrc"
 
       # app-builder has no bundled icon-conversion helper or fpm on arm64 and
-      # falls back to the system opj_decompress / fpm
+      # falls back to the system opj_decompress / fpm; the container runs as
+      # root, plain runners need sudo
       - name: Install icon and packaging tooling
         run: |
-          sudo apt-get update && sudo apt-get install -y libopenjp2-tools
-          command -v fpm >/dev/null || sudo gem install fpm --no-document
+          if command -v sudo >/dev/null; then SUDO=sudo; else SUDO=""; fi
+          $SUDO apt-get update && $SUDO apt-get install -y libopenjp2-tools
+          command -v fpm >/dev/null || $SUDO gem install fpm --no-document
 
       - name: Install cactus-blockchain
         uses: ./.github/actions/install
