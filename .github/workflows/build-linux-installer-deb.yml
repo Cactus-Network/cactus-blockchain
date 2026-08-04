@@ -128,6 +128,8 @@ jobs:
         run: |
           if [ -z "$GPG_PRIVATE_KEY" ]; then echo "No GPG key configured; skipping"; exit 0; fi
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          # tolerate stray whitespace/newlines picked up while pasting the secret
+          GPG_PASSPHRASE=$(printf '%s' "$GPG_PASSPHRASE" | tr -d '[:space:]')
           command -v sha256sum >/dev/null || sha256sum() { shasum -a 256 "$@"; }
           cd build_scripts/final_installer
           for f in *; do
