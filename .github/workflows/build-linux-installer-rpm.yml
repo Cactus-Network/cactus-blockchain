@@ -55,8 +55,40 @@ jobs:
           if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
             echo "CACTUS_INSTALLER_VERSION=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
           else
-            echo "CACTUS_INSTALLER_VERSION=0.0.0" >> "$GITHUB_ENV"
+            # Match the version the bundled daemon reports so the GUI does not
+            # show its mismatched-versions warning on untagged builds
+            # (PEP440 2.5.1.dev1 -> semver 2.5.1-dev1; both compare equal in the GUI).
+            PKG_VERSION=$(venv/bin/python -c "import importlib.metadata as m; print(m.version('cactus-blockchain'))")
+            echo "CACTUS_INSTALLER_VERSION=$(echo "$PKG_VERSION" | sed 's/\.dev/-dev/')" >> "$GITHUB_ENV"
           fi
+
+      - name: Get madmax plotter
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Cactus-Network's plotter forks are gone; madmax/bladebit are
+          # network-agnostic, so bundle Chia's builds under the names the
+          # cactus.plotters code expects.
+          LATEST_MADMAX=$(gh api repos/Chia-Network/chia-plotter-madmax/releases/latest --jq 'select(.prerelease == false) | .tag_name')
+          mkdir -p "$GITHUB_WORKSPACE/madmax"
+          gh release download -R Chia-Network/chia-plotter-madmax "$LATEST_MADMAX" -p 'chia_plot-*-x86-64' -O "$GITHUB_WORKSPACE/madmax/cactus_plot"
+          gh release download -R Chia-Network/chia-plotter-madmax "$LATEST_MADMAX" -p 'chia_plot_k34-*-x86-64' -O "$GITHUB_WORKSPACE/madmax/cactus_plot_k34"
+          chmod +x "$GITHUB_WORKSPACE"/madmax/cactus_plot "$GITHUB_WORKSPACE"/madmax/cactus_plot_k34
+
+      - name: Get bladebit plotter
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LATEST_BLADEBIT=$(gh api repos/Chia-Network/bladebit/releases/latest --jq 'select(.prerelease == false) | .tag_name')
+          ASSETS=$(gh release view "$LATEST_BLADEBIT" --repo Chia-Network/bladebit --json assets -q '.assets[].name')
+          if ! echo "$ASSETS" | grep -q 'bladebit.*-centos-x86-64.tar.gz'; then
+            LATEST_BLADEBIT=v2.0.1
+          fi
+          mkdir -p "$GITHUB_WORKSPACE/bladebit"
+          cd "$GITHUB_WORKSPACE/bladebit"
+          gh release download -R Chia-Network/bladebit "$LATEST_BLADEBIT" -p 'bladebit*-centos-x86-64.tar.gz'
+          find . -maxdepth 1 -name '*.tar.gz' -print0 | xargs -0 -I{} bash -c 'tar -xzf {} && rm {}'
+          find . -maxdepth 1 -name 'bladebit*' -print0 | xargs -0 -I{} chmod +x {}
 
       - name: Build GUI
         run: |

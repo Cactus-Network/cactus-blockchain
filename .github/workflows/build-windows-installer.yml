@@ -45,8 +45,36 @@ jobs:
           if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
             echo "CACTUS_INSTALLER_VERSION=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
           else
-            echo "CACTUS_INSTALLER_VERSION=0.0.0" >> "$GITHUB_ENV"
+            # Match the version the bundled daemon reports so the GUI does not
+            # show its mismatched-versions warning on untagged builds
+            # (PEP440 2.5.1.dev1 -> semver 2.5.1-dev1; both compare equal in the GUI).
+            PKG_VERSION=$(venv/Scripts/python -c "import importlib.metadata as m; print(m.version('cactus-blockchain'))")
+            echo "CACTUS_INSTALLER_VERSION=$(echo "$PKG_VERSION" | sed 's/\.dev/-dev/')" >> "$GITHUB_ENV"
           fi
+
+      - name: Get madmax plotter
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Cactus-Network's plotter forks are gone; madmax/bladebit are
+          # network-agnostic, so bundle Chia's builds under the names the
+          # cactus.plotters code expects.
+          LATEST_MADMAX=$(gh api repos/Chia-Network/chia-plotter-madmax/releases/latest --jq 'select(.prerelease == false) | .tag_name')
+          mkdir -p "$GITHUB_WORKSPACE/madmax"
+          gh release download -R Chia-Network/chia-plotter-madmax "$LATEST_MADMAX" -p 'chia_plot-*.exe' -O "$GITHUB_WORKSPACE/madmax/cactus_plot.exe"
+          gh release download -R Chia-Network/chia-plotter-madmax "$LATEST_MADMAX" -p 'chia_plot_k34-*.exe' -O "$GITHUB_WORKSPACE/madmax/cactus_plot_k34.exe"
+
+      - name: Get bladebit plotter
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LATEST_BLADEBIT=$(gh api repos/Chia-Network/bladebit/releases/latest --jq 'select(.prerelease == false) | .tag_name')
+          mkdir -p "$GITHUB_WORKSPACE/bladebit"
+          cd "$GITHUB_WORKSPACE/bladebit"
+          gh release download -R Chia-Network/bladebit "$LATEST_BLADEBIT" -p 'bladebit*windows-x86-64.zip'
+          find . -maxdepth 1 -name '*.zip' -print0 | xargs -0 -I{} bash -c 'unzip -o {} && rm {}'
 
       - name: Build GUI
         # HAS_SIGNING_SECRET is unset -> signing steps are skipped

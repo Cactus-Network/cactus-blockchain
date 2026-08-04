@@ -25,6 +25,12 @@ Write-Output "Use pyinstaller to create cactus .exe's"
 Write-Output "   ---"
 $SPEC_FILE = (py -c 'import sys; from pathlib import Path; path = Path(sys.argv[1]); print(path.absolute().as_posix())' "pyinstaller.spec")
 pyinstaller --log-level INFO $SPEC_FILE
+If ($LastExitCode -gt 0){
+    Throw "pyinstaller failed!"
+}
+If (-not (Test-Path "dist\daemon\cactus.exe")) {
+    Throw "pyinstaller did not produce dist\daemon\cactus.exe!"
+}
 
 Write-Output "   ---"
 Write-Output "Creating a directory of licenses from pip and npm packages"
@@ -55,6 +61,9 @@ Set-Location -Path "cactus-blockchain-gui\packages\gui" -PassThru
 
 Write-Output "   ---"
 Write-Output "Increase the stack for cactus command for (cactus plots create) chiapos limitations"
+If (-not (Test-Path "daemon\cactus.exe")) {
+    Throw "daemon\cactus.exe missing from GUI package directory!"
+}
 # editbin.exe needs to be in the path
 editbin.exe /STACK:8000000 daemon\cactus.exe
 Write-Output "   ---"

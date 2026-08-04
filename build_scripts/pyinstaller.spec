@@ -96,23 +96,16 @@ if THIS_IS_WINDOWS:
             "C:\\Windows\\System32\\vcruntime140_1.dll",
             ".",
         ),
-        (
-            f"{ROOT}\\madmax\\cactus_plot.exe",
-            "madmax"
-        ),
-        (
-            f"{ROOT}\\madmax\\cactus_plot_k34.exe",
-            "madmax"
-        ),
-        (
-            f"{ROOT}\\bladebit\\bladebit.exe",
-            "bladebit"
-        ),
-        (
-            f"{ROOT}\\bladebit\\bladebit_cuda.exe",
-            "bladebit"
-        ),
     ]
+
+    for plotter_exe, plotter_dir in [
+        (f"{ROOT}\\madmax\\cactus_plot.exe", "madmax"),
+        (f"{ROOT}\\madmax\\cactus_plot_k34.exe", "madmax"),
+        (f"{ROOT}\\bladebit\\bladebit.exe", "bladebit"),
+        (f"{ROOT}\\bladebit\\bladebit_cuda.exe", "bladebit"),
+    ]:
+        if os.path.exists(plotter_exe):
+            binaries.append((plotter_exe, plotter_dir))
 
 
 datas = []
