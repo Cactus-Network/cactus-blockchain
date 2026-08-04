@@ -67,19 +67,40 @@ if [ "${NOTARIZE:-}" == true ]; then
   export CSC_LINK=$APPLE_DEV_ID_APP
   export CSC_KEY_PASSWORD=$APPLE_DEV_ID_APP_PASS
   export CSC_FOR_PULL_REQUEST=true
+  echo "${NPM_PATH}/electron-builder" build --mac "${OPT_ARCH}" \
+    --config.productName="Cactus" \
+    --config ../../../build_scripts/electron-builder.json \
+    --publish never
+  "${NPM_PATH}/electron-builder" build --mac "${OPT_ARCH}" \
+    --config.productName="Cactus" \
+    --config ../../../build_scripts/electron-builder.json \
+    --publish never
+  LAST_EXIT_CODE=$?
 else
   echo "Not on ci or no secrets so not signing"
   export CSC_IDENTITY_AUTO_DISCOVERY=false
+  # Unsigned builds must still be ad-hoc signed UNIFORMLY: electron-builder
+  # leaves Electron Framework with its upstream Team ID signature while the
+  # renamed main binary gets a team-less ad-hoc one, and arm64 dyld kills the
+  # app at launch ("mapping process and mapped file have different Team IDs").
+  # Build the package dir, deep ad-hoc re-sign the whole bundle, then wrap it
+  # in the dmg.
+  "${NPM_PATH}/electron-builder" build --mac "${OPT_ARCH}" --dir \
+    --config.productName="Cactus" \
+    --config ../../../build_scripts/electron-builder.json \
+    --publish never
+  APP_PATH=$(ls -d dist/mac*/Cactus.app | head -1)
+  echo "Ad-hoc signing $APP_PATH"
+  rm -f "$APP_PATH/Contents/embedded.provisionprofile"
+  codesign --force --deep --sign - "$APP_PATH"
+  codesign --verify --deep --verbose=2 "$APP_PATH"
+  "${NPM_PATH}/electron-builder" build --mac dmg "${OPT_ARCH}" \
+    --pd "$(dirname "$APP_PATH")" \
+    --config.productName="Cactus" \
+    --config ../../../build_scripts/electron-builder.json \
+    --publish never
+  LAST_EXIT_CODE=$?
 fi
-echo "${NPM_PATH}/electron-builder" build --mac "${OPT_ARCH}" \
-  --config.productName="Cactus" \
-  --config ../../../build_scripts/electron-builder.json \
-  --publish never
-"${NPM_PATH}/electron-builder" build --mac "${OPT_ARCH}" \
-  --config.productName="Cactus" \
-  --config ../../../build_scripts/electron-builder.json \
-  --publish never
-LAST_EXIT_CODE=$?
 ls -l dist/mac*/Cactus.app/Contents/Resources/app.asar
 
 # reset the package.json to the original
