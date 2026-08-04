@@ -99,6 +99,23 @@ jobs:
           cd build_scripts
           bash build_linux_rpm-2-installer.sh amd64
 
+      - name: Sign artifacts
+        shell: bash
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          if [ -z "$GPG_PRIVATE_KEY" ]; then echo "No GPG key configured; skipping"; exit 0; fi
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          command -v sha256sum >/dev/null || sha256sum() { shasum -a 256 "$@"; }
+          cd build_scripts/final_installer
+          for f in *; do
+            case "$f" in *.sha256|*.asc) continue;; esac
+            sha256sum "$f" > "$f.sha256"
+            gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --armor --detach-sign "$f"
+          done
+          ls -la
+
       - uses: actions/upload-artifact@v4
         with:
           name: cactus-installers-rpm-x86_64
