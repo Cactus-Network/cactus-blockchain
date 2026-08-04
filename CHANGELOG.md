@@ -6,9 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does not yet adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 for setuptools_scm/PEP 440 reasons.
 
-## 2.7.3 Cactus blockchain 2026-07-16
+## 2.7.3 Cactus blockchain 2026-08-05
 
-## What's Changed
+Cactus rebased onto the Chia 2.7.3 codebase — the largest update since 2.5.0,
+and the foundation for the upcoming Chia 3.0 / proof-of-space v2 support.
+
+### Cactus-specific highlights
+
+- Full port to the Chia 2.7.3 base (consensus, wallet, data layer, services);
+  Cactus consensus identity (genesis, rewards schedule, 210M CAC supply)
+  unchanged
+- Native support for upstream chia_rs — the separate cactus_rs fork is retired
+- Hard fork 2 is NOT activated in this release: existing plots keep working
+  and no replot is required
+- macOS installers are now signed and notarized (no Gatekeeper warnings);
+  all release artifacts ship with SHA-256 checksums and GPG signatures
+  (public-key.asc attached to the release)
+- Linux installers are built for wider compatibility (Ubuntu 22.04+ /
+  Debian 12+, RHEL/Rocky 8+)
+- The GUI update check now works (served from download.cactus-network.net)
+- Removed the Stably USD (USDS) token inherited from upstream from the
+  default token list
+- DAO wallet removed (removed upstream in Chia 2.6)
+
+## What's Changed (from the Chia 2.7.3 base)
 
 ### Changed
 
