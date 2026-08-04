@@ -105,8 +105,16 @@ jobs:
           bash build_macos-1-gui.sh
 
       - name: Build installer
+        # NOTARIZE flips on automatically once the Apple signing secrets exist;
+        # without them the build falls back to the ad-hoc-signed path.
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
+          NOTARIZE: ${{ secrets.APPLE_DEV_ID_APP != '' }}
+          APPLE_DEV_ID_APP: ${{ secrets.APPLE_DEV_ID_APP }}
+          APPLE_DEV_ID_APP_PASS: ${{ secrets.APPLE_DEV_ID_APP_PASS }}
+          APPLE_NOTARIZE_USERNAME: ${{ secrets.APPLE_NOTARIZE_USERNAME }}
+          APPLE_NOTARIZE_PASSWORD: ${{ secrets.APPLE_NOTARIZE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           . ./venv/bin/activate
           cd build_scripts

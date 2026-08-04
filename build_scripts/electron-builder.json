@@ -33,6 +33,7 @@
     "license": "../../LICENSE",
     "include": "installer.nsh"
   },
+  "afterSign": "../../../build_scripts/mac-adhoc-sign.js",
   "mac": {
     "executableName": "Cactus",
     "artifactName": "${productName}-${env.CACTUS_INSTALLER_VERSION}.${ext}",
@@ -41,7 +42,6 @@
     "minimumSystemVersion": "15",
     "icon": "src/assets/img/cactus.icns",
     "entitlements": "entitlements.mac.plist",
-    "provisioningProfile": "cactusblockchain.provisionprofile",
     "darkModeSupport": true,
     "hardenedRuntime": true,
     "gatekeeperAssess": false
