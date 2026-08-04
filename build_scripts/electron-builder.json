@@ -70,9 +70,13 @@
   "linux": {
     "desktop": {
       "entry": {
-        "Name": "Cactus Blockchain"
+        "Name": "Cactus Blockchain",
+        "Comment": "Cactus blockchain full node, farmer, and wallet"
       }
     },
+    "category": "Network",
+    "synopsis": "Cactus Blockchain GUI",
+    "description": "Cactus blockchain full node, farmer, harvester, and wallet with graphical interface.",
     "artifactName": "${productName}-${env.CACTUS_INSTALLER_VERSION}.${ext}",
     "icon": "src/assets/img/cactus.icns"
   },
@@ -80,7 +84,14 @@
     "packageName": "cactus-blockchain",
     "afterInstall": "../../../build_scripts/assets/deb/postinst.sh",
     "afterRemove": "../../../build_scripts/assets/deb/prerm.sh",
-    "fpm": ["--deb-compression", "xz", "--deb-compression-level", "9"],
+    "fpm": [
+      "--deb-compression",
+      "xz",
+      "--deb-compression-level",
+      "9",
+      "--url=https://cactus-network.net",
+      "--category=net"
+    ],
     "depends": [
       "libgbm1",
       "libgtk-3-0",
@@ -109,7 +120,10 @@
       "--rpm-tag=Requires(pre): findutils",
       "--before-install=../../../build_scripts/assets/rpm/before-install.sh",
       "--rpm-compression=xz",
-      "--rpm-compression-level=9"
+      "--rpm-compression-level=9",
+      "--url=https://cactus-network.net",
+      "--license=Apache-2.0",
+      "--vendor=Cactus Network"
     ]
   }
 }
