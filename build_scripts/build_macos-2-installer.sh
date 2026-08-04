@@ -63,10 +63,10 @@ if [ "$(arch)" = "arm64" ]; then
   OPT_ARCH="--arm64"
 fi
 if [ "${NOTARIZE:-}" == true ]; then
-  echo "Setting credentials for signing"
-  export CSC_LINK=$APPLE_DEV_ID_APP
-  export CSC_KEY_PASSWORD=$APPLE_DEV_ID_APP_PASS
-  export CSC_FOR_PULL_REQUEST=true
+  echo "Signing with the Developer ID identity imported into the runner keychain"
+  # identity comes from the keychain populated by Apple-Actions/import-codesign-certs;
+  # electron-builder auto-discovers it (do NOT pass CSC_LINK: its internal
+  # p12 import fails to yield a usable identity and falls back to ad-hoc)
 else
   echo "Not on ci or no secrets so not signing"
   export CSC_IDENTITY_AUTO_DISCOVERY=false

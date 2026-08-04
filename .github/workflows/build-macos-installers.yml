@@ -53,6 +53,29 @@ jobs:
         env:
           PIP_EXTRA_INDEX_URL: https://pypi.chia.net/simple/
 
+      - name: Test for signing secrets
+        id: check_secrets
+        shell: bash
+        run: |
+          if [ -n "$APPLE_SECRET" ]; then echo "HAS_APPLE_SECRET=true" >> "$GITHUB_OUTPUT"; fi
+        env:
+          APPLE_SECRET: ${{ secrets.APPLE_DEV_ID_APP }}
+
+      - name: Delete keychain if it already exists
+        run: security delete-keychain signing_temp.keychain || true
+
+      # Import into a runner keychain and let electron-builder auto-discover
+      # the identity (upstream Chia's signing pattern) — handing the raw
+      # base64 to electron-builder via CSC_LINK made its internal import fail
+      # to yield a usable identity and it silently fell back to ad-hoc
+      # signing, which notarization then rejected.
+      - name: Import Apple app signing certificate
+        if: steps.check_secrets.outputs.HAS_APPLE_SECRET
+        uses: Apple-Actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.APPLE_DEV_ID_APP }}
+          p12-password: ${{ secrets.APPLE_DEV_ID_APP_PASS }}
+
       - name: Set installer version
         run: |
           if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
@@ -107,11 +130,10 @@ jobs:
       - name: Build installer
         # NOTARIZE flips on automatically once the Apple signing secrets exist;
         # without them the build falls back to the ad-hoc-signed path.
+        # CSC_IDENTITY_AUTO_DISCOVERY must stay unset here: in the signed path
+        # electron-builder discovers the imported identity from the keychain.
         env:
-          CSC_IDENTITY_AUTO_DISCOVERY: "false"
           NOTARIZE: ${{ secrets.APPLE_DEV_ID_APP != '' }}
-          APPLE_DEV_ID_APP: ${{ secrets.APPLE_DEV_ID_APP }}
-          APPLE_DEV_ID_APP_PASS: ${{ secrets.APPLE_DEV_ID_APP_PASS }}
           APPLE_NOTARIZE_USERNAME: ${{ secrets.APPLE_NOTARIZE_USERNAME }}
           APPLE_NOTARIZE_PASSWORD: ${{ secrets.APPLE_NOTARIZE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
