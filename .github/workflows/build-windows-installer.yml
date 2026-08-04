@@ -114,6 +114,9 @@ jobs:
             sha256sum "$f" > "$f.sha256"
             gpg --batch --yes "${PASSARGS[@]}" --armor --detach-sign "$f"
           done
+          # ship the public key with the release so signatures are verifiable
+          # (only this workflow adds it, to avoid multi-job upload collisions)
+          gpg --batch --armor --export > public-key.asc
           ls -la
 
       # build_windows-2-installer.ps1 copies the setup exe here, not to
