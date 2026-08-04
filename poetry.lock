@@ -3963,20 +3963,20 @@ wheel = "*"
 
 [[package]]
 name = "pytest-rerunfailures"
-version = "16.2"
+version = "16.4"
 description = "pytest plugin to re-run tests to eliminate flaky failures"
 optional = true
 python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"dev\""
 files = [
-    {file = "pytest_rerunfailures-16.2-py3-none-any.whl", hash = "sha256:c22a53d2827becc76f057d4ded123c0e726523f2f0e5f0bb4efb31fd59e1f14e"},
-    {file = "pytest_rerunfailures-16.2.tar.gz", hash = "sha256:5f5a32f15674a3d54f7598388fcd3cc1bc5c37284731a4704a44485dcdda5e23"},
+    {file = "pytest_rerunfailures-16.4-py3-none-any.whl", hash = "sha256:f69b5beb39622c90d1e44bd945d826eff6db545dcf0b68f52b7e4ad15eaf6d6c"},
+    {file = "pytest_rerunfailures-16.4.tar.gz", hash = "sha256:8222d17c37eb7b9e4d6fc96a3c724ff4e1a5c97a5cc7cbb2c19e9282cfd21a11"},
 ]
 
 [package.dependencies]
 packaging = ">=17.1"
-pytest = ">=8.1,<8.2.2 || >8.2.2"
+pytest = ">=8.2,<8.2.2 || >8.2.2"
 
 [[package]]
 name = "pytest-xdist"
@@ -5243,4 +5243,4 @@ upnp = ["miniupnpc"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10, <4"
-content-hash = "ee2729bf07baf5f0f488187c6a26f19300832539cafb15dec86af14d2b133cb3"
+content-hash = "420c0ff90b6045032e7654ece3eeb008735dd6b7deaf5a63c230f31b56a0cd52"
