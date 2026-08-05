@@ -4,6 +4,13 @@ CACTUS_CAT = {
     "symbol": "SUNY",
 }
 
+FAVCOIN_CAT = {
+    "asset_id": "3c33e7f3fe78576292b3afe0a4aa1a426219077c4bc11e5e9f0ffe326316131c",
+    "name": "FavCoin",
+    "symbol": "FAV",
+}
+
 DEFAULT_CATS = {
     CACTUS_CAT["asset_id"]: CACTUS_CAT,
+    FAVCOIN_CAT["asset_id"]: FAVCOIN_CAT,
 }
