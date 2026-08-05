@@ -3,7 +3,7 @@ name: 📦🚀 Build Installer - macOS DMG
 on:
   push:
     tags: ["**"]
-    branches: ["main", "chia-2.7.3-port"]
+    branches: ["main"]
   workflow_dispatch:
 
 concurrency:

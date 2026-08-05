@@ -111,11 +111,11 @@ Write-Output "   ---"
 If ($env:HAS_SIGNING_SECRET) {
    Write-Output "   ---"
    Write-Output "Sign Final Installer App"
-   signtool.exe sign /sha1 $env:SM_CODE_SIGNING_CERT_SHA1_HASH /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 .\dist\CactusSetup-$packageVersion.exe
+   signtool.exe sign /sha1 $env:SM_CODE_SIGNING_CERT_SHA1_HASH /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 .\dist\CactusSetup-$packageVersion-windows-x64.exe
    Write-Output "   ---"
    Write-Output "Verify signature"
    Write-Output "   ---"
-   signtool.exe verify /v /pa .\dist\CactusSetup-$packageVersion.exe
+   signtool.exe verify /v /pa .\dist\CactusSetup-$packageVersion-windows-x64.exe
 }   Else    {
    Write-Output "Skipping verify signatures - no authorization to install certificates"
 }
@@ -125,7 +125,7 @@ Write-Output "Moving final installers to expected location"
 Write-Output "   ---"
 Copy-Item ".\dist\win-unpacked" -Destination "$env:GITHUB_WORKSPACE\cactus-blockchain-gui\Cactus-win32-x64" -Recurse
 mkdir "$env:GITHUB_WORKSPACE\cactus-blockchain-gui\release-builds\windows-installer" -ea 0
-Copy-Item ".\dist\CactusSetup-$packageVersion.exe" -Destination "$env:GITHUB_WORKSPACE\cactus-blockchain-gui\release-builds\windows-installer"
+Copy-Item ".\dist\CactusSetup-$packageVersion-windows-x64.exe" -Destination "$env:GITHUB_WORKSPACE\cactus-blockchain-gui\release-builds\windows-installer"
 
 Write-Output "   ---"
 Write-Output "Windows Installer complete"

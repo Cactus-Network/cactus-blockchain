@@ -99,9 +99,9 @@ cd ../../../build_scripts || exit 1
 mkdir final_installer
 ORIGINAL_DMG_NAME="Cactus-${CACTUS_INSTALLER_VERSION}.dmg"
 if [ "$(arch)" = "arm64" ]; then
-  DMG_NAME=Cactus-${CACTUS_INSTALLER_VERSION}-arm64.dmg
+  DMG_NAME=Cactus-${CACTUS_INSTALLER_VERSION}-macos-apple-silicon.dmg
 else
-  DMG_NAME=Cactus-${CACTUS_INSTALLER_VERSION}.dmg
+  DMG_NAME=Cactus-${CACTUS_INSTALLER_VERSION}-macos-intel.dmg
 fi
 mv dist/"$ORIGINAL_DMG_NAME" final_installer/"$DMG_NAME"
 

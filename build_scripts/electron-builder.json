@@ -24,7 +24,7 @@
     }
   },
   "nsis": {
-    "artifactName": "CactusSetup-${env.CACTUS_INSTALLER_VERSION}.exe",
+    "artifactName": "CactusSetup-${env.CACTUS_INSTALLER_VERSION}-windows-x64.exe",
     "oneClick": false,
     "deleteAppDataOnUninstall": true,
     "allowToChangeInstallationDirectory": true,

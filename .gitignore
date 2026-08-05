@@ -316,3 +316,4 @@ tags
 # Ignore the binaries that are pulled for the installer
 /bladebit/
 /madmax/
+build_scripts/final_installer/
