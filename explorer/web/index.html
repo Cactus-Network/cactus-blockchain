@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cactus Explorer</title>
+<meta name="description" content="Block explorer for the Cactus blockchain — blocks, addresses, netspace and charts.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌵</text></svg>">
+<link rel="stylesheet" href="vendor/uPlot.min.css">
+<link rel="stylesheet" href="css/style.css?v=3">
+<script>
+// Apply the persisted theme before first paint to avoid a flash.
+(function () {
+  var t = localStorage.getItem("theme");
+  if (t === "dark" || t === "light") document.documentElement.dataset.theme = t;
+})();
+</script>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="#/">🌵 <span>Cactus Explorer</span></a>
+    <nav class="site-nav">
+      <a href="#/" data-nav="dashboard">Dashboard</a>
+      <a href="#/blocks" data-nav="blocks">Blocks</a>
+      <a href="#/charts" data-nav="charts">Charts</a>
+      <a href="#/peers" data-nav="peers">Nodes / Peers</a>
+    </nav>
+    <form id="search-form" role="search">
+      <input id="search-input" type="search" placeholder="height / block hash / cac1… address / coin id"
+             autocomplete="off" spellcheck="false" aria-label="Search the blockchain">
+    </form>
+    <button id="theme-toggle" type="button" title="Toggle light/dark theme" aria-label="Toggle theme">◐</button>
+  </div>
+  <div id="search-error" class="search-error" hidden></div>
+</header>
+
+<div id="sync-banner" class="sync-banner" hidden></div>
+
+<main id="main" class="main"></main>
+
+<footer class="site-footer">
+  <span>Cactus Explorer — data from a self-hosted Cactus full node.</span>
+  <a href="https://www.cactus-network.net/" target="_blank" rel="noopener">cactus-network.net</a>
+</footer>
+
+<script src="vendor/uPlot.iife.min.js"></script>
+<script type="module" src="js/app.js?v=3"></script>
+</body>
+</html>

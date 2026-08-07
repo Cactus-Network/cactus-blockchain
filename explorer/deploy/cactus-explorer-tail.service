@@ -1,0 +1,14 @@
+[Unit]
+Description=Cactus explorer tail indexer (follows the node's peak into Postgres)
+After=network-online.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+User=sgroiwes
+WorkingDirectory=/home/sgroiwes/cactus-blockchain/explorer
+ExecStart=/home/sgroiwes/cactus-blockchain/venv/bin/python -m indexer.tail
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,292 @@
+/* Cactus Explorer — theme tokens follow the validated reference palette
+   (dataviz skill references/palette.md).  Dark mode is *selected*: its own
+   steps, not an inversion.  The toggle stamps data-theme on <html> and must
+   win over the OS preference in both directions. */
+
+:root {
+  color-scheme: light;
+  --page:           #f9f9f7;
+  --surface:        #fcfcfb;
+  --ink:            #0b0b0b;
+  --ink-2:          #52514e;
+  --muted:          #898781;
+  --grid:           #e1e0d9;
+  --baseline:       #c3c2b7;
+  --border:         rgba(11, 11, 11, 0.10);
+  --accent:         #2a78d6;   /* categorical slot 1, light step */
+  --accent-fill:    rgba(42, 120, 214, 0.10);
+  --good:           #006300;   /* success *text* step, light */
+  --warn-bg:        #fdf3d7;
+  --warn-ink:       #5a4a12;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page:        #0d0d0d;
+    --surface:     #1a1a19;
+    --ink:         #ffffff;
+    --ink-2:       #c3c2b7;
+    --muted:       #898781;
+    --grid:        #2c2c2a;
+    --baseline:    #383835;
+    --border:      rgba(255, 255, 255, 0.10);
+    --accent:      #3987e5;  /* slot 1, dark step */
+    --accent-fill: rgba(57, 135, 229, 0.14);
+    --good:        #0ca30c;
+    --warn-bg:     #3a3213;
+    --warn-ink:    #ecd990;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page:        #0d0d0d;
+  --surface:     #1a1a19;
+  --ink:         #ffffff;
+  --ink-2:       #c3c2b7;
+  --muted:       #898781;
+  --grid:        #2c2c2a;
+  --baseline:    #383835;
+  --border:      rgba(255, 255, 255, 0.10);
+  --accent:      #3987e5;
+  --accent-fill: rgba(57, 135, 229, 0.14);
+  --good:        #0ca30c;
+  --warn-bg:     #3a3213;
+  --warn-ink:    #ecd990;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ------------------------------------------------------------- header */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.brand { font-weight: 650; font-size: 17px; color: var(--ink); white-space: nowrap; }
+.brand:hover { text-decoration: none; }
+
+.site-nav { display: flex; gap: 14px; }
+.site-nav a { color: var(--ink-2); padding: 4px 2px; }
+.site-nav a.active { color: var(--ink); font-weight: 600; border-bottom: 2px solid var(--accent); }
+.site-nav a:hover { text-decoration: none; color: var(--ink); }
+h1 .home-link { color: inherit; text-decoration: none; }
+h1 .home-link:hover { text-decoration: underline; }
+
+#search-form { flex: 1 1 260px; min-width: 200px; }
+
+#search-input {
+  width: 100%;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--page);
+  color: var(--ink);
+  font-size: 14px;
+}
+#search-input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+#theme-toggle {
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--ink-2);
+  border-radius: 8px;
+  font-size: 16px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.search-error {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 6px 16px;
+  color: #d03b3b;
+  font-size: 13px;
+}
+
+.sync-banner {
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+  text-align: center;
+  padding: 6px 16px;
+  font-size: 13.5px;
+}
+
+/* ------------------------------------------------------------- layout */
+
+.main { max-width: 1100px; margin: 0 auto; padding: 20px 16px 48px; }
+
+.site-footer {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+h1 { font-size: 22px; margin: 0 0 16px; }
+h2 { font-size: 17px; margin: 28px 0 10px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+/* ------------------------------------------------------------- stat tiles */
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.tile .label { color: var(--ink-2); font-size: 13px; }
+/* Stat-tile values keep proportional figures (tabular is for columns only). */
+.tile .value { font-size: 22px; font-weight: 600; margin-top: 2px; }
+.tile .sub { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.tile .spark { margin-top: 6px; }
+
+/* ------------------------------------------------------------- tables */
+
+.tbl-wrap { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th {
+  text-align: left;
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 12.5px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--grid);
+  white-space: nowrap;
+}
+td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--grid);
+  white-space: nowrap;
+}
+tr:last-child td { border-bottom: none; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.hash { font-family: var(--mono); font-size: 13px; }
+.muted { color: var(--muted); }
+.badge {
+  display: inline-block;
+  font-size: 11.5px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--ink-2);
+}
+.badge.reward { color: var(--good); border-color: currentColor; }
+
+button.copy {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 0 3px;
+}
+button.copy:hover { color: var(--ink); }
+
+/* definition-list detail cards */
+.kv { display: grid; grid-template-columns: 220px 1fr; gap: 0; font-size: 14px; }
+.kv > dt { color: var(--ink-2); padding: 7px 10px 7px 0; border-bottom: 1px solid var(--grid); }
+.kv > dd { margin: 0; padding: 7px 0; border-bottom: 1px solid var(--grid); overflow-wrap: anywhere; }
+.kv > dt:last-of-type, .kv > dd:last-of-type { border-bottom: none; }
+
+.pager { display: flex; gap: 10px; margin: 14px 0; }
+.pager button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.pager button:disabled { opacity: 0.45; cursor: default; }
+
+.error-box { color: #d03b3b; padding: 24px 0; }
+.loading { color: var(--muted); padding: 24px 0; }
+
+/* ------------------------------------------------------------- charts */
+
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px 8px; margin-bottom: 16px; }
+.chart-card h3 { margin: 0 0 2px; font-size: 15px; }
+.chart-card .chart-sub { color: var(--muted); font-size: 12.5px; margin-bottom: 8px; }
+.chart-slot { width: 100%; }
+
+.range-picker { display: flex; gap: 8px; margin-bottom: 14px; }
+.range-picker button {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-2);
+  border-radius: 8px;
+  padding: 4px 12px;
+  cursor: pointer;
+  font-size: 13.5px;
+}
+.range-picker button.active { color: var(--ink); font-weight: 600; border-color: var(--accent); }
+
+/* uPlot chrome: recessive grid/axis ink, tabular tick figures */
+.u-legend { display: none; }           /* single-series charts: title names the series */
+.uplot .u-axis { font-variant-numeric: tabular-nums; }
+
+.chart-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  padding: 6px 10px;
+  font-size: 13px;
+  z-index: 20;
+  white-space: nowrap;
+}
+.chart-tooltip .tt-value { font-weight: 650; font-size: 14px; }
+.chart-tooltip .tt-label { color: var(--ink-2); font-size: 12px; }
+
+/* ------------------------------------------------------------- mobile */
+
+@media (max-width: 720px) {
+  .kv { grid-template-columns: 1fr; }
+  .kv > dt { border-bottom: none; padding-bottom: 0; font-size: 12.5px; }
+  .hide-narrow { display: none; }
+  .header-inner { gap: 10px; }
+}

@@ -1,0 +1,17 @@
+# Explorer-only dependencies.  Install these *into the cactus venv*, because the
+# indexer imports cactus itself (BlockRecord parsing, bech32m, reward schedule).
+#
+#   ./venv/bin/pip install -r explorer/requirements.txt
+#
+# zstd, aiohttp and aiosqlite are already cactus dependencies and are not repeated here.
+#
+# The pins matter.  cactus 2.5.0 pins typing-extensions==4.11.0, and current
+# pydantic-core needs typing_extensions.Sentinel (>=4.15), so an unpinned
+# `pip install fastapi` breaks the venv your *node* runs from.  These versions
+# coexist with cactus's pin — `pip check` is clean afterwards.  fastapi 0.110.3
+# rather than 0.111 because 0.111 pulls fastapi-cli -> rich-toolkit, which wants
+# typing-extensions>=4.12.2 and reintroduces the conflict.
+asyncpg==0.29.0
+fastapi==0.110.3
+pydantic==2.7.4
+uvicorn[standard]==0.30.1

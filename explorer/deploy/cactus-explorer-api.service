@@ -1,0 +1,17 @@
+[Unit]
+Description=Cactus explorer API + frontend (uvicorn on 127.0.0.1:8000)
+After=network-online.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+User=sgroiwes
+WorkingDirectory=/home/sgroiwes/cactus-blockchain/explorer
+# CORS only matters if another site fetches the JSON directly; the explorer's
+# own pages are same-origin.  Restrict rather than the default "*".
+Environment=EXPLORER_CORS_ORIGINS=https://www.cactus-network.net,https://cactus-network.net
+ExecStart=/home/sgroiwes/cactus-blockchain/venv/bin/uvicorn api.main:app --host 127.0.0.1 --port 8000 --workers 2 --proxy-headers
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

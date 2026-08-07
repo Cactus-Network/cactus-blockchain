@@ -1,0 +1,35 @@
+#!/bin/bash
+# Restrict ufw 80/443 to Cloudflare's published IP ranges.
+# Installed at /usr/local/sbin/update-cloudflare-ufw and run weekly from
+# /etc/cron.weekly. Safe to re-run; refuses to change anything on a bad fetch.
+set -euo pipefail
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+v4=$(curl -sf --max-time 30 https://www.cloudflare.com/ips-v4)
+v6=$(curl -sf --max-time 30 https://www.cloudflare.com/ips-v6)
+
+# Sanity-check the lists so a broken fetch can't wipe the allowlist.
+[ "$(printf '%s\n' "$v4" | grep -cE '^[0-9]+\.[0-9.]+/[0-9]+$')" -ge 5 ] || { echo "implausible ips-v4 list, aborting" >&2; exit 1; }
+[ "$(printf '%s\n' "$v6" | grep -cE '^[0-9a-fA-F:]+/[0-9]+$')" -ge 3 ] || { echo "implausible ips-v6 list, aborting" >&2; exit 1; }
+
+# Add current ranges first (idempotent: ufw skips rules that already exist).
+for cidr in $v4 $v6; do
+    ufw allow proto tcp from "$cidr" to any port 80,443 comment 'cloudflare' >/dev/null
+done
+
+# Drop the blanket allow-from-anywhere rule, if still present.
+ufw delete allow 80,443/tcp >/dev/null 2>&1 || true
+
+# Prune cloudflare-tagged rules whose CIDR left the published list.
+# Delete highest-numbered first so numbering stays valid.
+ufw status numbered \
+    | grep '# cloudflare' \
+    | sed -E 's/^\[ *([0-9]+)\].*ALLOW IN[[:space:]]+([^[:space:]]+).*/\1 \2/' \
+    | sort -rn \
+    | while read -r num cidr; do
+        if ! printf '%s\n%s\n' "$v4" "$v6" | grep -qx "$cidr"; then
+            ufw --force delete "$num" >/dev/null
+        fi
+    done
+
+echo "cloudflare ufw allowlist updated: $(ufw status | grep -c '# cloudflare') rules"
