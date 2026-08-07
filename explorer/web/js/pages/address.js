@@ -61,6 +61,9 @@ export async function render(main, address) {
         ["Address", copyable(data.address, data.address)],
         ["Puzzle hash", copyable(data.puzzle_hash, data.puzzle_hash)],
         ["Balance", fmtCac(data.balance)],
+        // Token balances up top: visitors arriving from the FavCoin app care
+        // about FAV, and the per-token cards below sit under the fold on phones.
+        ...(data.tokens || []).map((t) => [`${t.name} balance`, fmtTokens(t.balance, ` ${t.symbol}`)]),
         ["Total received", fmtCac(data.total_received)],
         ["Coins (unspent / total)", `${fmtInt(data.unspent_count)} / ${fmtInt(data.coin_count)}`],
         ["Reward coins", fmtInt(data.reward_coin_count)],
