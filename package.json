@@ -3,6 +3,6 @@
     "ajv": "^7.2.4"
   },
   "dependencies": {
-    "scheduler": "^0.25.0"
+    "scheduler": "^0.27.0"
   }
 }
