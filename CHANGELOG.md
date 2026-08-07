@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project does not yet adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 for setuptools_scm/PEP 440 reasons.
 
+## 2.7.4 Cactus blockchain 2026-08-07
+
+### Added
+
+- FavCoin (FAV) is now in the default token list, so CAT balances appear in
+  the wallet without manually adding the asset ID
+
+### Changed
+
+- Installer filenames now say what they are: `CactusSetup-<version>-windows-x64.exe`,
+  `Cactus-<version>-macos-apple-silicon.dmg` / `Cactus-<version>-macos-intel.dmg`
+  (Linux packages keep distro-standard naming)
+
+### Fixed
+
+- Removed the defunct `introducer.cactus-network.net` from the default config;
+  peer discovery uses the DNS seeders. This stops the wallet and node from
+  logging a DNS resolution error (`[Errno 8] nodename nor servname provided`)
+  every retry cycle
+
 ## 2.7.3 Cactus blockchain 2026-08-05
 
 Cactus rebased onto the Chia 2.7.3 codebase — the largest update since 2.5.0,

@@ -773,7 +773,7 @@ class WalletNode:
                 target_outbound_count=self.config["target_peer_count"],
                 peers_file_path=self.root_path
                 / Path(self.config.get("wallet_peers_file_path", "wallet/db/wallet_peers.dat")),
-                introducer_info=self.config["introducer_peer"],
+                introducer_info=self.config.get("introducer_peer"),
                 dns_servers=self.config.get("dns_servers", ["dns-introducer.cactus-network.net"]),
                 peer_connect_interval=self.config["peer_connect_interval"],
                 selected_network=network_name,

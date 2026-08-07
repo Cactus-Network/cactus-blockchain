@@ -45,6 +45,8 @@ def configure(
         if set_node_introducer:
             try:
                 host, port = parse_host_port(set_node_introducer)
+                if config["full_node"].get("introducer_peer") is None:
+                    config["full_node"]["introducer_peer"] = {}
                 config["full_node"]["introducer_peer"]["host"] = host
                 config["full_node"]["introducer_peer"]["port"] = port
                 config["introducer"]["port"] = port
@@ -81,11 +83,13 @@ def configure(
             change_made = True
         if set_fullnode_port:
             config["full_node"]["port"] = int(set_fullnode_port)
-            config["full_node"]["introducer_peer"]["port"] = int(set_fullnode_port)
+            if config["full_node"].get("introducer_peer"):
+                config["full_node"]["introducer_peer"]["port"] = int(set_fullnode_port)
             set_peer_info(config["farmer"], peer_type=NodeType.FULL_NODE, peer_port=int(set_fullnode_port))
             set_peer_info(config["timelord"], peer_type=NodeType.FULL_NODE, peer_port=int(set_fullnode_port))
             set_peer_info(config["wallet"], peer_type=NodeType.FULL_NODE, peer_port=int(set_fullnode_port))
-            config["wallet"]["introducer_peer"]["port"] = int(set_fullnode_port)
+            if config["wallet"].get("introducer_peer"):
+                config["wallet"]["introducer_peer"]["port"] = int(set_fullnode_port)
             config["introducer"]["port"] = int(set_fullnode_port)
             print("Default full node port updated")
             change_made = True
@@ -145,10 +149,10 @@ def configure(
                 config["full_node"]["peers_file_path"] = "db/peers-testnet11.dat"
                 config["wallet"]["wallet_peers_file_path"] = "wallet/db/wallet_peers-testnet11.dat"
                 config["full_node"]["port"] = int(testnet_port)
-                if config["full_node"]["introducer_peer"] is None:
+                if config["full_node"].get("introducer_peer") is None:
                     config["full_node"]["introducer_peer"] = {}
                 assert config["full_node"]["introducer_peer"] is not None  # mypy
-                if config["wallet"]["introducer_peer"] is None:
+                if config["wallet"].get("introducer_peer") is None:
                     config["wallet"]["introducer_peer"] = {}
                 assert config["wallet"]["introducer_peer"] is not None  # mypy
                 config["full_node"]["introducer_peer"]["port"] = int(testnet_port)
@@ -184,22 +188,20 @@ def configure(
             elif testnet in {"false", "f"}:
                 print("Setting Mainnet")
                 mainnet_port = "11444"
-                mainnet_introducer = "introducer.cactus-network.net"
                 mainnet_dns_introducer = "dns-introducer.cactus-network.net"
                 bootstrap_peers = ["node.cactus-network.net"]
                 net = "mainnet"
                 config["full_node"]["peers_file_path"] = "db/peers.dat"
                 config["wallet"]["wallet_peers_file_path"] = "wallet/db/wallet_peers.dat"
                 config["full_node"]["port"] = int(mainnet_port)
-                config["full_node"]["introducer_peer"]["port"] = int(mainnet_port)
                 set_peer_info(config["farmer"], peer_type=NodeType.FULL_NODE, peer_port=int(mainnet_port))
                 set_peer_info(config["timelord"], peer_type=NodeType.FULL_NODE, peer_port=int(mainnet_port))
                 set_peer_info(config["wallet"], peer_type=NodeType.FULL_NODE, peer_port=int(mainnet_port))
-                config["wallet"]["introducer_peer"]["port"] = int(mainnet_port)
                 config["introducer"]["port"] = int(mainnet_port)
-                config["full_node"]["introducer_peer"]["host"] = mainnet_introducer
+                # Mainnet has no introducer service; peers come from the DNS seeders.
+                config["full_node"].pop("introducer_peer", None)
+                config["wallet"].pop("introducer_peer", None)
                 config["full_node"]["dns_servers"] = [mainnet_dns_introducer]
-                config["wallet"]["introducer_peer"]["host"] = mainnet_introducer
                 config["wallet"]["dns_servers"] = [mainnet_dns_introducer]
                 config["selected_network"] = net
                 config["harvester"]["selected_network"] = net

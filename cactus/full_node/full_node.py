@@ -599,7 +599,7 @@ class FullNode:
                 server=self.server,
                 target_outbound_count=self.config["target_outbound_peer_count"],
                 peers_file_path=self.root_path / Path(self.config.get("peers_file_path", "db/peers.dat")),
-                introducer_info=self.config["introducer_peer"],
+                introducer_info=self.config.get("introducer_peer"),
                 dns_servers=dns_servers,
                 peer_connect_interval=self.config["peer_connect_interval"],
                 selected_network=self.config["selected_network"],
