@@ -11,7 +11,7 @@
 # coexist with cactus's pin — `pip check` is clean afterwards.  fastapi 0.110.3
 # rather than 0.111 because 0.111 pulls fastapi-cli -> rich-toolkit, which wants
 # typing-extensions>=4.12.2 and reintroduces the conflict.
-asyncpg==0.29.0
+asyncpg==0.31.0
 fastapi==0.110.3
 pydantic==2.7.4
 uvicorn[standard]==0.30.1
