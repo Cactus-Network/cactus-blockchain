@@ -47,7 +47,7 @@ jobs:
       # python 3.12 comes from the builder image; setup-python would install
       # a runner-targeted build instead
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version-file: "cactus-blockchain-gui/.nvmrc"
 
