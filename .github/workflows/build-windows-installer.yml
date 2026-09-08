@@ -121,7 +121,7 @@ jobs:
 
       # build_windows-2-installer.ps1 copies the setup exe here, not to
       # build_scripts/final_installer like the other platforms
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: cactus-installers-windows-x64
           path: cactus-blockchain-gui/release-builds/windows-installer/
