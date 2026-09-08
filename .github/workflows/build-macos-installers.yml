@@ -32,7 +32,7 @@ jobs:
             madmax-suffix: macos-m1
             bladebit-suffix: macos-arm64.tar.gz
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: recursive
